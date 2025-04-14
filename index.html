@@ -6,13 +6,15 @@
     <link rel="stylesheet" href="style.css">
     <title>El Pollo loco</title>
 </head>
-<body>
+<body onload="init()">
+
     <h1>El Pollo loco</h1>
 
-    <canvas width="720px" height="480px">
+    <canvas id="canvas" width="720px" height="480px">
 
     </canvas>
 
+    <script src="classes/moveable-objects.class.js"></script>
     <script src="javascript/game.js"></script>
 </body>
 </html>
