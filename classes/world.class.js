@@ -49,6 +49,11 @@ class World {
     }
 
     addToMap(mo) {
-        this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
+        console.log("value of mo: ", mo.img);
+        if (mo.img instanceof HTMLImageElement || mo.img instanceof HTMLCanvasElement || mo.img instanceof ImageBitmap) {
+            this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
+        } else {
+            console.error("Invalid image source provided:", mo.img); // Log an error for debugging.
+        }
     }
 }
