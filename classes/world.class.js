@@ -22,6 +22,7 @@ class World {
     constructor(canvas) {
         this.ctx = canvas.getContext('2d');
         this.canvas = canvas;
+        this.keyboard = keyboard;
         this.draw();
     }
 
@@ -49,7 +50,6 @@ class World {
     }
 
     addToMap(mo) {
-        console.log("value of mo: ", mo.img);
         if (mo.img instanceof HTMLImageElement || mo.img instanceof HTMLCanvasElement || mo.img instanceof ImageBitmap) {
             this.ctx.drawImage(mo.img, mo.x, mo.y, mo.width, mo.height);
         } else {
