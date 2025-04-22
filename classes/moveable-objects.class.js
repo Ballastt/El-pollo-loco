@@ -1,4 +1,4 @@
-class MovableObject {
+class MovableObject extends DrawableObject{
     x = 120;
     y = 250;
     img;
@@ -7,6 +7,7 @@ class MovableObject {
     imageCache = {};
     currentImage = 0;
     speed = 0.55;
+    otherDirection = false; //standardmäßg mal falsch
 
     //loadImage()
     loadImage(path) {
@@ -23,7 +24,11 @@ class MovableObject {
         arr.forEach((path) => {
             let img = new Image(); //1. neues Image-Objekt wird erzeugt
             img.src = path;     // 1. Bildpfad wird gesetzt => Browser lädt das Bild
-            this.imageCache[path] = img; //3. Bild wird in Cache gespeichert
+
+              // Warten, bis das Bild vollständig geladen ist
+              img.onload = () => {
+                this.imageCache[path] = img; // Bild wird in Cache gespeichert, wenn es geladen ist
+            };
         });
       
     }
