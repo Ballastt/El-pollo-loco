@@ -1,4 +1,4 @@
-class MovableObject extends DrawableObject{
+class MoveableObject extends DrawableObject{
     x = 120;
     y = 250;
     img;
@@ -32,8 +32,14 @@ class MovableObject extends DrawableObject{
         });
       
     }
-      
-    
+
+    playAnimation(images) {
+        let i = this.currentImage % this.IMAGES_WALKING.length;
+        let path = images[i];
+        this.img = this.imageCache[path];
+        this.currentImage++;
+    }
+
 
     //Schablone (wie ein JSON)
     moveRight(){
