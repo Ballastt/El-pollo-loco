@@ -1,4 +1,4 @@
-class Cloud extends MovableObject{
+class Cloud extends MoveableObject{
 
 
     constructor() {
