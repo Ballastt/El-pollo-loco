@@ -5,7 +5,6 @@ class World {
     ctx;
     keyboard;
     camera_x = 0; //Kameradrehung
-    wordlWith = 4000;
 
     constructor(canvas) {
         this.ctx = canvas.getContext('2d');
