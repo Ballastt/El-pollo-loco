@@ -6,6 +6,7 @@ class World {
     keyboard;
     camera_x = 0; //Kameradrehung
     level_end_x = 6000;
+    collectedCoins = 0;
 
     constructor(canvas) {
         this.ctx = canvas.getContext('2d');
@@ -24,6 +25,8 @@ class World {
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        this.checkCoinCollection();
+        
         //Adjusting camera so we won't go beyond level ending at level_end_x
         if(this.camera_x < this.level_end_x - this.canvas.width) {
             if (this.keyboard.RIGHT) {
@@ -74,5 +77,15 @@ class World {
     flipImageBack(mo) {
         mo.x = mo.x * -1;
         this.ctx.restore(); //aktuelle Einstellungen wiederherstellen
+    }
+
+    checkCoinCollection() {
+        this.level.coins.forEach((coin, index) => {
+            if (this.character.isColliding(coin)){
+                this.level.coins.splice(index, 1); //removing coin from array
+                this.collectedCoins++;
+                console.log(`Coins collected: ${this.collectedCoins}`)
+            }
+        });
     }
 }
