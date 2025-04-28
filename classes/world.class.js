@@ -5,6 +5,7 @@ class World {
     ctx;
     keyboard;
     camera_x = 0; //Kameradrehung
+    level_end_x = 6000;
 
     constructor(canvas) {
         this.ctx = canvas.getContext('2d');
@@ -12,6 +13,7 @@ class World {
         this.keyboard = keyboard;
         this.draw();
         this.setWorld();
+     
     }
 
     setWorld() {
@@ -22,22 +24,28 @@ class World {
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.ctx.translate(this.camera_x, 0); //Kameradrehung inital
+        //Adjusting camera so we won't go beyond level ending at level_end_x
+        if(this.camera_x < this.level_end_x - this.canvas.width) {
+            if (this.keyboard.RIGHT) {
+                this.camera_x += 1;
+            }
+        }
 
+        this.ctx.translate(this.camera_x, 0); //Kameradrehung inital
         this.addObjectToMap(this.level.backgroundObjects);
         this.addObjectToMap(this.level.clouds);
         this.addToMap(this.character);
         this.addObjectToMap(this.level.enemies);
-
         this.ctx.translate(-this.camera_x, 0); //nach dem malen der Objekte, müssen wir wieder zurücksetzen, damit es sich nicht weiter dreht
         
-
         //Draw() wird immer wieder aufgerufen
         let self = this;
         requestAnimationFrame(function() {
             self.draw();
-        }
-    )};
+        });
+
+        
+    }
 
     addObjectToMap(objects) {
         objects.forEach(o => {
@@ -66,4 +74,8 @@ class World {
         mo.x = mo.x * -1;
         this.ctx.restore(); //aktuelle Einstellungen wiederherstellen
     }
+
+    
+    
+   
 }
