@@ -17,13 +17,9 @@ class Character extends MoveableObject{
         this.y = 180;
         this.width = 120;
         this.height = 250;
-        this.speed = 8;
+        this.speed = 6;
         this.loadImages(this.IMAGES_WALKING);
-
         this.animate();
-        
-
-        
     }
 
     animate() {
