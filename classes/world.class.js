@@ -33,6 +33,7 @@ class World {
 
         this.ctx.translate(this.camera_x, 0); //Kameradrehung inital
         this.addObjectToMap(this.level.backgroundObjects);
+        this.addObjectToMap(this.level.coins);
         this.addObjectToMap(this.level.clouds);
         this.addToMap(this.character);
         this.addObjectToMap(this.level.enemies);
@@ -74,8 +75,4 @@ class World {
         mo.x = mo.x * -1;
         this.ctx.restore(); //aktuelle Einstellungen wiederherstellen
     }
-
-    
-    
-   
 }
