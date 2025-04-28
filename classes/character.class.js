@@ -18,21 +18,37 @@ class Character extends MoveableObject{
         this.width = 120;
         this.height = 250;
         this.speed = 6;
+
+        this.walkingSound = new Audio('audio/character_walk_on_sand.mp3');
+        this.walkingSound.loop = true;
+
         this.loadImages(this.IMAGES_WALKING);
         this.animate();
     }
 
     animate() {
-
         setInterval(() => {
+            let isMoving = false; 
+
             if(this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
                 this.x += this.speed;
                 this.otherDirection = false;
+                isMoving = true;
             }
-
+            
             if(this.world.keyboard.LEFT && this.x > 0) {
                 this.x -= this.speed;
                 this.otherDirection = true;
+                isMoving = true;
+            }
+
+            if (isMoving) {
+                if (this.walkingSound.paused) {
+                    this.walkingSound.play();
+                }
+            } else {
+                this.walkingSound.pause();
+                this.walkingSound.currentTime = 0;
             }
             this.world.camera_x = -this.x + 100;
         }, 1000 / 60)
