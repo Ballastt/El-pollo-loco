@@ -8,6 +8,21 @@ class MoveableObject extends DrawableObject{
     currentImage = 0;
     speed = 0.55;
     otherDirection = false; //standardmäßg mal falsch
+    speedY = 0;
+    acceleration = 2.5;
+
+    applyGravity() {
+        setInterval(() => {
+            if (this.isAboveGround() || this.speedY > 0) {
+                this.y -= this.speedY;
+                this.speedY -= this.acceleration;
+            }
+        }, 1000 / 25);
+    }
+
+    isAboveGround() {
+        return this.y < 170;
+    }
 
     //loadImage()
     loadImage(path) {
@@ -54,6 +69,15 @@ class MoveableObject extends DrawableObject{
 
         console.log("moving left");
     }
+
+    isColliding(mo) {
+        return this.x + this.width * 0.95 > mo.x && 
+               this.x + this.width * 0.05 < mo.x + mo.width &&
+               this.y + this.height * 0.9 > mo.y &&
+               this.y + this.height * 0.1 < mo.y + mo.height;
+    }
+    
+    
         
         
     
