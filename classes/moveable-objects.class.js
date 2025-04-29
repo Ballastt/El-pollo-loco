@@ -17,7 +17,7 @@ class MoveableObject extends DrawableObject{
                 this.y -= this.speedY;
                 this.speedY -= this.acceleration;
             }
-        }, 1000 / 25);
+        }, 1000 / 20);
     }
 
     isAboveGround() {
@@ -58,17 +58,15 @@ class MoveableObject extends DrawableObject{
 
     //Schablone (wie ein JSON)
     moveRight(){
-        console.log("Moving right");
+        this.x += this.speed;
+        this.otherDirection = false;
     }
 
-    
     moveLeft() {
-        setInterval( () => {
-            this.x -= this.speed; //kann natürlich verändert werden;
-        }, 1000 / 60);
-
-        console.log("moving left");
+        this.x -= this.speed;
+        this.otherDirection = true;
     }
+              
 
     isColliding(mo) {
         return this.x + this.width * 0.95 > mo.x && 
@@ -77,8 +75,7 @@ class MoveableObject extends DrawableObject{
                this.y + this.height * 0.1 < mo.y + mo.height;
     }
     
-    
-        
-        
-    
+    jump() {
+        this.speedY = 25;
+    }
 }
