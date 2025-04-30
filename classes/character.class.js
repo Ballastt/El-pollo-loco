@@ -46,18 +46,27 @@ class Character extends MoveableObject{
         'img/2_character_pepe/1_idle/long_idle/I-20.png'
     ];
 
+    IMAGES_HURT = [
+        'img/2_character_pepe/4_hurt/H-41.png',
+        'img/2_character_pepe/4_hurt/H-42.png',
+        'img/2_character_pepe/4_hurt/H-43.png'
+    ];
+
 
     STATES = {
         IDLE: 'idle',
         LONG_IDLE: 'long_idle',
         WALKING: 'walking',
-        JUMPING: 'jumping'
+        JUMPING: 'jumping',
+        HURT: 'hurting'
     }
 
     world;
+    lastHit = 0;
     
-    constructor(){
+    constructor(world){
         super().loadImage('/img/2_character_pepe/2_walk/W-21.png');
+        this.world = world;
 
         this.health = 100; //Anfangs-Health
         this.coins = 0;     //Anfangs-Coins
@@ -79,10 +88,13 @@ class Character extends MoveableObject{
         this.walkingSound = new Audio('audio/character_walk_on_sand.mp3');
         this.walkingSound.loop = true;
 
+        this.hitSound = new Audio('audio/character_getting_hit.mp3');
+
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
         this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_LONG_IDLE);
+        this.loadImages(this.IMAGES_HURT);
         this.applyGravity();
         this.animate();
         this.currentState = this.STATES.IDLE;
@@ -99,7 +111,8 @@ class Character extends MoveableObject{
             this.handleMovement();
             this.handleWalkingSound();
             this.updateCamera();
-            }, 1000 / 60);
+            this.checkCollisionsWithEnemy(this.world.level.enemies);
+        }, 1000 / 60);
     }
         
     startAnimationLoop() {
@@ -168,11 +181,25 @@ class Character extends MoveableObject{
             case this.STATES.IDLE:
                 this.playAnimation(this.IMAGES_IDLE); // stehendes Bild
                 break;
+            case this.STATES.HURT:
+                this.playAnimation(this.IMAGES_HURT);
+                break;
         }
     }
             
     updateCamera() {
         this.world.camera_x = -this.x + 100;
+    }
+
+    //Kollisionserkennung mit dem Feind
+    checkCollisionsWithEnemy(enemies) {
+        enemies.forEach(enemy => {
+            if (this.isColliding(enemy)) {
+                this.currentState = this.STATES.HURT;
+               
+                this.hit();
+            }
+        });
     }
 
     //Gesundheit reduzieren
@@ -183,18 +210,19 @@ class Character extends MoveableObject{
             this.die();
     }
 
+    hit() {
+        let now = Date.now();
+        if (now - this.lastHit > 1000) { //Schutz vor schnellen Treffern
+            this.decreaseHealth(20);  //reduziert Gesundheit
+            console.log(this.health, this.currentState)
+            
+            this.lastHit = now;      //Setzt den Zeitpunkt des letzten Treffers
+
+        }
+    }
+
     //Methode für den Tod des Charakters
     die() {
         console.log("Der Charakter ist tot!");
-    }
-
-    //Kollisionserkennung mit dem Feind
-    checkCollisionsWithEnemy(enemies) {
-        enemies.forEach(enemy => {
-            if (this.isColliding(enemy)) {
-                
-                this.decreaseHealth(20);
-            }
-        });
     }
 }
