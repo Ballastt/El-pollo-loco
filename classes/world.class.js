@@ -1,5 +1,5 @@
 class World {
-    character = new Character();
+    character;
     level = level1;
     canvas;
     ctx;
@@ -7,30 +7,32 @@ class World {
     camera_x = 0; //Kameradrehung
     level_end_x = 6000;
     collectedCoins = 0;
+    statusbar;
+    healthbar;
 
     constructor(canvas) {
         this.ctx = canvas.getContext('2d');
         this.canvas = canvas;
         this.keyboard = keyboard;
+
+        this.character = new Character(this);
+        this.statusbar = new StatusBar(0, 0, 250, 60);
+       
         this.draw();
-        this.setWorld();
         this.checkCollisions();
-        this.healthbar = new StatusBar('img/7_statusbars/1_statusbar/2_statusbar_health/blue/0.png', 20, 20, 150, 40)
-  
     }
 
-    setWorld() {
-        this.character.world = this;
-    }
 
     checkCollisions() {
         setInterval(() => {
             this.level.enemies.forEach((enemy) => {
                 if (this.character.isColliding(enemy)) {
                     console.log('collision with character: ', enemy);
+                    this.character.hit();
+                    this.statusbar.setPercentage(this.character.health);
                 }
             })
-        }, 200);
+        }, 1000);
     }
 
 
@@ -39,7 +41,6 @@ class World {
 
         this.checkCoinCollection();
       
-        
         //Adjusting camera so we won't go beyond level ending at level_end_x
         if(this.camera_x < this.level_end_x - this.canvas.width) {
             if (this.keyboard.RIGHT) {
@@ -48,22 +49,22 @@ class World {
         }
 
         this.ctx.translate(this.camera_x, 0); //Kameradrehung inital
+
+        //alle "beweglichen" Objekte zeichnen
         this.addObjectToMap(this.level.backgroundObjects);
         this.addObjectToMap(this.level.coins);
         this.addObjectToMap(this.level.clouds);
         this.addToMap(this.character);
         this.addObjectToMap(this.level.enemies);
+
+        //Kamera wieder zurücksetzen
         this.ctx.translate(-this.camera_x, 0); //nach dem malen der Objekte, müssen wir wieder zurücksetzen, damit es sich nicht weiter dreht
         
-       
+        //Zeichne UI-elemente die nicht von der Kamera beeinflusst sind
+        this.addToMap(this.statusbar);
 
-        //Draw() wird immer wieder aufgerufen
-        let self = this;
-        requestAnimationFrame(function() {
-            self.draw();
-        });
-
-        
+         // Nächster Frame
+        requestAnimationFrame(() => this.draw());
     }
 
     addObjectToMap(objects) {
