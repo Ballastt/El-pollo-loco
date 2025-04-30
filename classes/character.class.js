@@ -59,13 +59,22 @@ class Character extends MoveableObject{
     constructor(){
         super().loadImage('/img/2_character_pepe/2_walk/W-21.png');
 
+        this.health = 100; //Anfangs-Health
+        this.coins = 0;     //Anfangs-Coins
+        this.bottles = 0;   //Flaschen-Zähler
         this.x = 50;
-        this.y = 80;
+        this.y = 90;
         this.width = 120;
         this.height = 250;
         this.speed = 6;
 
-        
+         // Die Hitbox ist schmaler und zentriert
+        this.hitbox = {
+            offsetX: 10, // von links etwas weiter rein
+            offsetY: 100, // von oben etwas tiefer
+            width: 86,   // schmaler als das Bild
+            height: 146  // kürzer als das Bild
+        };
 
         this.walkingSound = new Audio('audio/character_walk_on_sand.mp3');
         this.walkingSound.loop = true;
@@ -164,6 +173,28 @@ class Character extends MoveableObject{
             
     updateCamera() {
         this.world.camera_x = -this.x + 100;
+    }
 
+    //Gesundheit reduzieren
+    decreaseHealth(amount) {
+        this.health -= amount;
+        if (this.health <= 0) 
+            this.health = 0;
+            this.die();
+    }
+
+    //Methode für den Tod des Charakters
+    die() {
+        console.log("Der Charakter ist tot!");
+    }
+
+    //Kollisionserkennung mit dem Feind
+    checkCollisionsWithEnemy(enemies) {
+        enemies.forEach(enemy => {
+            if (this.isColliding(enemy)) {
+                
+                this.decreaseHealth(20);
+            }
+        });
     }
 }
