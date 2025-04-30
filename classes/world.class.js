@@ -14,11 +14,23 @@ class World {
         this.keyboard = keyboard;
         this.draw();
         this.setWorld();
-     
+        this.checkCollisions();
+        this.healthbar = new StatusBar('img/7_statusbars/1_statusbar/2_statusbar_health/blue/0.png', 20, 20, 150, 40)
+  
     }
 
     setWorld() {
         this.character.world = this;
+    }
+
+    checkCollisions() {
+        setInterval(() => {
+            this.level.enemies.forEach((enemy) => {
+                if (this.character.isColliding(enemy)) {
+                    console.log('collision with character: ', enemy);
+                }
+            })
+        }, 200);
     }
 
 
@@ -26,6 +38,7 @@ class World {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.checkCoinCollection();
+      
         
         //Adjusting camera so we won't go beyond level ending at level_end_x
         if(this.camera_x < this.level_end_x - this.canvas.width) {
@@ -42,6 +55,8 @@ class World {
         this.addObjectToMap(this.level.enemies);
         this.ctx.translate(-this.camera_x, 0); //nach dem malen der Objekte, müssen wir wieder zurücksetzen, damit es sich nicht weiter dreht
         
+       
+
         //Draw() wird immer wieder aufgerufen
         let self = this;
         requestAnimationFrame(function() {
