@@ -11,6 +11,14 @@ class Coin extends MoveableObject{
         this.width = 100; //coin width
         this.height = 100; //coin height
         this.speed = 0; //coins don't move
+
+        this.hitbox = {
+            offsetX: 30,
+            offsetY: 30,
+            width: 40,
+            height: 40
+        };
+
         this.loadImages(this.IMAGES_COIN);
     }
 }
