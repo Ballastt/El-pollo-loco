@@ -1,11 +1,4 @@
 class MoveableObject extends DrawableObject{
-    x = 120;
-    y = 250;
-    img;
-    height = 150;
-    width = 100;
-    imageCache = {};
-    currentImage = 0;
     speed = 0.55;
     otherDirection = false; //standardmäßg mal falsch
     speedY = 0;
@@ -24,29 +17,7 @@ class MoveableObject extends DrawableObject{
         return this.y < 170;
     }
 
-    //loadImage()
-    loadImage(path) {
-        this.img = new Image();
-        this.img.src = path;
-    }
-
-
-    /**
-     * 
-     * @param {Array} arr - ['img/image1.png', 'img/image2.png', ....]
-     */
-    loadImages(arr) {
-        arr.forEach((path) => {
-            let img = new Image(); //1. neues Image-Objekt wird erzeugt
-            img.src = path;     // 1. Bildpfad wird gesetzt => Browser lädt das Bild
-
-              // Warten, bis das Bild vollständig geladen ist
-              img.onload = () => {
-                this.imageCache[path] = img; // Bild wird in Cache gespeichert, wenn es geladen ist
-            };
-        });
-      
-    }
+   
 
     playAnimation(images) {
         let i = this.currentImage % this.IMAGES_WALKING.length;
@@ -67,12 +38,12 @@ class MoveableObject extends DrawableObject{
         this.otherDirection = true;
     }
               
-
+    //character isColliding(Chicken)
     isColliding(mo) {
-        return this.x + this.width * 0.95 > mo.x && 
-               this.x + this.width * 0.05 < mo.x + mo.width &&
-               this.y + this.height * 0.9 > mo.y &&
-               this.y + this.height * 0.1 < mo.y + mo.height;
+        return this.x + this.width > mo.x && 
+               this.y + this.height > mo.y &&
+               this.x < mo.x &&
+               this.y < mo.y + mo.height
     }
     
     jump() {
