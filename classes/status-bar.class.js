@@ -19,7 +19,9 @@ class StatusBar extends DrawableObject{
         this.width = width;
         this.height = height;
 
-        this.setPercentage(100);
+        setTimeout(() => {
+            this.setPercentage(100);
+        }, 50); // 50ms reichen oft aus
     }
 
     setPercentage(percentage) {
