@@ -21,15 +21,12 @@ class MoveableObject extends DrawableObject{
         return this.y < 170;
     }
 
-   
-
     playAnimation(images) {
         let i = this.currentImage % this.IMAGES_WALKING.length;
         let path = images[i];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
-
 
     //Schablone (wie ein JSON)
     moveRight(){
@@ -56,10 +53,14 @@ class MoveableObject extends DrawableObject{
 
     hit() {
         let now = Date.now();
-        if (now - this.lastHit > 1000) {   // 1 Sekunde Schutz
+        if (now - this.lastHit > 1000) { // 1 Sekunde Schutz vor mehrfachen Treffern
             this.health -= 5;
-            console.log(this.health);
             this.lastHit = now;
+    
+            // Aktualisiere die HealthBar
+            if (world && world.healthBar) {
+                world.healthBar.setPercentage(this.health);
+            }
         }
     }
     
