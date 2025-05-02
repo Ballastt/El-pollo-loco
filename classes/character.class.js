@@ -62,6 +62,10 @@ class Character extends MoveableObject{
         'img/2_character_pepe/5_dead/D-57.png'
     ];
 
+    IMAGES_HAND = [
+        'img/6_salsa_bottle/salsa_bottle.png',
+    ];
+
 
     STATES = {
         IDLE: 'idle',
@@ -82,7 +86,7 @@ class Character extends MoveableObject{
         this.health = 100;
         this.coins = 0;     //Anfangs-Coins
         this.bottles = 0;   //Flaschen-Zähler
-        this.x = 50;
+        this.x = 20;
         this.y = 90;
         this.width = 120;
         this.height = 250;
@@ -107,6 +111,7 @@ class Character extends MoveableObject{
         this.loadImages(this.IMAGES_LONG_IDLE);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD);
+        this.loadImage(this.IMAGES_HAND);
         this.applyGravity();
         this.animate();
         this.currentState = this.STATES.IDLE;
@@ -219,6 +224,16 @@ class Character extends MoveableObject{
 
         if (this.isDead) return; // keine weiteren Treffer
 
+    }
+
+    throwBottle() {
+        if (this.bottles > 0) {
+            this.bottles--;
+            if (world && world.throwBar) {
+                let percentage = (this.bottles / this.maxBottles) * 100;
+                world.throwBar.setPercentage(percentage);
+            }
+        }
     }
 
     //Gesundheit reduzieren
