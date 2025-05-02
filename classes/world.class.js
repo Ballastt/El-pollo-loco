@@ -25,14 +25,8 @@ class World {
 
     checkCollisions() {
         setInterval(() => {
-            this.level.enemies.forEach((enemy) => {
-                if (this.character.isColliding(enemy)) {
-                    console.log('collision with character: ', enemy);
-                    this.character.hit();
-                    this.statusbar.setPercentage(this.character.health);
-                }
-            })
-        }, 1000);
+            this.character.checkCollisionsWithEnemy(this.level.enemies);
+        }, 100); // reicht alle 100ms für Kollisionen
     }
 
 
