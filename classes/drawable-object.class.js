@@ -1,8 +1,7 @@
 class DrawableObject {
     img;
     imageCache = {};
-    currentImage = 0;
-
+    
     x = 120;
     y = 250;
     
@@ -12,8 +11,11 @@ class DrawableObject {
 
     //loadImage()
     loadImage(path) {
-        this.img = new Image();
-        this.img.src = path;
+        let img = new Image();
+        img.onload = () => {
+        this.img = img; // erst setzen, wenn das Bild wirklich geladen ist
+        };
+        img.src = path;
     }
 
     /**
@@ -21,21 +23,23 @@ class DrawableObject {
      * @param {Array} arr - ['img/image1.png', 'img/image2.png', ....]
      */
     loadImages(arr) {
+        console.log('Loading images:', arr); // Debug-Pfade
         arr.forEach((path) => {
-            let img = new Image(); //1. neues Image-Objekt wird erzeugt
-            img.src = path;     // 1. Bildpfad wird gesetzt => Browser lädt das Bild
-
-              // Warten, bis das Bild vollständig geladen ist
-              img.onload = () => {
-                this.imageCache[path] = img; // Bild wird in Cache gespeichert, wenn es geladen ist
-            };
+            let img = new Image();
+            img.src = path;
+            img.onload = () => console.log(`Image loaded: ${path}`);
+            img.onerror = () => console.error(`Failed to load image: ${path}`);
+            this.imageCache[path] = img;
         });
-      
     }
 
     draw(ctx) {
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-
+        if (this.img instanceof HTMLImageElement && this.img.complete) {
+            ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        } else {
+                // Optional: Platzhalter oder Skip-Zeile
+                // console.log('Bild noch nicht geladen:', this.img);
+        }
     }
 
     drawHitbox(ctx) {
