@@ -1,8 +1,12 @@
 class MoveableObject extends DrawableObject{
+    currentImage = 0;
     speed = 0.55;
     otherDirection = false; //standardmäßg mal falsch
     speedY = 0;
     acceleration = 2.5;
+    health = 100;
+    lastHit = 0;
+
 
     applyGravity() {
         setInterval(() => {
@@ -49,4 +53,14 @@ class MoveableObject extends DrawableObject{
     jump() {
         this.speedY = 25;
     }
+
+    hit() {
+        let now = Date.now();
+        if (now - this.lastHit > 1000) {   // 1 Sekunde Schutz
+            this.health -= 5;
+            console.log(this.health);
+            this.lastHit = now;
+        }
+    }
+    
 }
