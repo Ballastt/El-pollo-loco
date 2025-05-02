@@ -52,23 +52,34 @@ class Character extends MoveableObject{
         'img/2_character_pepe/4_hurt/H-43.png'
     ];
 
+    IMAGES_DEAD = [
+        'img/2_character_pepe/5_dead/D-51.png',
+        'img/2_character_pepe/5_dead/D-52.png',
+        'img/2_character_pepe/5_dead/D-53.png',
+        'img/2_character_pepe/5_dead/D-54.png',
+        'img/2_character_pepe/5_dead/D-55.png',
+        'img/2_character_pepe/5_dead/D-56.png',
+        'img/2_character_pepe/5_dead/D-57.png'
+    ];
+
 
     STATES = {
         IDLE: 'idle',
         LONG_IDLE: 'long_idle',
         WALKING: 'walking',
         JUMPING: 'jumping',
-        HURT: 'hurting'
+        HURT: 'hurting',
+        DEAD: 'dead'
     }
 
     world;
     lastHit = 0;
+    isDead = false;
     
     constructor(world){
         super().loadImage('/img/2_character_pepe/2_walk/W-21.png');
         this.world = world;
-
-        this.health = 100; //Anfangs-Health
+        this.health = 100;
         this.coins = 0;     //Anfangs-Coins
         this.bottles = 0;   //Flaschen-Zähler
         this.x = 50;
@@ -95,6 +106,7 @@ class Character extends MoveableObject{
         this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_LONG_IDLE);
         this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_DEAD);
         this.applyGravity();
         this.animate();
         this.currentState = this.STATES.IDLE;
@@ -122,6 +134,7 @@ class Character extends MoveableObject{
     }
         
     handleMovement() {
+        if (this.isDead) return; // keine Bewegung mehr
         let isMoving = false;
         
         if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
@@ -184,6 +197,9 @@ class Character extends MoveableObject{
             case this.STATES.HURT:
                 this.playAnimation(this.IMAGES_HURT);
                 break;
+            case this.STATES.DEAD:
+                this.playAnimation(this.IMAGES_DEAD);
+                break;
         }
     }
             
@@ -200,29 +216,39 @@ class Character extends MoveableObject{
                 this.hit();
             }
         });
+
+        if (this.isDead) return; // keine weiteren Treffer
+
     }
 
     //Gesundheit reduzieren
     decreaseHealth(amount) {
         this.health -= amount;
-        if (this.health <= 0) 
+        if (this.health <= 0) {
             this.health = 0;
             this.die();
-    }
-
-    hit() {
-        let now = Date.now();
-        if (now - this.lastHit > 1000) { //Schutz vor schnellen Treffern
-            this.decreaseHealth(20);  //reduziert Gesundheit
-            console.log(this.health, this.currentState)
-            
-            this.lastHit = now;      //Setzt den Zeitpunkt des letzten Treffers
-
         }
+           
     }
 
     //Methode für den Tod des Charakters
     die() {
-        console.log("Der Charakter ist tot!");
+        if (!this.isDead) {
+            this.isDead = true;
+            this.currentState = this.STATES.DEAD;
+            console.log("Der Charakter ist tot!");
+            this.walkingSound.pause();
+        }
+    }
+
+    gameOver() {
+        //game over overlay
+        document.getElementById('game-over-screen').classList.remove('hidden');
+        this.stopGame();
+    }
+
+    stopGame() {
+        clearInterval(this.characterMovementInterval);
+        clearInterval(this.charaterAnimationInterval);
     }
 }
