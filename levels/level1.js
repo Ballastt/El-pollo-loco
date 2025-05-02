@@ -64,10 +64,10 @@ function generateClouds() {
 }
 
 
-function generateCoins() {
+function generateCoins(maxCoins = 100) {
     const coins = [];
     const coinDistance = 200; //distance between the coins
-    const numberOfCoins = Math.floor(6000 / coinDistance); //based on level 
+    const numberOfCoins = Math.min(maxCoins, Math.floor(5900 / coinDistance)); 
     
     for (let i = 0; i <=numberOfCoins; i++) {
         const coin = new Coin(i * coinDistance + Math.random() * 50);
