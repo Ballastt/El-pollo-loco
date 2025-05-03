@@ -2,13 +2,11 @@ class DrawableObject {
     img;
     imageCache = {};
     
-    x = 120;
-    y = 250;
+    x = 0; // Standardposition auf der x-Achse
+    y = 0; // Standardposition auf der y-Achse
+    width = 50; // Standardbreite
+    height = 50; // Standardhöhe
     
-    height = 150;
-    width = 100;
-
-
     //loadImage()
     loadImage(path) {
         let img = new Image();
@@ -23,7 +21,6 @@ class DrawableObject {
      * @param {Array} arr - ['img/image1.png', 'img/image2.png', ....]
      */
     loadImages(arr) {
-        console.log('Loading images:', arr); // Debug-Pfade
         arr.forEach((path) => {
             let img = new Image();
             img.src = path;
