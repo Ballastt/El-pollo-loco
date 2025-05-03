@@ -62,18 +62,13 @@ class Character extends MoveableObject{
         'img/2_character_pepe/5_dead/D-57.png'
     ];
 
-    IMAGES_HAND = [
-        'img/6_salsa_bottle/salsa_bottle.png',
-    ];
-
-
     STATES = {
         IDLE: 'idle',
         LONG_IDLE: 'long_idle',
         WALKING: 'walking',
         JUMPING: 'jumping',
         HURT: 'hurting',
-        DEAD: 'dead'
+        DEAD: 'dead',
     }
 
     world;
@@ -111,7 +106,6 @@ class Character extends MoveableObject{
         this.loadImages(this.IMAGES_LONG_IDLE);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD);
-        this.loadImage(this.IMAGES_HAND);
         this.applyGravity();
         this.animate();
         this.currentState = this.STATES.IDLE;
@@ -152,10 +146,12 @@ class Character extends MoveableObject{
             isMoving = true;
         }
         
+        //springen
         if (this.world.keyboard.UP && !this.isAboveGround()) {
             this.jump();
         }
 
+        // Zustandsverwaltung
         if (this.isAboveGround()) {
             this.currentState = this.STATES.JUMPING;
             this.lastMoveTime = Date.now();
@@ -164,13 +160,14 @@ class Character extends MoveableObject{
             this.lastMoveTime = Date.now();
         } else {
             const idleDuration = Date.now() - (this.lastMoveTime || Date.now());
+
             if (idleDuration > 10000) {
                 this.currentState = this.STATES.LONG_IDLE;
             } else {
                 this.currentState = this.STATES.IDLE;
             }
         }
-        
+
         this.isMoving = isMoving; // gespeichert für andere Methoden wie Sound
     }
         
@@ -205,6 +202,7 @@ class Character extends MoveableObject{
             case this.STATES.DEAD:
                 this.playAnimation(this.IMAGES_DEAD);
                 break;
+            
         }
     }
             
