@@ -16,19 +16,12 @@ class World {
     soundVolume = 0.2;
 
 
-    bottles = [];
-    availableBottles = [];
-
     constructor(canvas) {
         this.ctx = canvas.getContext('2d');
         this.canvas = canvas;
         this.keyboard = keyboard;
 
         this.character = new Character(this);
-
-        for(let i = 0; i < 30; i++) {
-            this.availableBottles.push(new SalsaBottle(0, 0));
-        }
 
         this.coinCollectSound = new Audio('audio/get_coin.mp3');
         this.updateSoundVolume();
@@ -72,19 +65,6 @@ class World {
         this.checkCollisions();
     }
 
-    throwBottle() {
-        if (this.availableBottles.length > 0) {
-            // Flasche aus dem Array "popen"
-            const bottle = this.availableBottles.pop();
-            bottle.x = this.character.x + 50; // Position der Flasche vor dem Charakter
-            bottle.y = this.character.y;
-            bottle.throwBottle(); // Flasche werfen
-            this.bottles.push(bottle); // Flasche in das "geworfene"-Array verschieben
-        } else {
-            console.log('Keine Flaschen mehr verfügbar!');
-        }
-    }
-    
     checkCollisions() {
         setInterval(() => {
             this.character.checkCollisionsWithEnemy(this.level.enemies);
@@ -106,11 +86,6 @@ class World {
 
         this.ctx.translate(this.camera_x, 0); //Kameradrehung inital
 
-        // Geworfene Flaschen zeichnen
-        this.bottles.forEach(bottle => {
-            this.addToMap(bottle);
-        });
-
         //alle "beweglichen" Objekte zeichnen
         this.addObjectToMap(this.level.backgroundObjects);
         this.addObjectToMap(this.level.coins);
@@ -118,6 +93,7 @@ class World {
         this.addToMap(this.character);
         this.addObjectToMap(this.level.enemies);
 
+    
         //Kamera wieder zurücksetzen
         this.ctx.translate(-this.camera_x, 0); //nach dem malen der Objekte, müssen wir wieder zurücksetzen, damit es sich nicht weiter dreht
         
