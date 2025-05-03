@@ -4,10 +4,10 @@ class Coin extends MoveableObject{
         'img/8_coin/coin_2.png'      
     ]
 
-    constructor(x) {
+    constructor(x, y) {
         super().loadImage('img/8_coin/coin_1.png'); //coin
         this.x = x; //position of coin on x
-        this.y = 30 + Math.random() * 300; // random y position
+        this.y = y;
         this.width = 100; //coin width
         this.height = 100; //coin height
         this.speed = 0; //coins don't move
