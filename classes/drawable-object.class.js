@@ -9,11 +9,8 @@ class DrawableObject {
     
     //loadImage()
     loadImage(path) {
-        let img = new Image();
-        img.onload = () => {
-        this.img = img; // erst setzen, wenn das Bild wirklich geladen ist
-        };
-        img.src = path;
+        this.img = new Image();
+        this.img.src = path;
     }
 
     /**
