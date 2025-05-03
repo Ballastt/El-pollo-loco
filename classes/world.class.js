@@ -15,6 +15,7 @@ class World {
     coinCollectSound;
     soundVolume = 0.2;
 
+
     bottles = [];
     availableBottles = [];
 
@@ -164,8 +165,7 @@ class World {
         this.level.coins.forEach((coin, index) => {
             if (this.character.isColliding(coin)){
                 this.level.coins.splice(index, 1); //removing coin from array
-                this.collectedCoins++;
-
+                this.collectCoin();
                 //Audio abspielen
                 this.coinCollectSound.currentTime = 0;
                 this.coinCollectSound.play();
@@ -179,6 +179,11 @@ class World {
                 }
             }
         });
+    }
+
+    collectCoin() {
+        this.collectedCoins++;
+        console.log('Coin collected! Total coins:', this.collectedCoins);
     }
 
     updateSoundVolume() {
