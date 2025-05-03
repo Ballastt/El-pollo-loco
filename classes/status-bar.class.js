@@ -24,9 +24,7 @@ class StatusBar extends DrawableObject{
         this.img = this.imageCache[path];
         if (!this.img) {
             console.error(`Image not found for percentage: ${percentage}, path: ${path}`);
-        } else {
-            console.log(`StatusBar image set for ${percentage}%: ${path}`);
-        }
+        } 
     }
     
     resolveImageIndex() {
