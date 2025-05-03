@@ -12,6 +12,8 @@ class World {
     throwbar;
     coinBar;
 
+    throwableObjects = [];
+
     coinCollectSound;
     soundVolume = 0.2;
 
@@ -62,16 +64,34 @@ class World {
         this.coinBar.setPercentage(0);
        
         this.draw();
+        this.run();
         this.checkCollisions();
     }
 
-    checkCollisions() {
+    run() {
         setInterval(() => {
-            this.character.checkCollisionsWithEnemy(this.level.enemies);
-        }, 100); // reicht alle 100ms für Kollisionen
+            this.checkCollisions();
+            this.checkThrowObjects();
+        }, 200)
     }
 
+    checkThrowObjects() {
+        if (this.keyboard.D) {
+            this.bottle = new ThrowableObject(this.character.x + 100, this.character.y + 100);
+            this.throwableObjects.push(this.bottle);
+        }
+    }
 
+    checkCollisions() {
+        // Kollision mit Feinden überprüfen
+        this.character.checkCollisionsWithEnemy(this.level.enemies);
+    
+        //Aktualisiere die Gesundheitsleiste nach einer Kollision
+        this.healthBar.setPercentage(this.character.health);
+    }
+    
+
+    //gameloop 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -92,6 +112,7 @@ class World {
         this.addObjectToMap(this.level.clouds);
         this.addToMap(this.character);
         this.addObjectToMap(this.level.enemies);
+        this.addObjectToMap(this.throwableObjects);
 
     
         //Kamera wieder zurücksetzen
