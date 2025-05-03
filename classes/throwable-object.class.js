@@ -21,29 +21,34 @@ class ThrowableObject extends MoveableObject {
     ];
 
     constructor(x, y) {
-       super();
+       super().loadImage('img/6_salsa_bottle/salsa_bottle.png');
        this.loadImages(this.IMAGES_ROTATION);
        this.loadImages(this.IMAGES_SPLASH);
        this.loadImages(this.IMAGES_GROUND);
   
        this.x = x;
        this.y = y;
-       this.width = 80; // Beispielgröße
-       this.height = 80; // Beispielgröße
+       this.width = 70; // Beispielgröße
+       this.height = 70; // Beispielgröße
 
        this.isFlying = false;
-   }
+       this.throw();
+    }
 
-   throwBottle() {
+    throw() {
         this.isFlying = true;
-        this.speedY = 20; //Beispielgeschwindigkeit
+        this.speedY = 30; //Beispielgeschwindigkeit
         this.applyGravity();
+        setInterval(() => {
+            this.x += 8;
+            
+        }, 25);
 
         //Animation der Rotation starten
-        this.animateRotation();
-   }
+        /*this.animateRotation();*/
+    }
 
-   animateRotation() {
+    animateRotation() {
         let index = 0;
         const interval = setInterval(() => {
             if (!this.isFlying) {
@@ -53,9 +58,9 @@ class ThrowableObject extends MoveableObject {
             this.img = this.imageCache[this.IMAGES_ROTATION[index]];
             index = (index + 1) % this.IMAGES_ROTATION.length;
         }, 100);
-   }
+    }
 
-   splash() {
+    splash() {
         this.isFlying = false;
 
         let index = 0;
@@ -68,10 +73,10 @@ class ThrowableObject extends MoveableObject {
             this.img = this.imageCache[this.IMAGES_SPLASH[index]];
             index++;
         }, 100);
-   }
+    }
 
-   setGroundImage() {
+    setGroundImage() {
         const index = Math.floor(Math.random() * this.IMAGES_GROUND.length); //Zufallsindex
         this.img = this.imageCache[this.IMAGES_GROUND[index]];
-   }
+    }
 }
