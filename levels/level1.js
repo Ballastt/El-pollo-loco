@@ -66,11 +66,26 @@ function generateClouds() {
 
 function generateCoins(maxCoins = 100) {
     const coins = [];
-    const coinDistance = 200; //distance between the coins
+    const coinDistance = 200; // Abstand zwischen den Coins
     const numberOfCoins = Math.min(maxCoins, Math.floor(5900 / coinDistance)); 
-    
-    for (let i = 0; i <=numberOfCoins; i++) {
-        const coin = new Coin(i * coinDistance + Math.random() * 50);
+    const statusBarWidth = 250; // Breite der Statusbar
+
+    for (let i = 0; i <= numberOfCoins; i++) {
+        let x;
+        if (i === 0) {
+            // Für den ersten Coin: Stelle sicher, dass er außerhalb der Statusbar liegt
+            x = statusBarWidth + 10; // StatusBar + Coin-Breite + Puffer
+            console.log('First Coin X-Position:', x); // Debugging
+        } else {
+            // Normale Position für andere Coins
+            x = i * coinDistance + Math.random() * 50;
+        }
+
+        // Berechne die y-Position (z. B. zufällig)
+        const y = 30 + Math.random() * 300;
+
+        // Erstelle den Coin mit x und y
+        const coin = new Coin(x, y);
         coins.push(coin);
     }
 
