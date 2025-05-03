@@ -41,14 +41,34 @@ class MoveableObject extends DrawableObject{
               
     //character isColliding(Chicken)
     isColliding(mo) {
-        return this.x + this.width > mo.x && 
-               this.y + this.height > mo.y &&
-               this.x < mo.x &&
-               this.y < mo.y + mo.height
-    }
+        const thisHitbox = this.hitbox
+            ? {
+                x: this.x + this.hitbox.offsetX,
+                y: this.y + this.hitbox.offsetY,
+                width: this.hitbox.width,
+                height: this.hitbox.height,
+            }
+            : { x: this.x, y: this.y, width: this.width, height: this.height };
     
+        const moHitbox = mo.hitbox
+            ? {
+                x: mo.x + mo.hitbox.offsetX,
+                y: mo.y + mo.hitbox.offsetY,
+                width: mo.hitbox.width,
+                height: mo.hitbox.height,
+            }
+            : { x: mo.x, y: mo.y, width: mo.width, height: mo.height };
+    
+        return (
+            thisHitbox.x + thisHitbox.width > moHitbox.x &&
+            thisHitbox.y + thisHitbox.height > moHitbox.y &&
+            thisHitbox.x < moHitbox.x + moHitbox.width &&
+            thisHitbox.y < moHitbox.y + moHitbox.height
+        );
+    }
+
     jump() {
-        this.speedY = 25;
+        this.speedY = 30;
     }
 
     hit() {
