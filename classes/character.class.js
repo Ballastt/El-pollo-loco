@@ -74,7 +74,7 @@ class Character extends MoveableObject{
     world;
     lastHit = 0;
     isDead = false;
-    
+
     constructor(world){
         super().loadImage('/img/2_character_pepe/2_walk/W-21.png');
         this.world = world;
@@ -82,7 +82,7 @@ class Character extends MoveableObject{
         this.coins = 0;     //Anfangs-Coins
         this.bottles = 0;   //Flaschen-Zähler
         this.x = 20;
-        this.y = 90;
+        this.y = 80;
         this.width = 120;
         this.height = 250;
         this.speed = 6;
@@ -98,7 +98,8 @@ class Character extends MoveableObject{
         this.walkingSound = new Audio('audio/character_walk_on_sand.mp3');
         this.walkingSound.loop = true;
 
-        this.hitSound = new Audio('audio/character_getting_hit.mp3');
+        this.hitSound = new Audio('audio/hitting_a_chicken.mp3');
+        this.jumpSound = new Audio('audio/character_jumping.mp3')
 
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
@@ -149,6 +150,7 @@ class Character extends MoveableObject{
         //springen
         if (this.world.keyboard.UP && !this.isAboveGround()) {
             this.jump();
+            this.jumpSound.play();
         }
 
         // Zustandsverwaltung
@@ -158,16 +160,18 @@ class Character extends MoveableObject{
         } else if (isMoving) {
             this.currentState = this.STATES.WALKING;
             this.lastMoveTime = Date.now();
-        } else {
+        } 
+           
+        if (!isMoving && !this.isAboveGround()) {
             const idleDuration = Date.now() - (this.lastMoveTime || Date.now());
 
-            if (idleDuration > 10000) {
+            if(idleDuration > 10000) {
                 this.currentState = this.STATES.LONG_IDLE;
             } else {
                 this.currentState = this.STATES.IDLE;
             }
         }
-
+            
         this.isMoving = isMoving; // gespeichert für andere Methoden wie Sound
     }
         
@@ -212,11 +216,15 @@ class Character extends MoveableObject{
 
     //Kollisionserkennung mit dem Feind
     checkCollisionsWithEnemy(enemies) {
+        const now = Date.now();
+        if (now - this.lastHit < 1000) return; //Immunitätsphase von einer sekunde
+
         enemies.forEach(enemy => {
             if (this.isColliding(enemy)) {
                 this.currentState = this.STATES.HURT;
-               
                 this.hit();
+                this.hitSound.play();
+                this.lastHit = now; //Zeitpunkt des letzten Treffers aktualisieren
             }
         });
 
@@ -251,6 +259,7 @@ class Character extends MoveableObject{
             this.currentState = this.STATES.DEAD;
             console.log("Der Charakter ist tot!");
             this.walkingSound.pause();
+            this.gameOver();
         }
     }
 
@@ -263,5 +272,6 @@ class Character extends MoveableObject{
     stopGame() {
         clearInterval(this.characterMovementInterval);
         clearInterval(this.charaterAnimationInterval);
+        this.isGameStopped = true;
     }
 }
