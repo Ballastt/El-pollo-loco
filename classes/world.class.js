@@ -28,6 +28,7 @@ class World {
         this.character = new Character(this);
 
         this.coinCollectSound = new Audio('audio/get_coin.mp3');
+        this.bottleCollectSound = new Audio('audio/get_bottle.mp3');
         this.updateSoundVolume();
 
          // Bildpfade für die drei Statusbars definieren
@@ -173,55 +174,75 @@ class World {
         this.ctx.restore(); //aktuelle Einstellungen wiederherstellen
     }
 
-    checkCoinCollection() {
-        this.level.coins.forEach((coin, index) => {
-            if (this.character.isColliding(coin)){
-                this.level.coins.splice(index, 1); //removing coin from array
-                this.collectCoin();
-                //Audio abspielen
-                this.coinCollectSound.currentTime = 0;
-                this.coinCollectSound.play();
 
-                console.log(`Coins collected: ${this.collectedCoins} / ${this.level.totalCoins}`);
+    checkItemCollection(itemType, options) {
+        const { items, characterProperty, sound, bar, maxItems, onCollect } = options;
 
-                 // Aktualisiere die CoinBar
-                if (this.coinBar) {
-                    let percentage = (this.collectedCoins / this.level.totalCoins) * 100;
-                    this.coinBar.setPercentage(percentage);
+        items.forEach((item, index) => {
+            if (this.character.isColliding(item)) {
+                console.log(`${itemType} gesammelt`);
+                items.splice(index, 1); // Entferne das Item aus dem Level
+            
+                // Aktualisiere den Zähler des Charakters
+                this.character[characterProperty] = (this.character[characterProperty] || 0) + 1;
+            
+                // Aktion beim Sammeln (z. B. Statusleiste aktualisieren, Punkte hinzufügen)
+                if (onCollect) onCollect();
+
+                // Audio abspielen
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.play();
+                }
+
+                // Aktualisiere die Statusleiste (falls vorhanden)
+                if (bar && maxItems) {
+                    const percentage = (this.character[characterProperty] / maxItems) * 100;
+                    bar.setPercentage(percentage);
                 }
             }
         });
     }
 
-    collectCoin() {
-        this.collectedCoins++;
-        console.log('Coin collected! Total coins:', this.collectedCoins);
-    }
-
-    updateSoundVolume() {
-        // Lautstärke für alle Sounds anpassen
-        this.coinCollectSound.volume = this.soundVolume;
-    }
-
-    checkBottleCollection() {
-        this.level.bottles.forEach((bottle, index) => {
-            if (this.character.isColliding(bottle)) {
-                console.log("flasche gesammelt");
-                this.level.bottles.splice(index, 1);//Flasche aus dem level entfernen
-                this.collectBottle(); //Aktualisiere Statusleiste
+    /**
+     * Spezifische Funktionen für Coins
+     */
+    checkCoinCollection() {
+        this.checkItemCollection('Coin', {
+            items: this.level.coins,
+            characterProperty: 'collectedCoins',
+            sound: this.coinCollectSound,
+            bar: this.coinBar,
+            maxItems: this.level.totalCoins,
+            onCollect: () => {
+                console.log(`Coins collected: ${this.character.collectedCoins} / ${this.level.totalCoins}`);
             }
-        })
+        });
     }
 
-    collectBottle() {
-        this.character.collectedBottles = (this.character.collectedBottles || 0) +1;
-        this.updateThrowBar();
+    /**
+     * Spezifische Funktionen für Bottles
+     */
+    checkBottleCollection() {
+        this.checkItemCollection('Bottle', {
+            items: this.level.bottles,
+            characterProperty: 'collectedBottles',
+            sound: this.bottleCollectSound,
+            bar: this.throwBar,
+            maxItems: this.level.totalBottles,
+            onCollect: () => {
+                console.log(`Bottles collected: ${this.character.collectedBottles} / ${this.level.totalCoins}`);
+            }
+        });
     }
 
-    updateThrowBar() {
-        const maxBottles = 25; // Maximale Anzahl von Flaschen
-        const percentage = (this.character.collectedBottles / maxBottles) * 100;
-        this.throwBar.setPercentage(percentage); // Aktualisiere die Wurfstatusleiste
+    /**
+     * Lautstärke für Sounds anpassen
+     */
+    updateSoundVolume() {
+        this.coinCollectSound.volume = this.soundVolume;
+        this.bottleCollectSound.volume = this.soundVolume;
     }
+    
     
 }
