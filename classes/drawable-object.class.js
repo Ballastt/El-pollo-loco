@@ -38,7 +38,7 @@ class DrawableObject {
 
     drawHitbox(ctx) {
 
-        if (this instanceof Character || this instanceof Chicken || this instanceof Coin || this instanceof Endboss) {
+        if (this instanceof Character || this instanceof Chicken || this instanceof Coin || this instanceof CollectableBottle || this instanceof Endboss) {
             //Debug Hitbox
             ctx.beginPath();
             ctx.lineWidth = '2';
