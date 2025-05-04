@@ -92,10 +92,26 @@ function generateCoins(maxCoins = 100) {
     return coins;
 }
 
+function generateBottles(maxBottles = 25) {
+    const bottles = [];
+    const bottleDistance = 250; // Abstand zwischen Flaschen
+    const numberOfBottles = Math.min(maxBottles, Math.floor(5900 / bottleDistance)); 
+    const startX = 300; // Startposition der Flaschen (nach der Statusbar)
+
+    for (let i = 0; i < numberOfBottles; i++) {
+        const x = startX + i * bottleDistance + Math.random() * 100; // Zufällige Position im Bereich
+        const y = 40 + Math.random() * 300; // Zufällige Höhe zwischen 100px und 300px
+        bottles.push(new CollectableBottle(x, y));
+    }
+
+    return bottles;
+}
+
 
 const level1 = new Level(
     generateEnemies(),
     generateClouds(),
     backgroundObjects,
-    generateCoins()
+    generateCoins(),
+    generateBottles()
 );
