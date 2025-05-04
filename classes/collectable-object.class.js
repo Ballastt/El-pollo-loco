@@ -7,11 +7,12 @@ class CollectableObject extends MoveableObject {
         this.height = height;
         this.speed = 0; // Keine Bewegung
 
+        // Standard-Hitbox (kann in Unterklassen überschrieben werden)
         this.hitbox = {
-            offsetX: 30,
-            offsetY: 30,
-            width: width - 60,
-            height: height - 60
+            offsetX: 0,
+            offsetY: 0,
+            width: width,
+            height: height
         };
     }
 
