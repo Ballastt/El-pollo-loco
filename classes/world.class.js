@@ -6,7 +6,9 @@ class World {
     keyboard;
     camera_x = 0; //Kameradrehung
     level_end_x = 6000;
+
     collectedCoins = 0;
+    collectedBottles = 0;
 
     healthbar;
     throwbar;
@@ -76,11 +78,22 @@ class World {
     }
 
     checkThrowObjects() {
-        if (this.keyboard.D) {
-            this.bottle = new ThrowableObject(this.character.x + 100, this.character.y + 100);
-            this.throwableObjects.push(this.bottle);
+        if (this.keyboard.D && this.character.collectedBottles > 0) {
+            let offsetX = this.character.otherDirection ? -10 : 60;
+            let offsetY = 80;
+    
+            const bottle = new SalsaBottle(
+                this.character.x + offsetX,
+                this.character.y + offsetY,
+                this.character.otherDirection
+            );
+    
+            this.throwableObjects.push(bottle);
+            this.character.collectedBottles--;
+            this.updateThrowBar();
         }
     }
+    
 
     checkCollisions() {
         // Kollision mit Feinden überprüfen
@@ -96,6 +109,7 @@ class World {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.checkCoinCollection();
+        this.checkBottleCollection();
       
         //Adjusting camera so we won't go beyond level ending at level_end_x
         if(this.camera_x < this.level_end_x - this.canvas.width) {
@@ -109,6 +123,7 @@ class World {
         //alle "beweglichen" Objekte zeichnen
         this.addObjectToMap(this.level.backgroundObjects);
         this.addObjectToMap(this.level.coins);
+        this.addObjectToMap(this.level.bottles);
         this.addObjectToMap(this.level.clouds);
         this.addToMap(this.character);
         this.addObjectToMap(this.level.enemies);
@@ -187,4 +202,26 @@ class World {
         // Lautstärke für alle Sounds anpassen
         this.coinCollectSound.volume = this.soundVolume;
     }
+
+    checkBottleCollection() {
+        this.level.bottles.forEach((bottle, index) => {
+            if (this.character.isColliding(bottle)) {
+                console.log("flasche gesammelt");
+                this.level.bottles.splice(index, 1);//Flasche aus dem level entfernen
+                this.collectBottle(); //Aktualisiere Statusleiste
+            }
+        })
+    }
+
+    collectBottle() {
+        this.character.collectedBottles = (this.character.collectedBottles || 0) +1;
+        this.updateThrowBar();
+    }
+
+    updateThrowBar() {
+        const maxBottles = 25; // Maximale Anzahl von Flaschen
+        const percentage = (this.character.collectedBottles / maxBottles) * 100;
+        this.throwBar.setPercentage(percentage); // Aktualisiere die Wurfstatusleiste
+    }
+    
 }
