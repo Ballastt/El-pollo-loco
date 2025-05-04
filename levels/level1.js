@@ -27,17 +27,15 @@ for (let i = -1; i < numberOfBackgrounds; i++) {
 
 function generateEnemies() {
     const enemies = [];
+    const amount = 30;
+    const level_end_x  = 5700;
+    const startX = 300;
+    const spacing = (level_end_x - startX) / amount;
 
-    const amount = 15;
     for (let i = 0; i < amount; i++) {
-        const isSmall = Math.random() < 0.5;
-        const x = 400 + Math.random() * 5000;
-
-        if (isSmall) {
-            enemies.push(new SmallChicken(x));
-        } else {
-            enemies.push(new NormalChicken(x));
-        }
+        const baseX = startX + i * spacing; // Gleichmäßige Verteilung
+        const x = baseX + (Math.random() - 0.5) * spacing * 0.3; // Kleine Zufälligkeit (bis zu 30% des Spacin
+        enemies.push(Math.random() < 0.5 ? new SmallChicken(x) : new NormalChicken(x));
     }
 
     enemies.push(new Endboss());
@@ -46,9 +44,9 @@ function generateEnemies() {
 }
 
 
+
 function generateClouds() {
     const clouds = [];
-
     const cloudDistance = 660; // 800px apart
     const numberOfClouds = Math.floor(7000 / cloudDistance);
 
@@ -64,24 +62,13 @@ function generateClouds() {
 }
 
 
-function generateCoins(maxCoins = 100) {
+function generateCoins(maxCoins = 40) {
     const coins = [];
-    const coinDistance = 200; // Abstand zwischen den Coins
-    const numberOfCoins = Math.min(maxCoins, Math.floor(5900 / coinDistance)); 
-    const statusBarWidth = 250; // Breite der Statusbar
+    const coinDistance = 5700 / maxCoins; 
+    const startX = 300; 
 
-    for (let i = 0; i <= numberOfCoins; i++) {
-        let x;
-        if (i === 0) {
-            // Für den ersten Coin: Stelle sicher, dass er außerhalb der Statusbar liegt
-            x = statusBarWidth + 10; // StatusBar + Coin-Breite + Puffer
-            console.log('First Coin X-Position:', x); // Debugging
-        } else {
-            // Normale Position für andere Coins
-            x = i * coinDistance + Math.random() * 50;
-        }
-
-        // Berechne die y-Position (z. B. zufällig)
+    for (let i = 0; i < maxCoins; i++) {
+        const x = startX + i * coinDistance + Math.random() * 100; // Zufällige Position im Bereich
         const y = 30 + Math.random() * 300;
 
         // Erstelle den Coin mit x und y
@@ -92,15 +79,14 @@ function generateCoins(maxCoins = 100) {
     return coins;
 }
 
-function generateBottles(maxBottles = 25) {
+function generateBottles(maxBottles = 30) {
     const bottles = [];
-    const bottleDistance = 250; // Abstand zwischen Flaschen
-    const numberOfBottles = Math.min(maxBottles, Math.floor(5900 / bottleDistance)); 
+    const bottleDistance = 5700 / maxBottles; 
     const startX = 300; // Startposition der Flaschen (nach der Statusbar)
 
-    for (let i = 0; i < numberOfBottles; i++) {
+    for (let i = 0; i < maxBottles; i++) {
         const x = startX + i * bottleDistance + Math.random() * 100; // Zufällige Position im Bereich
-        const y = 40 + Math.random() * 300; // Zufällige Höhe zwischen 100px und 300px
+        const y = 30 + Math.random() * 300; // Zufällige Höhe zwischen 100px und 300px
         bottles.push(new CollectableBottle(x, y));
     }
 
@@ -112,6 +98,6 @@ const level1 = new Level(
     generateEnemies(),
     generateClouds(),
     backgroundObjects,
-    generateCoins(),
-    generateBottles()
+    generateCoins(40),
+    generateBottles(30)
 );
