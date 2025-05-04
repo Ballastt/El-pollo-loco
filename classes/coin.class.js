@@ -1,24 +1,12 @@
-class Coin extends MoveableObject{
+class Coin extends CollectableObject{
     IMAGES_COIN = [
         'img/8_coin/coin_1.png',
-        'img/8_coin/coin_2.png'      
-    ]
+        'img/8_coin/coin_2.png'
+    ];
 
     constructor(x, y) {
-        super().loadImage('img/8_coin/coin_1.png'); //coin
-        this.x = x; //position of coin on x
-        this.y = y;
-        this.width = 100; //coin width
-        this.height = 100; //coin height
-        this.speed = 0; //coins don't move
-
-        this.hitbox = {
-            offsetX: 30,
-            offsetY: 30,
-            width: 40,
-            height: 40
-        };
-
-        this.loadImages(this.IMAGES_COIN);
+        super(x, y, 100, 100); // Übergibt Größe an CollectableObject
+        this.loadImage('img/8_coin/coin_1.png');
+        this.loadCollectableImages(this.IMAGES_COIN);
     }
 }
