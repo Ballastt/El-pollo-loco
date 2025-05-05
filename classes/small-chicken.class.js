@@ -9,6 +9,6 @@ class SmallChicken extends Chicken {
             ],
             35, 35, [0.45, 0.80]
         );
-        this.y = 385;
+        this.y = 380;
     }
 }
