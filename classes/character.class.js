@@ -137,6 +137,13 @@ class Character extends MoveableObject{
         if (this.isDead) return; // keine Bewegung mehr
         let isMoving = false;
         
+        this.handleMovementWithKeyboard();
+        this.handleMovementDifferentStates();
+       
+        this.isMoving = isMoving; // gespeichert für andere Methoden wie Sound
+    }
+
+    handleMovementWithKeyboard() {
         if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
             this.moveRight();
             isMoving = true;
@@ -152,7 +159,9 @@ class Character extends MoveableObject{
             this.jump();
             this.jumpSound.play();
         }
+    }
 
+    handleMovementDifferentStates() {
         // Zustandsverwaltung
         if (this.isAboveGround()) {
             this.currentState = this.STATES.JUMPING;
@@ -161,18 +170,11 @@ class Character extends MoveableObject{
             this.currentState = this.STATES.WALKING;
             this.lastMoveTime = Date.now();
         } 
-           
         if (!isMoving && !this.isAboveGround()) {
             const idleDuration = Date.now() - (this.lastMoveTime || Date.now());
 
-            if(idleDuration > 10000) {
-                this.currentState = this.STATES.LONG_IDLE;
-            } else {
-                this.currentState = this.STATES.IDLE;
-            }
+            this.currentState = idleDuration > 10000 ? this.STATES.LONG_IDLE : this.STATES.IDLE;
         }
-            
-        this.isMoving = isMoving; // gespeichert für andere Methoden wie Sound
     }
         
     handleWalkingSound() {
@@ -249,7 +251,6 @@ class Character extends MoveableObject{
             this.health = 0;
             this.die();
         }
-           
     }
 
     //Methode für den Tod des Charakters
