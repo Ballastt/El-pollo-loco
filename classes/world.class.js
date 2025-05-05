@@ -61,7 +61,7 @@ class World {
         
         // Statusbars mit den jeweiligen Bildern initialisieren
         this.healthBar = new StatusBar(healthImages, 0, 0, 250, 60);
-        this.throwBar = new StatusBar(throwImages, 0, 50, 250, 60);
+        this.throwBar = new StatusBar(throwImages, 0, 50, 250, 60, true);
         this.coinBar = new StatusBar(coinImages, 0, 100, 250, 60, true);
 
         this.coinBar.setPercentage(0);
@@ -91,7 +91,6 @@ class World {
     
             this.throwableObjects.push(bottle);
             this.character.collectedBottles--;
-            this.updateThrowBar();
         }
     }
     
@@ -231,7 +230,7 @@ class World {
             bar: this.throwBar,
             maxItems: this.level.totalBottles,
             onCollect: () => {
-                console.log(`Bottles collected: ${this.character.collectedBottles} / ${this.level.totalCoins}`);
+                console.log(`Bottles collected: ${this.character.collectedBottles} / ${this.level.totalBottles}`);
             }
         });
     }
