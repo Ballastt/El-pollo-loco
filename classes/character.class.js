@@ -80,13 +80,14 @@ class Character extends MoveableObject{
         super().loadImage('/img/2_character_pepe/2_walk/W-21.png');
         this.world = world;
         this.health = 100;
-        this.coins = 0;     //Anfangs-Coins
-        this.bottles = 0;   //Flaschen-Zähler
+        this.coins = 0;    
+        this.bottles = 0;   
         this.x = 20;
-        this.y = 80;
         this.width = 120;
         this.height = 250;
         this.speed = 6;
+        this.groundY = 180;
+        this.y = this.groundY;
 
          // Die Hitbox ist schmaler und zentriert
         this.hitbox = {
@@ -230,11 +231,10 @@ class Character extends MoveableObject{
     //Kollisionserkennung mit dem Feind
     checkCollisionsWithEnemy(enemies) {
         const now = Date.now();
-        if (now - this.lastHit < 1000) return; //Immunitätsphase von einer sekunde
+        if (now - this.lastHit < 2000) return; //Immunitätsphase von einer sekunde
 
         enemies.forEach(enemy => {
             if (this.isColliding(enemy)) {
-                console.log("getroffen vom feind")
                 this.currentState = this.STATES.HURT;
                 this.hit();
                 this.hitSound.play();
