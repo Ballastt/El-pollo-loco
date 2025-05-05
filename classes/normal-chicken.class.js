@@ -9,5 +9,6 @@ class NormalChicken extends Chicken {
             ],
         55, 55, [0.35, 0.65]
        );
+       this.y = 362;
     }
 }
