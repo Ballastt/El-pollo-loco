@@ -2,7 +2,7 @@ class Chicken extends MoveableObject{
     constructor(imagePath, imageArray, width, height, speedRange){
         super().loadImage(imagePath);
 
-        this.x = 200 + Math.random() * 5000;
+        this.x = 200 + Math.random() * 5700;
         this.y = 370;
         this.speed = speedRange[0] + Math.random() * speedRange[1];
         this.height = height;
