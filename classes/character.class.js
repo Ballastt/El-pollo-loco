@@ -263,15 +263,4 @@ class Character extends MoveableObject{
         }
     }
 
-    gameOver() {
-        //game over overlay
-        document.getElementById('game-over-screen').classList.remove('hidden');
-        this.stopGame();
-    }
-
-    stopGame() {
-        clearInterval(this.characterMovementInterval);
-        clearInterval(this.charaterAnimationInterval);
-        this.isGameStopped = true;
-    }
 }
