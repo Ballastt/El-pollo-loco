@@ -74,6 +74,7 @@ class Character extends MoveableObject{
     world;
     lastHit = 0;
     isDead = false;
+    hurtUntil = 0;
 
     constructor(world){
         super().loadImage('/img/2_character_pepe/2_walk/W-21.png');
@@ -134,49 +135,59 @@ class Character extends MoveableObject{
     }
         
     handleMovement() {
-        if (this.isDead) return; // keine Bewegung mehr
-        let isMoving = false;
-        
-        this.handleMovementWithKeyboard();
-        this.handleMovementDifferentStates();
-       
-        this.isMoving = isMoving; // gespeichert für andere Methoden wie Sound
+        this.handleInput();
+        this.handleState();
     }
+    
 
-    handleMovementWithKeyboard() {
+    handleInput() {
+        if (this.isDead || Date.now() < this.hurtUntil) return;
+    
+        this.isMoving = false;
+    
         if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
             this.moveRight();
-            isMoving = true;
+            this.isMoving = true;
         }
-        
+    
         if (this.world.keyboard.LEFT && this.x > 0) {
             this.moveLeft();
-            isMoving = true;
+            this.isMoving = true;
         }
-        
-        //springen
+    
         if (this.world.keyboard.UP && !this.isAboveGround()) {
             this.jump();
             this.jumpSound.play();
         }
     }
+    
 
-    handleMovementDifferentStates() {
-        // Zustandsverwaltung
+    handleState() {
+        const now = Date.now();
+    
+        if (this.isDead) {
+            this.currentState = this.STATES.DEAD;
+            return;
+        }
+    
+        if (now < this.hurtUntil) {
+            this.currentState = this.STATES.HURT;
+            return;
+        }
+    
         if (this.isAboveGround()) {
             this.currentState = this.STATES.JUMPING;
-            this.lastMoveTime = Date.now();
-        } else if (isMoving) {
+            this.lastMoveTime = now;
+        } else if (this.isMoving) {
             this.currentState = this.STATES.WALKING;
-            this.lastMoveTime = Date.now();
-        } 
-        if (!isMoving && !this.isAboveGround()) {
-            const idleDuration = Date.now() - (this.lastMoveTime || Date.now());
-
+            this.lastMoveTime = now;
+        } else {
+            const idleDuration = now - (this.lastMoveTime || now);
             this.currentState = idleDuration > 10000 ? this.STATES.LONG_IDLE : this.STATES.IDLE;
         }
     }
-        
+            
+
     handleWalkingSound() {
          if (this.isMoving) {
              if (this.walkingSound.paused) {
@@ -223,10 +234,12 @@ class Character extends MoveableObject{
 
         enemies.forEach(enemy => {
             if (this.isColliding(enemy)) {
+                console.log("getroffen vom feind")
                 this.currentState = this.STATES.HURT;
                 this.hit();
                 this.hitSound.play();
                 this.lastHit = now; //Zeitpunkt des letzten Treffers aktualisieren
+                this.hurtUntil = now + 500;
             }
         });
 
