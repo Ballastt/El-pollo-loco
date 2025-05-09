@@ -10,7 +10,7 @@ class NormalChicken extends Chicken {
             [
                 'img/3_enemies_chicken/chicken_normal/2_dead/dead.png'
             ],
-        55, [0.35, 0.65]
+        55, 55, [0.35, 0.65]
        );
        this.y = 362;
     }
