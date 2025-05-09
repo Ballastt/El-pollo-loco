@@ -91,6 +91,7 @@ class World {
     
             this.throwableObjects.push(bottle);
             this.character.collectedBottles--;
+            this.updateThrowBar();
         }
     }
     
