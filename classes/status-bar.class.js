@@ -13,13 +13,11 @@ class StatusBar extends DrawableObject{
         this.height = height;
         this.reversed = isReversed;
 
-        setTimeout(() => {
-            this.setPercentage(isReversed ? 0 : 100);
-        }, 50); // 50ms reichen oft aus
+        this.setPercentage(isReversed ? 0 : 100);
     }
 
     setPercentage(percentage) {
-        this.percentage = percentage;
+        this.percentage = Math.max(0, Math.min(percentage, 100)); // Begrenze auf 0–100
         let path = this.images[this.resolveImageIndex()];
         this.img = this.imageCache[path];
         if (!this.img) {
