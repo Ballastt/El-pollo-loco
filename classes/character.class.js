@@ -88,6 +88,7 @@ class Character extends MoveableObject{
         this.speed = 6;
         this.groundY = 180;
         this.y = this.groundY;
+        this.isDead = false;
 
          // Die Hitbox ist schmaler und zentriert
         this.hitbox = {
@@ -212,7 +213,7 @@ class Character extends MoveableObject{
                 this.playAnimation(this.IMAGES_LONG_IDLE);
                 break;
             case this.STATES.IDLE:
-                this.playAnimation(this.IMAGES_IDLE); // stehendes Bild
+                this.playAnimation(this.IMAGES_IDLE); 
                 break;
             case this.STATES.HURT:
                 this.playAnimation(this.IMAGES_HURT);
@@ -225,7 +226,9 @@ class Character extends MoveableObject{
     }
             
     updateCamera() {
-        this.world.camera_x = -this.x + 100;
+        if (this.world) {
+            this.world.camera_x = -this.x + 100;
+        }
     }
 
     //Kollisionserkennung mit dem Feind
@@ -236,45 +239,46 @@ class Character extends MoveableObject{
         enemies.forEach(enemy => {
             if (this.isColliding(enemy)) {
                 this.currentState = this.STATES.HURT;
-                this.hit();
+                this.hit(20);
                 this.hitSound.play();
                 this.lastHit = now; //Zeitpunkt des letzten Treffers aktualisieren
                 this.hurtUntil = now + 500;
             }
         });
-
-        if (this.isDead) return; // keine weiteren Treffer
-
     }
+
 
     throwBottle() {
         if (this.bottles > 0) {
             this.bottles--;
-            if (world && world.throwBar) {
+            if (this.world && this.world.throwBar) {
                 let percentage = (this.bottles / this.maxBottles) * 100;
-                world.throwBar.setPercentage(percentage);
+                this.world.throwBar.setPercentage(percentage);
             }
         }
     }
 
-    //Gesundheit reduzieren
-    decreaseHealth(amount) {
-        this.health -= amount;
-        if (this.health <= 0) {
-            this.health = 0;
-            this.die();
+    hit(damage) {
+        if (typeof damage !== 'number' || damage <= 0) {
+            console.warn('Ungültiger Schadenswert:', damage);
+            return;
+        }
+        let now = Date.now();
+        if (now - this.lastHit > 1000) { 
+            super.hit(damage);
+            this.lastHit = now;
+    
+            if (world && world.healthBar) {
+                world.healthBar.setPercentage(this.health);
+            }
         }
     }
 
-    //Methode für den Tod des Charakters
     die() {
-        if (!this.isDead) {
-            this.isDead = true;
-            this.currentState = this.STATES.DEAD;
-            console.log("Der Charakter ist tot!");
-            this.walkingSound.pause();
-            this.gameOver();
-        }
+        super.die(); // Basis-Logik aufrufen
+        this.playAnimation(this.IMAGES_DEAD); // Animation für den Tod
+        console.log("Der Charakter ist gestorben!");
     }
+    
 
 }
