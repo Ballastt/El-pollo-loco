@@ -30,7 +30,7 @@ class MoveableObject extends DrawableObject{
     }
 
     playAnimation(images) {
-        let i = this.currentImage % this.IMAGES_WALKING.length;
+        let i = this.currentImage % images.length;
         let path = images[i];
         this.img = this.imageCache[path];
         this.currentImage++;
@@ -82,13 +82,13 @@ class MoveableObject extends DrawableObject{
     // Allgemeine Trefferlogik
     hit(damage) {
         this.health -= damage;
-        console.log(`${this.constructor.name} getroffen! Gesundheit: ${this.health}`);
-
+        
         // Überprüfen, ob das Objekt sterben soll
         if (this.health < 0) {
             this.health = 0; // Gesundheit darf nicht negativ sein
             this.die();
         }
+        console.log(`${this.constructor.name} getroffen! Gesundheit: ${this.health}`);
     }
 
     // Allgemeine Logik für den Tod
