@@ -83,6 +83,7 @@ class World {
         }, 200)
     }
 
+    //drückt der Spieler die D-Taste und hat er Flaschen?
     checkThrowObjects() {
         if (this.keyboard.D && this.character.collectedBottles > 0) {
             let offsetX = this.character.otherDirection ? -10 : 60;
@@ -98,8 +99,22 @@ class World {
             this.character.collectedBottles--;
             this.updateThrowBar();
         }
+
+        this.bottleEnemyCollision();
     }
     
+    bottleEnemyCollision() {
+        this.throwableObjects.forEach((bottle, bottleIndex) => {
+            this.level.enemies.forEach((enemy, enemyIndex) => {
+                if (bottle.isColliding(enemy)) {
+                    console.log("Flasche trifft Feind");
+                    enemy.die();
+                    this.level.enemies.splice(enemyIndex, 1); //entfernt Feind aus dem Feind Array
+                    this.throwableObjects.splice(bottleIndex, 1); //entfernt Flasche aus dem Flaschen Array
+                }
+            });
+        });
+    }
 
     checkCollisions() {
         // Kollision mit Feinden überprüfen
