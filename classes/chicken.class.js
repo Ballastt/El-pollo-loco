@@ -1,6 +1,6 @@
 class Chicken extends MoveableObject{
-    constructor(imagePath, imageArray, width, height, speedRange){
-        super().loadImage(imagePath);
+    constructor(imagePath, imageArray, imageDeadArray, width, height, speedRange){
+        super();
 
         this.x = 200 + Math.random() * 5700;
         this.y = 370;
@@ -8,11 +8,13 @@ class Chicken extends MoveableObject{
         this.height = height;
         this.width = width;
         this.IMAGES_WALKING = imageArray;
+        this.IMAGES_DEAD = imageDeadArray;
+
+        this.imageCache = {};
+        this.loadImage(imagePath);
 
         this.loadImages(this.IMAGES_WALKING);
         this.animate();
-
-        
     }
 
     animate() {
