@@ -5,6 +5,7 @@ class MoveableObject extends DrawableObject{
     speedY = 0;
     acceleration = 2.5;
     health = 100;
+    isDead = false;
     lastHit = 0;
     groundY;
 
@@ -78,16 +79,23 @@ class MoveableObject extends DrawableObject{
         this.speedY = 34;
     }
 
-    hit() {
-        let now = Date.now();
-        if (now - this.lastHit > 1000) { // 1 Sekunde Schutz vor mehrfachen Treffern
-            this.health -= 5;
-            this.lastHit = now;
-    
-            // Aktualisiere die HealthBar
-            if (world && world.healthBar) {
-                world.healthBar.setPercentage(this.health);
-            }
+    // Allgemeine Trefferlogik
+    hit(damage) {
+        this.health -= damage;
+        console.log(`${this.constructor.name} getroffen! Gesundheit: ${this.health}`);
+
+        // Überprüfen, ob das Objekt sterben soll
+        if (this.health < 0) {
+            this.health = 0; // Gesundheit darf nicht negativ sein
+            this.die();
+        }
+    }
+
+    // Allgemeine Logik für den Tod
+    die() {
+        if (!this.isDead) {
+            this.isDead = true;
+            console.log(`${this.constructor.name} ist gestorben!`);
         }
     }
     
