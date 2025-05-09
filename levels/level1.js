@@ -38,8 +38,6 @@ function generateEnemies() {
         enemies.push(Math.random() < 0.5 ? new SmallChicken(x) : new NormalChicken(x));
     }
 
-    enemies.push(new Endboss());
-
     return enemies;
 }
 
