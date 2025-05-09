@@ -1,5 +1,6 @@
 class World {
     character;
+    endboss;
     level = level1;
     canvas;
     ctx;
@@ -26,6 +27,10 @@ class World {
         this.keyboard = keyboard;
 
         this.character = new Character(this);
+
+        // Endboss initialisieren und den Charakter übergeben
+        this.endboss = new Endboss(this.character);
+
 
         this.coinCollectSound = new Audio('audio/get_coin.mp3');
         this.bottleCollectSound = new Audio('audio/get_bottle.mp3');
@@ -99,7 +104,7 @@ class World {
     checkCollisions() {
         // Kollision mit Feinden überprüfen
         this.character.checkCollisionsWithEnemy(this.level.enemies);
-    
+        this.character.checkCollisionsWithEndboss(this.endboss);
         //Aktualisiere die Gesundheitsleiste nach einer Kollision
         this.healthBar.setPercentage(this.character.health);
     }
@@ -127,6 +132,7 @@ class World {
         this.addObjectToMap(this.level.bottles);
         this.addObjectToMap(this.level.clouds);
         this.addToMap(this.character);
+        this.addToMap(this.endboss);
         this.addObjectToMap(this.level.enemies);
         this.addObjectToMap(this.throwableObjects);
 
