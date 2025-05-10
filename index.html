@@ -9,9 +9,9 @@
     <title>El Pollo Loco</title>
   </head>
   <body onload="init()">
-    <!--Start Screen
+
     <div id="start-screen">
-        <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen Image">
+        <img src="img/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen Image" id="startScreen-img">
         <audio id="start-sound" autoplay loop>
             <source src="audio/audio_start_screen.mp3" type="audio/mpeg">
             Your browser does not support the audio element.
@@ -19,14 +19,15 @@
         <div class="buttons">
             <button id="learn-button" class="btn-grad">Über das Spiel</button>
             <button id="start-button" class="btn-grad">Start game</button>
-            <button id="mute-button" class="btn-grad">Mute Music</button>
+            <button id="mute-button" class="btn-grad">
+              <img src="img/9_intro_outro_screens/start/sound-off.png" alt="Mute Button" id="mute">
+            </button>
         </div>
-    </div>-->
+    </div>
     <div id="background-image">
       <h1>El pollo loco</h1>
     </div>
     <canvas id="canvas" width="720px" height="480px"> </canvas>
-    <button id="mute-button" class="btn-grad">Mute Music</button>
 
     <div id="game-over-screen" class="hidden">
       <h1>GAME OVER</h1>
@@ -53,6 +54,7 @@
     <script src="classes/salsaBottle-object.class.js"></script>
     <script src="levels/level1.js"></script>
     <script src="classes/gameManager.class.js"></script>
+    <script src="javascript/audio.js"></script>
     <script src="javascript/game.js"></script>
   </body>
 </html>
