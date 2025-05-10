@@ -34,38 +34,10 @@ class World {
     this.bottleCollectSound = new Audio("audio/get_bottle.mp3");
     this.updateSoundVolume();
 
-    // Bildpfade für die drei Statusbars definieren
-    const healthImages = [
-      "img/7_statusbars/1_statusbar/2_statusbar_health/blue/0.png",
-      "img/7_statusbars/1_statusbar/2_statusbar_health/blue/20.png",
-      "img/7_statusbars/1_statusbar/2_statusbar_health/blue/40.png",
-      "img/7_statusbars/1_statusbar/2_statusbar_health/blue/60.png",
-      "img/7_statusbars/1_statusbar/2_statusbar_health/blue/80.png",
-      "img/7_statusbars/1_statusbar/2_statusbar_health/blue/100.png",
-    ];
-
-    const throwImages = [
-      "img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/0.png",
-      "img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/20.png",
-      "img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/40.png",
-      "img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/60.png",
-      "img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/80.png",
-      "img/7_statusbars/1_statusbar/3_statusbar_bottle/blue/100.png",
-    ];
-
-    const coinImages = [
-      "img/7_statusbars/1_statusbar/1_statusbar_coin/blue/0.png",
-      "img/7_statusbars/1_statusbar/1_statusbar_coin/blue/20.png",
-      "img/7_statusbars/1_statusbar/1_statusbar_coin/blue/40.png",
-      "img/7_statusbars/1_statusbar/1_statusbar_coin/blue/60.png",
-      "img/7_statusbars/1_statusbar/1_statusbar_coin/blue/80.png",
-      "img/7_statusbars/1_statusbar/1_statusbar_coin/blue/100.png",
-    ];
-
     // Statusbars mit den jeweiligen Bildern initialisieren
-    this.healthBar = new StatusBar(healthImages, 0, 0, 250, 60);
-    this.throwBar = new StatusBar(throwImages, 0, 50, 250, 60, true);
-    this.coinBar = new StatusBar(coinImages, 0, 100, 250, 60, true);
+    this.healthBar = new StatusBar('health', 0, 0, 250, 60);
+    this.throwBar = new StatusBar('throw', 0, 50, 250, 60, true);
+    this.coinBar = new StatusBar('coin', 0, 100, 250, 60, true);
 
     this.coinBar.setPercentage(0);
 
@@ -101,13 +73,19 @@ class World {
     this.bottleEnemyCollision();
   }
 
+  updateThrowBar() {
+    const maxBottles = this.level.totalBottles || 30; // Standardwert: 30 Flaschen
+    const percentage = (this.character.collectedBottles / maxBottles) * 100;
+    console.log(`Updating ThrowBar: ${percentage}%`);
+    this.throwBar.setPercentage(percentage);
+  }
+
   bottleEnemyCollision() {
     this.throwableObjects.forEach((bottle, bottleIndex) => {
-      this.level.enemies.forEach((enemy, enemyIndex) => {
+      this.level.enemies.forEach((enemy) => {
         if (bottle.isColliding(enemy)) {
-          console.log("Flasche trifft Feind");
+          console.log("Flasche trifft Feind", enemy);
           enemy.die();
-          this.level.enemies.splice(enemyIndex, 1); //entfernt Feind aus dem Feind Array
           this.throwableObjects.splice(bottleIndex, 1); //entfernt Flasche aus dem Flaschen Array
         }
       });
@@ -253,6 +231,7 @@ class World {
         console.log(
           `Bottles collected: ${this.character.collectedBottles} / ${this.level.totalBottles}`
         );
+        this.updateThrowBar();
       },
     });
   }
