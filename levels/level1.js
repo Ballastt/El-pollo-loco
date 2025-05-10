@@ -27,20 +27,19 @@ for (let i = -1; i < numberOfBackgrounds; i++) {
 
 function generateEnemies() {
     const enemies = [];
-    const amount = 30;
-    const level_end_x  = 5700;
-    const startX = 300;
+    const amount = 20; // Anzahl der Feinde (kann angepasst werden)
+    const level_end_x = 6000; // Ende des Levels
+    const startX = 1500; // Feinde erscheinen erst nach diesem Punkt
     const spacing = (level_end_x - startX) / amount;
 
     for (let i = 0; i < amount; i++) {
-        const baseX = startX + i * spacing; // Gleichmäßige Verteilung
-        const x = baseX + (Math.random() - 0.5) * spacing * 0.3; // Kleine Zufälligkeit (bis zu 30% des Spacin
+        const baseX = startX + i * spacing; // Verhindert Feinde vor startX
+        const x = baseX + (Math.random() - 0.5) * spacing * 0.3; // Zufällige Position
         enemies.push(Math.random() < 0.5 ? new SmallChicken(x) : new NormalChicken(x));
     }
 
     return enemies;
 }
-
 
 
 function generateClouds() {
