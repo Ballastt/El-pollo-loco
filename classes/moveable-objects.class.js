@@ -88,9 +88,6 @@ class MoveableObject extends DrawableObject {
       this.health = 0; // Gesundheit darf nicht negativ sein
       this.die();
     }
-    console.log(
-      `${this.constructor.name} getroffen! Gesundheit: ${this.health}`
-    );
   }
 
   // Allgemeine Logik für den Tod
