@@ -35,14 +35,22 @@ class Chicken extends MoveableObject {
     }, 200);
   }
 
-  die() {
+  die(enemies, index) {
+    console.log("Chicken is dying..."); // Debugging
     clearInterval(this.walkingInterval);
     clearInterval(this.animationInterval);
     this.playAnimation(this.IMAGES_DEAD);
+    this.hitbox = null;
 
     setTimeout(() => {
-      this.speed = 0;
-      this.y += 5;
-    }, 200);
-  }
+        this.speed = 0;
+        this.y += 5;
+
+        // Entferne das Huhn aus dem Array
+        if (enemies && typeof index === "number") {
+            console.log("Removing chicken from enemies array...", this);
+            enemies.splice(index, 1);
+        }
+    }, 500); // Wartezeit für die Todesanimation
+}
 }
