@@ -19,4 +19,8 @@ class Level {
         this.totalCoins = coins.length;
         this.totalBottles = bottles.length;
     }
+
+    regenerateEnemies() {
+        this.enemies = generateEnemies();
+    }
 }
