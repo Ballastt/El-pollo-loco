@@ -128,77 +128,37 @@ class Character extends MoveableObject {
     this.startAnimationLoop();
   }
 
-  startMovementLoop() {
-    setInterval(() => {
-      this.handleMovement();
-      this.handleWalkingSound();
-      this.updateCamera();
-
-      this.checkCollisionsWithEnemy(this.world.level.enemies);
-    }, 1000 / 60);
-  }
-
-  startAnimationLoop() {
-    setInterval(() => {
-      this.handleAnimations();
-    }, 50);
-  }
-
-  handleMovement() {
-    this.handleInput();
-    this.handleState();
-  }
-
-  handleInput() {
-    if (this.isDead || Date.now() < this.hurtUntil) return;
-
-    this.isMoving = false;
-
-    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
-      this.moveRight();
-      this.isMoving = true;
-    }
-
-    if (this.world.keyboard.LEFT && this.x > 0) {
-      this.moveLeft();
-      this.isMoving = true;
-    }
-
-    if (this.world.keyboard.UP && !this.isAboveGround()) {
-      this.jump();
-      this.jumpSound.play();
+  checkCollisionsWithEndboss(endboss) {
+    if (this.isColliding(endboss)) {
+      console.log("Kollision mit dem Endboss");
+      this.currentState = this.STATES.HURT;
+      endboss.hurt(10);
+      this.hit(20);
     }
   }
 
-  handleState() {
+  checkCollisionsWithEnemy(enemies) {
     const now = Date.now();
+    if (now - this.lastHit < 2000) return; // Immunitätsphase von einer Sekunde
 
-    if (this.isDead) return this.currentState = this.STATES.DEAD;
-
-    if (now < this.hurtUntil) return this.currentState = this.STATES.HURT;
-
-    if (this.isAboveGround()) {
-      this.currentState = this.STATES.JUMPING;
-      this.lastMoveTime = now;
-    } else if (this.isMoving) {
-      this.currentState = this.STATES.WALKING;
-      this.lastMoveTime = now;
-    } else {
-      const idleDuration = now - (this.lastMoveTime || now);
-      this.currentState =
-        idleDuration > 10000 ? this.STATES.LONG_IDLE : this.STATES.IDLE;
-    }
+    enemies.forEach((enemy) => {
+      if (this.isColliding(enemy)) {
+        this.currentState = this.STATES.HURT;
+        this.hit(10);
+        console.log(
+          `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
+        );
+        //this.hitSound.play();
+        this.lastHit = now; // Zeitpunkt des letzten Treffers aktualisieren
+        this.hurtUntil = now + 500;
+      }
+    });
   }
 
-  handleWalkingSound() {
-    if (this.isMoving) {
-      if (this.walkingSound.paused) {
-        this.walkingSound.play();
-      }
-    } else {
-      this.walkingSound.pause();
-      this.walkingSound.currentTime = 0;
-    }
+  die() {
+    super.die(); // Basis-Logik aufrufen
+    this.playAnimation(this.IMAGES_DEAD); // Animation für den Tod
+    console.log("Der Charakter ist gestorben!");
   }
 
   handleAnimations() {
@@ -224,49 +184,60 @@ class Character extends MoveableObject {
     }
   }
 
-  updateCamera() {
-    if (this.world) {
-      this.world.camera_x = -this.x + 100;
+  handleInput() {
+    if (this.isDead || Date.now() < this.hurtUntil) return;
+
+    this.isMoving = false;
+
+    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
+      this.moveRight();
+      this.isMoving = true;
+    }
+
+    if (this.world.keyboard.LEFT && this.x > 0) {
+      this.moveLeft();
+      this.isMoving = true;
+    }
+
+    if (this.world.keyboard.UP && !this.isAboveGround()) {
+      this.jump();
+      this.jumpSound.play();
     }
   }
 
-  //Kollisionserkennung mit dem Feind
-  checkCollisionsWithEnemy(enemies) {
+  handleMovement() {
+    this.handleInput();
+    this.handleState();
+  }
+
+  handleState() {
     const now = Date.now();
-    if (now - this.lastHit < 2000) return; //Immunitätsphase von einer sekunde
 
-    enemies.forEach((enemy) => {
-      if (this.isColliding(enemy)) {
-        this.currentState = this.STATES.HURT;
-        this.hit(10);
-        console.log(
-          `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
-        );
-        //this.hitSound.play();
-        this.lastHit = now; //Zeitpunkt des letzten Treffers aktualisieren
-        this.hurtUntil = now + 500;
-      }
-    });
-  }
+    if (this.isDead) return (this.currentState = this.STATES.DEAD);
 
-  
+    if (now < this.hurtUntil) return (this.currentState = this.STATES.HURT);
 
-  checkCollisionsWithEndboss(endboss) {
-    if (this.isColliding(endboss)) {
-      console.log("Kollision mit dem Endboss");
-      this.currentState = this.STATES.HURT;
-      endboss.hurt(10);
-      this.hit(20);
+    if (this.isAboveGround()) {
+      this.currentState = this.STATES.JUMPING;
+      this.lastMoveTime = now;
+    } else if (this.isMoving) {
+      this.currentState = this.STATES.WALKING;
+      this.lastMoveTime = now;
+    } else {
+      const idleDuration = now - (this.lastMoveTime || now);
+      this.currentState =
+        idleDuration > 10000 ? this.STATES.LONG_IDLE : this.STATES.IDLE;
     }
   }
 
-  throwBottle() {
-    if (this.bottles > 0) {
-      this.bottles--;
-      if (this.world && this.world.throwBar) {
-        let percentage = (this.bottles / this.maxBottles) * 100;
-        this.world.throwBar.setPercentage(percentage);
+  handleWalkingSound() {
+    if (this.isMoving) {
+      if (this.walkingSound.paused) {
+        this.walkingSound.play();
       }
+    } else {
+      this.walkingSound.pause();
+      this.walkingSound.currentTime = 0;
     }
   }
 
@@ -292,9 +263,51 @@ class Character extends MoveableObject {
     }
   }
 
-  die() {
-    super.die(); // Basis-Logik aufrufen
-    this.playAnimation(this.IMAGES_DEAD); // Animation für den Tod
-    console.log("Der Charakter ist gestorben!");
+  startAnimationLoop() {
+    setInterval(() => {
+      this.handleAnimations();
+    }, 50);
+  }
+
+  startMovementLoop() {
+    setInterval(() => {
+      this.handleMovement();
+      this.handleWalkingSound();
+      this.updateCamera();
+
+      this.checkCollisionsWithEnemy(this.world.level.enemies);
+    }, 1000 / 60);
+  }
+
+  throwBottle() {
+    if (this.bottles > 0) {
+      this.bottles--;
+
+      const offsetX = this.otherDirection ? -10 : 60;
+      const offsetY = 80;
+      const bottle = new SalsaBottle(
+        this.x + offsetX,
+        this.y + offsetY,
+        this.otherDirection
+      );
+
+      this.world.throwableObjects.push(bottle);
+      this.updateThrowBar();
+    }
+  }
+
+  updateCamera() {
+    if (this.world) {
+      this.world.camera_x = -this.x + 100;
+    }
+  }
+
+  updateThrowBar() {
+    if (this.world && this.world.throwBar) {
+      const maxBottles = this.world.level.totalBottles || 30;
+      const percentage = (this.bottles / maxBottles) * 100;
+      this.world.throwBar.setPercentage(percentage);
+      console.log(`Updated ThrowBar: ${percentage}%`);
+    }
   }
 }
