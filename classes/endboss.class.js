@@ -78,7 +78,7 @@ class Endboss extends MoveableObject {
     setInterval(() => {
       this.handleAnimations();
       this.updateState();
-      this.moveTowardsCharacter();
+      this.checkCharacterPositionAndMove();
     }, 100);
   }
 
@@ -127,6 +127,13 @@ class Endboss extends MoveableObject {
     const dx = this.x - characterX;
     const dy = this.y - characterY;
     return Math.sqrt(dx * dx + dy * dy); // Pythagoras: √(dx² + dy²)
+  }
+
+  //Endboss bewegt sich nur, wenn Charakter am Ende des Spiels
+  checkCharacterPositionAndMove() {
+    if (this.character.x >= 6000) {
+        this.moveTowardsCharacter();
+    }
   }
 
   moveTowardsCharacter() {
