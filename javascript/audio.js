@@ -11,29 +11,11 @@ const startSound = document.getElementById("start-sound");
 // Variable to track sound state
 let isMuted = false;
 
-// Function to start the game
-function startGame() {
-  startScreen.style.display = "none";
-
-  // Start the game logic (your existing game code)
-  initializeGame();
-}
-
-// Function to show game instructions
-function showInstructions() {
-  alert(
-    "Welcome to the game! Here are the instructions:\n\n- Use arrow keys to move.\n- Avoid enemies and collect items.\n- Have fun!"
-  );
-}
-
 // Function to toggle mute/unmute
 function toggleMute() {
   console.log("Mute button clicked!"); // Prüfen, ob der Button geklickt wurde
 
-  if (!startSound) {
-    console.error("Audio element not found!");
-    return;
-  }
+  if (!startSound) return console.error("Audio element not found!");
 
   if (isMuted) {
     startSound.muted = false;
@@ -47,33 +29,28 @@ function toggleMute() {
   isMuted = !isMuted; // Zustand umschalten
 }
 
-
 // Event Listeners
-startButton.addEventListener("click", startGame);
-learnButton.addEventListener("click", showInstructions);
-muteButton.addEventListener("click", toggleMute);
-console.log()
 
-// Placeholder for game initialization
-function initializeGame() {
-  console.log("Game starts here!");
-  // Add your game logic here (e.g., create the World instance and start the game loop)
-}
+muteButton.addEventListener("click", toggleMute);
 
 window.addEventListener("load", () => {
-  const startSound = document.getElementById("start-sound");
-  const startButton = document.getElementById("start-button");
+  // Standardwerte setzen
+  isMuted = false;
+  startSound.muted = false;
+  muteIcon.src = "img/9_intro_outro_screens/start/sound-on.png";
+
+  // Versuche, den Ton abzuspielen
+  startSound.play().catch((error) => {
+    console.warn("Autoplay blockiert: Benutzerinteraktion erforderlich, um den Sound abzuspielen.");
+  });
 
   // Unmute and play audio after user clicks "Start Game"
   startButton.addEventListener("click", () => {
+    isMuted = false;
     startSound.muted = false;
+    muteIcon.src = "img/9_intro_outro_screens/start/sound-on.png";
     startSound.play().catch((error) => {
       console.error("Error playing sound:", error);
     });
   });
 });
-
-
-console.log("Start Button:", startButton);
-console.log("Learn Button:", learnButton);
-console.log("Mute Button:", muteButton);
