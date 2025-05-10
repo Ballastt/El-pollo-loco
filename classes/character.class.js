@@ -133,6 +133,7 @@ class Character extends MoveableObject {
       this.handleMovement();
       this.handleWalkingSound();
       this.updateCamera();
+
       this.checkCollisionsWithEnemy(this.world.level.enemies);
     }, 1000 / 60);
   }
@@ -172,15 +173,9 @@ class Character extends MoveableObject {
   handleState() {
     const now = Date.now();
 
-    if (this.isDead) {
-      this.currentState = this.STATES.DEAD;
-      return;
-    }
+    if (this.isDead) return this.currentState = this.STATES.DEAD;
 
-    if (now < this.hurtUntil) {
-      this.currentState = this.STATES.HURT;
-      return;
-    }
+    if (now < this.hurtUntil) return this.currentState = this.STATES.HURT;
 
     if (this.isAboveGround()) {
       this.currentState = this.STATES.JUMPING;
@@ -243,25 +238,25 @@ class Character extends MoveableObject {
     enemies.forEach((enemy) => {
       if (this.isColliding(enemy)) {
         this.currentState = this.STATES.HURT;
-        this.hit(5);
+        this.hit(10);
+        console.log(
+          `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
+        );
         //this.hitSound.play();
         this.lastHit = now; //Zeitpunkt des letzten Treffers aktualisieren
         this.hurtUntil = now + 500;
-
-        //Feind Entfernen wenn tot
-        if (enemy instanceof Chicken && enemy.isDead) {
-          const index = enemies.indexOf(enemy);
-          if (index > -1) enemies.splice(index, 1);
-        }
       }
     });
   }
 
+  
+
   checkCollisionsWithEndboss(endboss) {
     if (this.isColliding(endboss)) {
       console.log("Kollision mit dem Endboss");
+      this.currentState = this.STATES.HURT;
       endboss.hurt(10);
-      this.health -= 20;
+      this.hit(20);
     }
   }
 
@@ -278,15 +273,18 @@ class Character extends MoveableObject {
   hit(damage) {
     let now = Date.now();
     if (now - this.lastHit > 1000) {
-      super.hit(damage);
+      console.log("Character hit() aufgerufen"); // <- Teste, ob dieser Code erreicht wird
+      super.hit(damage); // <- Sollte auch MoveableObject.hit() loggen
       this.lastHit = now;
 
-      this.health = Math.max(0, this.health); // Begrenze die Gesundheit auf 0
-      const percentage = (this.health / this.maxHealth) * 100; // Berechne den Prozentsatz
+      this.health = Math.max(0, this.health);
+      const percentage = (this.health / this.maxHealth) * 100;
 
-      if (world && world.healthBar) {
-        world.healthBar.setPercentage(percentage); // Aktualisiere die Healthbar
+      if (this.world && this.world.healthBar) {
+        this.world.healthBar.setPercentage(percentage);
       }
+
+      console.log(`Character getroffen! Gesundheit: ${this.health}`);
     }
 
     if (this.health === 0) {
