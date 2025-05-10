@@ -21,8 +21,6 @@ class DrawableObject {
     arr.forEach((path) => {
       let img = new Image();
       img.src = path;
-      img.onload = () => console.log(`Image loaded: ${path}`);
-      img.onerror = () => console.error(`Failed to load image: ${path}`);
       this.imageCache[path] = img;
     });
   }
