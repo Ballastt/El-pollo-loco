@@ -5,7 +5,7 @@ class World {
   canvas;
   ctx;
   keyboard;
-  camera_x = 0; //Kameradrehung
+  camera_x = 0; // Kameradrehung
   level_end_x = 6000;
 
   collectedCoins = 0;
@@ -35,9 +35,9 @@ class World {
     this.updateSoundVolume();
 
     // Statusbars mit den jeweiligen Bildern initialisieren
-    this.healthBar = new StatusBar('health', 0, 0, 250, 60);
-    this.throwBar = new StatusBar('throw', 0, 50, 250, 60, true);
-    this.coinBar = new StatusBar('coin', 0, 100, 250, 60, true);
+    this.healthBar = new StatusBar("health", 0, 0, 250, 60);
+    this.throwBar = new StatusBar("throw", 0, 50, 250, 60, true);
+    this.coinBar = new StatusBar("coin", 0, 100, 250, 60, true);
 
     this.coinBar.setPercentage(0);
 
@@ -46,106 +46,13 @@ class World {
     this.checkCollisions();
   }
 
-  run() {
-    setInterval(() => {
-      this.checkCollisions();
-      this.checkThrowObjects();
-    }, 200);
-  }
-
-  //drückt der Spieler die D-Taste und hat er Flaschen?
-  checkThrowObjects() {
-    if (this.keyboard.D && this.character.collectedBottles > 0) {
-      let offsetX = this.character.otherDirection ? -10 : 60;
-      let offsetY = 80;
-
-      const bottle = new SalsaBottle(
-        this.character.x + offsetX,
-        this.character.y + offsetY,
-        this.character.otherDirection
-      );
-
-      this.throwableObjects.push(bottle);
-      this.character.collectedBottles--;
-      this.updateThrowBar();
-    }
-
-    this.bottleEnemyCollision();
-  }
-
-  updateThrowBar() {
-    const maxBottles = this.level.totalBottles || 30; // Standardwert: 30 Flaschen
-    const percentage = (this.character.collectedBottles / maxBottles) * 100;
-    console.log(`Updating ThrowBar: ${percentage}%`);
-    this.throwBar.setPercentage(percentage);
-  }
-
-  bottleEnemyCollision() {
-    this.throwableObjects.forEach((bottle, bottleIndex) => {
-      this.level.enemies.forEach((enemy) => {
-        if (bottle.isColliding(enemy)) {
-          console.log("Flasche trifft Feind", enemy);
-          enemy.die();
-          this.throwableObjects.splice(bottleIndex, 1); //entfernt Flasche aus dem Flaschen Array
-        }
-      });
-    });
-  }
-
-  checkCollisions() {
-    // Kollision mit Feinden überprüfen
-    this.character.checkCollisionsWithEnemy(this.level.enemies);
-    this.character.checkCollisionsWithEndboss(this.endboss);
-    //Aktualisiere die Gesundheitsleiste nach einer Kollision
-    this.healthBar.setPercentage(this.character.health);
-  }
-
-  //gameloop
-  draw() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.checkCoinCollection();
-    this.checkBottleCollection();
-
-    //Adjusting camera so we won't go beyond level ending at level_end_x
-    if (this.camera_x < this.level_end_x - this.canvas.width) {
-      if (this.keyboard.RIGHT) {
-        this.camera_x += 1;
-      }
-    }
-
-    this.ctx.translate(this.camera_x, 0); //Kameradrehung inital
-
-    //alle "beweglichen" Objekte zeichnen
-    this.addObjectToMap(this.level.backgroundObjects);
-    this.addObjectToMap(this.level.coins);
-    this.addObjectToMap(this.level.bottles);
-    this.addObjectToMap(this.level.clouds);
-    this.addToMap(this.character);
-    this.addToMap(this.endboss);
-    this.addObjectToMap(this.level.enemies);
-    this.addObjectToMap(this.throwableObjects);
-
-    //Kamera wieder zurücksetzen
-    this.ctx.translate(-this.camera_x, 0); //nach dem malen der Objekte, müssen wir wieder zurücksetzen, damit es sich nicht weiter dreht
-
-    //Zeichne UI-elemente die nicht von der Kamera beeinflusst sind
-    // Zeichne die Statusbars
-    this.addToMap(this.healthBar);
-    this.addToMap(this.throwBar);
-    this.addToMap(this.coinBar);
-
-    // Nächster Frame
-    requestAnimationFrame(() => this.draw());
-  }
-
   addObjectToMap(objects) {
     objects.forEach((o) => {
       this.addToMap(o);
     });
   }
 
-  //mo steht für moveableObject
+  // mo steht für moveableObject
   addToMap(mo) {
     if (mo.otherDirection) this.flipImage(mo);
 
@@ -155,16 +62,55 @@ class World {
     if (mo.otherDirection) this.flipImageBack(mo);
   }
 
-  flipImage(mo) {
-    this.ctx.save(); //aktuelle Einstellungen speichern
-    this.ctx.translate(mo.width, 0); //wir verändern, wie wir das Bild einfügen
-    this.ctx.scale(-1, 1);
-    mo.x = mo.x * -1;
+  bottleEnemyCollision() {
+    this.throwableObjects.forEach((bottle, bottleIndex) => {
+      this.level.enemies.forEach((enemy) => {
+        if (bottle.isColliding(enemy)) {
+          console.log("Flasche trifft Feind", enemy);
+          enemy.die();
+          this.throwableObjects.splice(bottleIndex, 1); // entfernt Flasche aus dem Flaschen Array
+        }
+      });
+    });
   }
 
-  flipImageBack(mo) {
-    mo.x = mo.x * -1;
-    this.ctx.restore(); //aktuelle Einstellungen wiederherstellen
+  checkBottleCollection() {
+    this.checkItemCollection("Bottle", {
+      items: this.level.bottles,
+      characterProperty: "collectedBottles",
+      sound: this.bottleCollectSound,
+      bar: this.throwBar,
+      maxItems: this.level.totalBottles,
+      onCollect: () => {
+        console.log(
+          `Bottles collected: ${this.character.collectedBottles} / ${this.level.totalBottles}`
+        );
+        this.updateThrowBar();
+      },
+    });
+  }
+
+  checkCollisions() {
+    // Kollision mit Feinden überprüfen
+    this.character.checkCollisionsWithEnemy(this.level.enemies);
+    this.character.checkCollisionsWithEndboss(this.endboss);
+    // Aktualisiere die Gesundheitsleiste nach einer Kollision
+    this.healthBar.setPercentage(this.character.health);
+  }
+
+  checkCoinCollection() {
+    this.checkItemCollection("Coin", {
+      items: this.level.coins,
+      characterProperty: "collectedCoins",
+      sound: this.coinCollectSound,
+      bar: this.coinBar,
+      maxItems: this.level.totalCoins,
+      onCollect: () => {
+        console.log(
+          `Coins collected: ${this.character.collectedCoins} / ${this.level.totalCoins}`
+        );
+      },
+    });
   }
 
   checkItemCollection(itemType, options) {
@@ -199,48 +145,79 @@ class World {
     });
   }
 
-  /**
-   * Spezifische Funktionen für Coins
-   */
-  checkCoinCollection() {
-    this.checkItemCollection("Coin", {
-      items: this.level.coins,
-      characterProperty: "collectedCoins",
-      sound: this.coinCollectSound,
-      bar: this.coinBar,
-      maxItems: this.level.totalCoins,
-      onCollect: () => {
-        console.log(
-          `Coins collected: ${this.character.collectedCoins} / ${this.level.totalCoins}`
-        );
-      },
-    });
+  checkThrowObjects() {
+    if (this.keyboard.D) {
+      this.character.throwBottle(); // Delegate to Character
+    }
+    this.bottleEnemyCollision();
   }
 
-  /**
-   * Spezifische Funktionen für Bottles
-   */
-  checkBottleCollection() {
-    this.checkItemCollection("Bottle", {
-      items: this.level.bottles,
-      characterProperty: "collectedBottles",
-      sound: this.bottleCollectSound,
-      bar: this.throwBar,
-      maxItems: this.level.totalBottles,
-      onCollect: () => {
-        console.log(
-          `Bottles collected: ${this.character.collectedBottles} / ${this.level.totalBottles}`
-        );
-        this.updateThrowBar();
-      },
-    });
+  draw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.checkCoinCollection();
+    this.checkBottleCollection();
+
+    // Adjusting camera so we won't go beyond level ending at level_end_x
+    if (this.camera_x < this.level_end_x - this.canvas.width) {
+      if (this.keyboard.RIGHT) {
+        this.camera_x += 1;
+      }
+    }
+
+    this.ctx.translate(this.camera_x, 0); // Kameradrehung inital
+
+    // alle "beweglichen" Objekte zeichnen
+    this.addObjectToMap(this.level.backgroundObjects);
+    this.addObjectToMap(this.level.coins);
+    this.addObjectToMap(this.level.bottles);
+    this.addObjectToMap(this.level.clouds);
+    this.addToMap(this.character);
+    this.addToMap(this.endboss);
+    this.addObjectToMap(this.level.enemies);
+    this.addObjectToMap(this.throwableObjects);
+
+    // Kamera wieder zurücksetzen
+    this.ctx.translate(-this.camera_x, 0); // nach dem malen der Objekte, müssen wir wieder zurücksetzen, damit es sich nicht weiter dreht
+
+    // Zeichne UI-elemente die nicht von der Kamera beeinflusst sind
+    // Zeichne die Statusbars
+    this.addToMap(this.healthBar);
+    this.addToMap(this.throwBar);
+    this.addToMap(this.coinBar);
+
+    // Nächster Frame
+    requestAnimationFrame(() => this.draw());
   }
 
-  /**
-   * Lautstärke für Sounds anpassen
-   */
+  flipImage(mo) {
+    this.ctx.save(); // aktuelle Einstellungen speichern
+    this.ctx.translate(mo.width, 0); // wir verändern, wie wir das Bild einfügen
+    this.ctx.scale(-1, 1);
+    mo.x = mo.x * -1;
+  }
+
+  flipImageBack(mo) {
+    mo.x = mo.x * -1;
+    this.ctx.restore(); // aktuelle Einstellungen wiederherstellen
+  }
+
+  run() {
+    setInterval(() => {
+      this.checkCollisions();
+      this.checkThrowObjects();
+    }, 200);
+  }
+
   updateSoundVolume() {
     this.coinCollectSound.volume = this.soundVolume;
     this.bottleCollectSound.volume = this.soundVolume;
+  }
+
+  updateThrowBar() {
+    const maxBottles = this.level.totalBottles || 30; // Standardwert: 30 Flaschen
+    const percentage = (this.character.collectedBottles / maxBottles) * 100;
+    console.log(`Updating ThrowBar: ${percentage}%`);
+    this.throwBar.setPercentage(percentage);
   }
 }
