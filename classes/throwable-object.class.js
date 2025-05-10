@@ -10,6 +10,18 @@ class ThrowableObject extends MoveableObject {
     this.isFlying = false;
   }
 
+  applyGravity() {
+    this.speedY += 1; // Schwerkraft anwenden
+  }
+
+  checkGroundCollision() {
+    if (this.y >= 370) {
+      // 370 ist die Bodenhöhe
+      this.splash();
+      clearInterval(this.throwInterval); // Stoppe die Bewegung
+    }
+  }
+
   throw() {
     this.isFlying = true;
     this.speedX = this.otherDirection ? -10 : 10;
@@ -21,11 +33,8 @@ class ThrowableObject extends MoveableObject {
         this.x += this.speedX;
         this.y += this.speedY;
         this.applyGravity(); // Schwerkraft anwenden
+        this.checkGroundCollision();
       }
     }, 25);
-  }
-
-  applyGravity() {
-    this.speedY += 1; // Schwerkraft anwenden
   }
 }
