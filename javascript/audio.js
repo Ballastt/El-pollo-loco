@@ -13,24 +13,21 @@ let isMuted = false;
 
 // Function to toggle mute/unmute
 function toggleMute() {
-  console.log("Mute button clicked!"); // Prüfen, ob der Button geklickt wurde
-
   if (!startSound) return console.error("Audio element not found!");
 
   if (isMuted) {
     startSound.muted = false;
     muteIcon.src = "img/9_intro_outro_screens/start/sound-on.png";
-    console.log("Sound unmuted");
   } else {
     startSound.muted = true;
     muteIcon.src = "img/9_intro_outro_screens/start/sound-off.png";
-    console.log("Sound muted");
   }
   isMuted = !isMuted; // Zustand umschalten
 }
 
-// Event Listeners
 
+
+// Event Listeners
 muteButton.addEventListener("click", toggleMute);
 
 window.addEventListener("load", () => {
