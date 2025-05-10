@@ -1,77 +1,105 @@
 * {
-    margin: 0;
-    box-sizing: border-box;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 canvas {
-    background-color: black;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  background-color: black;
 }
 
 h1 {
-    padding: 40px 0;
+  padding: 40px 0;
+}
+
+#background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
+  background-image: url('img/5_background/bg-image_loco.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.66;
 }
 
 #start-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 10; /* Ensure it's on top */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10; /* Ensure it's on top */
 }
 
 #start-screen img {
-    width: 100%;
-    height: 100%;
-    margin-bottom: 20px;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 20px;
 }
 
 #start-screen button {
-    padding: 10px 20px;
-    margin: 10px;
-    font-size: 1.2rem;
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 1.2rem;
 }
 
 #game-canvas {
-    position: relative;
-    z-index: 1; /* Below the start screen */
+  position: relative;
+  z-index: 1; /* Below the start screen */
 }
 
-
-.btn-grad {background-image: linear-gradient(to right, #ffb347 0%, #ffcc33  51%, #ffb347  100%)}
 .btn-grad {
-   margin: 10px;
-   padding: 15px 45px;
-   text-align: center;
-   text-transform: uppercase;
-   transition: 0.5s;
-   background-size: 200% auto;
-   color: white;            
+  background-image: linear-gradient(
+    to right,
+    #ffb347 0%,
+    #ffcc33 51%,
+    #ffb347 100%
+  );
+}
+.btn-grad {
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
 
-   border: 4px #9f3b18 solid;
-   display: block;
-   cursor: pointer;
+  border: 4px #9f3b18 solid;
+  display: block;
+  cursor: pointer;
 }
 
 .btn-grad:hover {
-   background-position: right center; /* change the direction of the change here */
-   color: #fff;
-   text-decoration: none;
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
 }
 
 .buttons {
-    display: flex;
-    flex-direction: row;
-    padding: 30px 0; 
+  display: flex;
+  flex-direction: row;
+  padding: 30px 0;
 }
