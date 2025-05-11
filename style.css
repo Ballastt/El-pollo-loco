@@ -5,16 +5,20 @@
 
 @font-face {
   font-family: "Mountains of Christmas";
-  src: url("fonts/MountainsOfChristmas-Regular.ttf") format("truetype");
+  src: url("MountainsofChristmas-Regular.woff2") format("woff2"),
+    url("MountainsofChristmas-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: "Mountains of Christmas";
-  src: url("fonts/MountainsOfChristmas-Bold.ttf") format("truetype");
+  src: url("MountainsofChristmas-Bold.woff2") format("woff2"),
+    url("MountainsofChristmas-Bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 body {
@@ -22,7 +26,7 @@ body {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  font-family: "Mountains of Christmas", cursive;
+  font-family: "Mountains of Christmas", "Comic Sans MS", "Brush Script MT", cursive;
 }
 
 canvas {
@@ -35,7 +39,9 @@ canvas {
 }
 
 h1 {
+  font-size: 4rem;
   padding: 40px 0;
+  font-weight: bold;
 }
 
 #background-image {
@@ -45,14 +51,14 @@ h1 {
   z-index: 0;
   width: 100%;
   height: 100%;
-  background-image: url("img/5_background/bg-image_loco.jpg");
+  background-image: url("img/5_background/sunny-defocused-green-nature-background-abstract-bokeh-effect-es-element-your-design.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
-  opacity: 0.66;
+  opacity: 1;
 }
 
 #start-screen {
