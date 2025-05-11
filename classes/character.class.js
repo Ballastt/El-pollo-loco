@@ -1,4 +1,5 @@
 class Character extends MoveableObject {
+  // --- Konstanten ---
   IMAGES_WALKING = [
     "/img/2_character_pepe/2_walk/W-21.png",
     "/img/2_character_pepe/2_walk/W-22.png",
@@ -71,11 +72,13 @@ class Character extends MoveableObject {
     DEAD: "dead",
   };
 
+  // --- Eigenschaften ---
   world;
   lastHit = 0;
   isDead = false;
   hurtUntil = 0;
 
+  // --- Konstruktor ---
   constructor(world) {
     super().loadImage("/img/2_character_pepe/2_walk/W-21.png");
 
@@ -100,16 +103,15 @@ class Character extends MoveableObject {
 
     // Die Hitbox ist schmaler und zentriert
     this.hitbox = {
-      offsetX: 10, // von links etwas weiter rein
-      offsetY: 100, // von oben etwas tiefer
-      width: 86, // schmaler als das Bild
-      height: 146, // kürzer als das Bild
+      offsetX: 10,
+      offsetY: 100,
+      width: 86,
+      height: 146,
     };
 
     this.walkingSound = new Audio("audio/character_walk_on_sand.mp3");
     this.walkingSound.loop = true;
 
-    //this.hitSound = new Audio("audio/hitting_a_chicken.mp3");
     this.jumpSound = new Audio("audio/character_jumping.mp3");
 
     this.loadImages(this.IMAGES_WALKING);
@@ -123,11 +125,28 @@ class Character extends MoveableObject {
     this.currentState = this.STATES.IDLE;
   }
 
+  // --- Animations- und Bewegungssteuerung ---
   animate() {
     this.startMovementLoop();
     this.startAnimationLoop();
   }
 
+  startMovementLoop() {
+    setInterval(() => {
+      this.handleMovement();
+      this.handleWalkingSound();
+      this.updateCamera();
+      this.checkCollisionsWithEnemy(this.world.level.enemies);
+    }, 1000 / 60);
+  }
+
+  startAnimationLoop() {
+    setInterval(() => {
+      this.handleAnimations();
+    }, 50);
+  }
+
+  // --- Kollision und Treffer ---
   checkCollisionsWithEndboss(endboss) {
     if (this.isColliding(endboss)) {
       console.log("Kollision mit dem Endboss");
@@ -139,7 +158,7 @@ class Character extends MoveableObject {
 
   checkCollisionsWithEnemy(enemies) {
     const now = Date.now();
-    if (now - this.lastHit < 2000) return; // Immunitätsphase von einer Sekunde
+    if (now - this.lastHit < 2000) return;
 
     enemies.forEach((enemy) => {
       if (this.isColliding(enemy)) {
@@ -148,40 +167,44 @@ class Character extends MoveableObject {
         console.log(
           `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
         );
-        //this.hitSound.play();
-        this.lastHit = now; // Zeitpunkt des letzten Treffers aktualisieren
+        this.lastHit = now;
         this.hurtUntil = now + 500;
       }
     });
   }
 
+  hit(damage) {
+    let now = Date.now();
+    if (now - this.lastHit > 1000) {
+      console.log("Character hit() aufgerufen");
+      super.hit(damage);
+      this.lastHit = now;
+
+      this.health = Math.max(0, this.health);
+      const percentage = (this.health / this.maxHealth) * 100;
+
+      if (this.world && this.world.healthBar) {
+        this.world.healthBar.setPercentage(percentage);
+      }
+
+      console.log(`Character getroffen! Gesundheit: ${this.health}`);
+    }
+
+    if (this.health === 0) {
+      this.die();
+    }
+  }
+
   die() {
-    super.die(); // Basis-Logik aufrufen
-    this.playAnimation(this.IMAGES_DEAD); // Animation für den Tod
+    super.die();
+    this.playAnimation(this.IMAGES_DEAD);
     console.log("Der Charakter ist gestorben!");
   }
 
-  handleAnimations() {
-    switch (this.currentState) {
-      case this.STATES.JUMPING:
-        this.playAnimation(this.IMAGES_JUMPING);
-        break;
-      case this.STATES.WALKING:
-        this.playAnimation(this.IMAGES_WALKING);
-        break;
-      case this.STATES.LONG_IDLE:
-        this.playAnimation(this.IMAGES_LONG_IDLE);
-        break;
-      case this.STATES.IDLE:
-        this.playAnimation(this.IMAGES_IDLE);
-        break;
-      case this.STATES.HURT:
-        this.playAnimation(this.IMAGES_HURT);
-        break;
-      case this.STATES.DEAD:
-        this.playAnimation(this.IMAGES_DEAD);
-        break;
-    }
+  // --- Bewegungs- und Statussteuerung ---
+  handleMovement() {
+    this.handleInput();
+    this.handleState();
   }
 
   handleInput() {
@@ -203,11 +226,6 @@ class Character extends MoveableObject {
       this.jump();
       this.jumpSound.play();
     }
-  }
-
-  handleMovement() {
-    this.handleInput();
-    this.handleState();
   }
 
   handleState() {
@@ -241,44 +259,31 @@ class Character extends MoveableObject {
     }
   }
 
-  hit(damage) {
-    let now = Date.now();
-    if (now - this.lastHit > 1000) {
-      console.log("Character hit() aufgerufen"); // <- Teste, ob dieser Code erreicht wird
-      super.hit(damage); // <- Sollte auch MoveableObject.hit() loggen
-      this.lastHit = now;
-
-      this.health = Math.max(0, this.health);
-      const percentage = (this.health / this.maxHealth) * 100;
-
-      if (this.world && this.world.healthBar) {
-        this.world.healthBar.setPercentage(percentage);
-      }
-
-      console.log(`Character getroffen! Gesundheit: ${this.health}`);
+  // --- Animationen ---
+  handleAnimations() {
+    switch (this.currentState) {
+      case this.STATES.JUMPING:
+        this.playAnimation(this.IMAGES_JUMPING);
+        break;
+      case this.STATES.WALKING:
+        this.playAnimation(this.IMAGES_WALKING);
+        break;
+      case this.STATES.LONG_IDLE:
+        this.playAnimation(this.IMAGES_LONG_IDLE);
+        break;
+      case this.STATES.IDLE:
+        this.playAnimation(this.IMAGES_IDLE);
+        break;
+      case this.STATES.HURT:
+        this.playAnimation(this.IMAGES_HURT);
+        break;
+      case this.STATES.DEAD:
+        this.playAnimation(this.IMAGES_DEAD);
+        break;
     }
-
-    if (this.health === 0) {
-      this.die();
-    }
   }
 
-  startAnimationLoop() {
-    setInterval(() => {
-      this.handleAnimations();
-    }, 50);
-  }
-
-  startMovementLoop() {
-    setInterval(() => {
-      this.handleMovement();
-      this.handleWalkingSound();
-      this.updateCamera();
-
-      this.checkCollisionsWithEnemy(this.world.level.enemies);
-    }, 1000 / 60);
-  }
-
+  // --- Aktionen ---
   throwBottle() {
     if (this.bottles > 0) {
       this.bottles--;
@@ -296,6 +301,7 @@ class Character extends MoveableObject {
     }
   }
 
+  // --- Kamera und Fortschrittsanzeige ---
   updateCamera() {
     if (this.world) {
       this.world.camera_x = -this.x + 100;
