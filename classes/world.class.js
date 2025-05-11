@@ -5,6 +5,7 @@ class World {
   canvas;
   ctx;
   keyboard;
+  gameManager;
   camera_x = 0; // Kameradrehung
   level_end_x = 6000;
 
@@ -25,7 +26,8 @@ class World {
     this.canvas = canvas;
     this.keyboard = keyboard;
 
-    this.character = new Character(this);
+    this.character = new Character(this); //Initalisierung des Charakters
+    this.gameManager = null; //Referenz auf GameManager wird später gesetzt
 
     // Endboss initialisieren und den Charakter übergeben
     this.endboss = new Endboss(this.character);
@@ -111,6 +113,13 @@ class World {
         );
       },
     });
+  }
+
+  checkGameOver() {
+    if (this.character.isDead) {
+        console.log("Game Over detected in World");
+        this.gameManager.gameOver();
+    }
   }
 
   checkItemCollection(itemType, options) {
@@ -206,6 +215,7 @@ class World {
     setInterval(() => {
       this.checkCollisions();
       this.checkThrowObjects();
+      this.checkGameOver();
     }, 200);
   }
 
