@@ -22,6 +22,8 @@ class World {
   bottleCollectSound;
   soundVolume = 0.15;
 
+  gameManager;
+
   // --- Konstruktor ---
   constructor(canvas) {
     this.ctx = canvas.getContext("2d");
@@ -29,9 +31,8 @@ class World {
     this.keyboard = keyboard;
 
     this.character = new Character(this);
-
-    // Endboss initialisieren und den Charakter übergeben
     this.endboss = new Endboss(this.character);
+    this.gameManager = new GameManager(this);
 
     this.coinCollectSound = new Audio("audio/get_coin.mp3");
     this.bottleCollectSound = new Audio("audio/get_bottle.mp3");
@@ -115,7 +116,6 @@ class World {
   }
 
   checkThrowObjects() {
-     console.log("Key D pressed:", this.keyboard.D); // Debugging log
     if (this.keyboard.D) {
       this.character.throwBottle(); // Wurfaktion an Character delegieren
     }
