@@ -1,33 +1,34 @@
 class World {
+  // --- Eigenschaften ---
   character;
   endboss;
   level = level1;
   canvas;
   ctx;
   keyboard;
-  gameManager;
   camera_x = 0; // Kameradrehung
   level_end_x = 6000;
 
   collectedCoins = 0;
   collectedBottles = 0;
 
-  healthbar;
-  throwbar;
+  healthBar;
+  throwBar;
   coinBar;
 
   throwableObjects = [];
 
   coinCollectSound;
-  soundVolume = 0.2;
+  bottleCollectSound;
+  soundVolume = 0.15;
 
+  // --- Konstruktor ---
   constructor(canvas) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
 
-    this.character = new Character(this); //Initalisierung des Charakters
-    this.gameManager = null; //Referenz auf GameManager wird später gesetzt
+    this.character = new Character(this);
 
     // Endboss initialisieren und den Charakter übergeben
     this.endboss = new Endboss(this.character);
@@ -48,20 +49,57 @@ class World {
     this.checkCollisions();
   }
 
-  addObjectToMap(objects) {
-    objects.forEach((o) => {
-      this.addToMap(o);
-    });
+  // --- Hauptlogik ---
+  run() {
+    setInterval(() => {
+      this.checkCollisions();
+      this.checkThrowObjects();
+      this.checkGameOver();
+    }, 200);
   }
 
-  // mo steht für moveableObject
-  addToMap(mo) {
-    if (mo.otherDirection) this.flipImage(mo);
+  draw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    mo.draw(this.ctx);
-    mo.drawHitbox(this.ctx);
+    this.checkCoinCollection();
+    this.checkBottleCollection();
 
-    if (mo.otherDirection) this.flipImageBack(mo);
+    // Kamerabewegung nur bis zum Levelende
+    if (this.camera_x < this.level_end_x - this.canvas.width) {
+      if (this.keyboard.RIGHT) {
+        this.camera_x += 1;
+      }
+    }
+
+    this.ctx.translate(this.camera_x, 0); // Kameradrehung initial
+
+    // Bewegliche Objekte zeichnen
+    this.addObjectToMap(this.level.backgroundObjects);
+    this.addObjectToMap(this.level.coins);
+    this.addObjectToMap(this.level.bottles);
+    this.addObjectToMap(this.level.clouds);
+    this.addToMap(this.character);
+    this.addToMap(this.endboss);
+    this.addObjectToMap(this.level.enemies);
+    this.addObjectToMap(this.throwableObjects);
+
+    // Kamera zurücksetzen
+    this.ctx.translate(-this.camera_x, 0);
+
+    // UI-Elemente zeichnen
+    this.addToMap(this.healthBar);
+    this.addToMap(this.throwBar);
+    this.addToMap(this.coinBar);
+
+    // Nächster Frame
+    requestAnimationFrame(() => this.draw());
+  }
+
+  // --- Kollisionen ---
+  checkCollisions() {
+    this.character.checkCollisionsWithEnemy(this.level.enemies);
+    this.character.checkCollisionsWithEndboss(this.endboss);
+    this.healthBar.setPercentage(this.character.health);
   }
 
   bottleEnemyCollision() {
@@ -70,36 +108,21 @@ class World {
         if (bottle.isColliding(enemy)) {
           console.log("Flasche trifft Feind", enemy);
           enemy.die();
-          this.throwableObjects.splice(bottleIndex, 1); // entfernt Flasche aus dem Flaschen Array
+          this.throwableObjects.splice(bottleIndex, 1); // Entfernt Flasche aus dem Array
         }
       });
     });
   }
 
-  checkBottleCollection() {
-    this.checkItemCollection("Bottle", {
-      items: this.level.bottles,
-      characterProperty: "collectedBottles",
-      sound: this.bottleCollectSound,
-      bar: this.throwBar,
-      maxItems: this.level.totalBottles,
-      onCollect: () => {
-        console.log(
-          `Bottles collected: ${this.character.collectedBottles} / ${this.level.totalBottles}`
-        );
-        this.updateThrowBar();
-      },
-    });
+  checkThrowObjects() {
+     console.log("Key D pressed:", this.keyboard.D); // Debugging log
+    if (this.keyboard.D) {
+      this.character.throwBottle(); // Wurfaktion an Character delegieren
+    }
+    this.bottleEnemyCollision();
   }
 
-  checkCollisions() {
-    // Kollision mit Feinden überprüfen
-    this.character.checkCollisionsWithEnemy(this.level.enemies);
-    this.character.checkCollisionsWithEndboss(this.endboss);
-    // Aktualisiere die Gesundheitsleiste nach einer Kollision
-    this.healthBar.setPercentage(this.character.health);
-  }
-
+  // --- Sammelaktionen ---
   checkCoinCollection() {
     this.checkItemCollection("Coin", {
       items: this.level.coins,
@@ -115,11 +138,19 @@ class World {
     });
   }
 
-  checkGameOver() {
-    if (this.character.isDead) {
-        console.log("Game Over detected in World");
-        this.gameManager.gameOver();
-    }
+  checkBottleCollection() {
+    this.checkItemCollection("Bottle", {
+      items: this.level.bottles,
+      characterProperty: "collectedBottles",
+      sound: this.bottleCollectSound,
+      bar: this.throwBar,
+      maxItems: this.level.totalBottles,
+       onCollect: () => {
+            this.character.bottles++; // Increment available throwable bottles
+            console.log(`Bottle added. Total bottles: ${this.character.bottles}`);
+            this.character.updateThrowBar();
+        },
+    });
   }
 
   checkItemCollection(itemType, options) {
@@ -129,13 +160,13 @@ class World {
     items.forEach((item, index) => {
       if (this.character.isColliding(item)) {
         console.log(`${itemType} gesammelt`);
-        items.splice(index, 1); // Entferne das Item aus dem Level
+        items.splice(index, 1); // Entferne Item aus dem Level
 
-        // Aktualisiere den Zähler des Charakters
+        // Charakter-Zähler aktualisieren
         this.character[characterProperty] =
           (this.character[characterProperty] || 0) + 1;
 
-        // Aktion beim Sammeln (z. B. Statusleiste aktualisieren, Punkte hinzufügen)
+        // Aktion beim Sammeln
         if (onCollect) onCollect();
 
         // Audio abspielen
@@ -144,7 +175,7 @@ class World {
           sound.play();
         }
 
-        // Aktualisiere die Statusleiste (falls vorhanden)
+        // Statusleiste aktualisieren
         if (bar && maxItems) {
           const percentage =
             (this.character[characterProperty] / maxItems) * 100;
@@ -154,69 +185,39 @@ class World {
     });
   }
 
-  checkThrowObjects() {
-    if (this.keyboard.D) {
-      this.character.throwBottle(); // Delegate to Character
+  checkGameOver() {
+    if (this.character.isDead) {
+        console.log("Game Over detected in World");
+        this.gameManager.gameOver();
     }
-    this.bottleEnemyCollision();
   }
 
-  draw() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  // --- Hilfsfunktionen ---
+  addObjectToMap(objects) {
+    objects.forEach((o) => {
+      this.addToMap(o);
+    });
+  }
 
-    this.checkCoinCollection();
-    this.checkBottleCollection();
+  addToMap(mo) {
+    if (mo.otherDirection) this.flipImage(mo);
 
-    // Adjusting camera so we won't go beyond level ending at level_end_x
-    if (this.camera_x < this.level_end_x - this.canvas.width) {
-      if (this.keyboard.RIGHT) {
-        this.camera_x += 1;
-      }
-    }
+    mo.draw(this.ctx);
+    mo.drawHitbox(this.ctx);
 
-    this.ctx.translate(this.camera_x, 0); // Kameradrehung inital
-
-    // alle "beweglichen" Objekte zeichnen
-    this.addObjectToMap(this.level.backgroundObjects);
-    this.addObjectToMap(this.level.coins);
-    this.addObjectToMap(this.level.bottles);
-    this.addObjectToMap(this.level.clouds);
-    this.addToMap(this.character);
-    this.addToMap(this.endboss);
-    this.addObjectToMap(this.level.enemies);
-    this.addObjectToMap(this.throwableObjects);
-
-    // Kamera wieder zurücksetzen
-    this.ctx.translate(-this.camera_x, 0); // nach dem malen der Objekte, müssen wir wieder zurücksetzen, damit es sich nicht weiter dreht
-
-    // Zeichne UI-elemente die nicht von der Kamera beeinflusst sind
-    // Zeichne die Statusbars
-    this.addToMap(this.healthBar);
-    this.addToMap(this.throwBar);
-    this.addToMap(this.coinBar);
-
-    // Nächster Frame
-    requestAnimationFrame(() => this.draw());
+    if (mo.otherDirection) this.flipImageBack(mo);
   }
 
   flipImage(mo) {
-    this.ctx.save(); // aktuelle Einstellungen speichern
-    this.ctx.translate(mo.width, 0); // wir verändern, wie wir das Bild einfügen
+    this.ctx.save();
+    this.ctx.translate(mo.width, 0);
     this.ctx.scale(-1, 1);
     mo.x = mo.x * -1;
   }
 
   flipImageBack(mo) {
     mo.x = mo.x * -1;
-    this.ctx.restore(); // aktuelle Einstellungen wiederherstellen
-  }
-
-  run() {
-    setInterval(() => {
-      this.checkCollisions();
-      this.checkThrowObjects();
-      this.checkGameOver();
-    }, 200);
+    this.ctx.restore();
   }
 
   updateSoundVolume() {
@@ -225,7 +226,7 @@ class World {
   }
 
   updateThrowBar() {
-    const maxBottles = this.level.totalBottles || 30; // Standardwert: 30 Flaschen
+    const maxBottles = this.level.totalBottles || 30;
     const percentage = (this.character.collectedBottles / maxBottles) * 100;
     console.log(`Updating ThrowBar: ${percentage}%`);
     this.throwBar.setPercentage(percentage);
