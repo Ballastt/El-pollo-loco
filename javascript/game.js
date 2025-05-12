@@ -30,7 +30,6 @@ function startGame() {
 
 function initGame() {
   canvas = document.getElementById("canvas");
-  keyboard = new Keyboard();
   level = level1;
   level.regenerateEnemies();
 
@@ -61,63 +60,56 @@ function initializeEventListeners() {
   const learnButton = document.getElementById("learn-button");
   if (learnButton) learnButton.addEventListener("click", showInstructions);
 
-  window.addEventListener("keydown", handleKeyDown);
-  window.addEventListener("keyup", handleKeyUp);
 }
 
 // Funktion für Keydown-Event
-function handleKeyDown(e) {
-  switch (e.key) {
-    case "ArrowRight":
-      keyboard.RIGHT = true;
-      break;
-    case "ArrowLeft":
-      keyboard.LEFT = true;
-      break;
-    case "ArrowUp":
-      keyboard.UP = true;
-      break;
-    case "ArrowDown":
-      keyboard.DOWN = true;
-      break;
-    case " ":
-      keyboard.SPACE = true;
-      console.log("SPACE pressed", keyboard);
-      break;
-    case "d":
-    case "D":
-      keyboard.D = true;
-      console.log("D pressed", keyboard);
-      break;
+window.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") {
+    keyboard.RIGHT = true;
   }
-}
+  if (e.key === "ArrowLeft") {
+    keyboard.LEFT = true;
+  }
+  if (e.key === "ArrowUp") {
+    keyboard.UP = true;
+  }
+  if (e.key === "ArrowDown") {
+    keyboard.DOWN = true;
+  }
+  if (e.key === " ") {
+    keyboard.SPACE = true;
+    console.log("SPACE pressed", keyboard);
+  }
+  if (e.key === "d" || e.key === "D") {
+    // Taste D hinzufügen
+    keyboard.D = true;
+    console.log("D pressed", keyboard);
+  }
+});
 
-// Funktion für Keyup-Event
-function handleKeyUp(e) {
-  switch (e.key) {
-    case "ArrowRight":
-      keyboard.RIGHT = false;
-      break;
-    case "ArrowLeft":
-      keyboard.LEFT = false;
-      break;
-    case "ArrowUp":
-      keyboard.UP = false;
-      break;
-    case "ArrowDown":
-      keyboard.DOWN = false;
-      break;
-    case " ":
-      keyboard.SPACE = false;
-      console.log("SPACE released", keyboard);
-      break;
-    case "d":
-    case "D":
-      keyboard.D = false;
-      console.log("D released", keyboard);
-      break;
+window.addEventListener("keyup", (e) => {
+  if (e.key === "ArrowRight") {
+    keyboard.RIGHT = false;
   }
-}
+  if (e.key === "ArrowLeft") {
+    keyboard.LEFT = false;
+  }
+  if (e.key === "ArrowUp") {
+    keyboard.UP = false;
+  }
+  if (e.key === "ArrowDown") {
+    keyboard.DOWN = false;
+  }
+  if (e.key === " ") {
+    keyboard.SPACE = false;
+    console.log("SPACE released", keyboard);
+  }
+  if (e.key === "d" || e.key === "D") {
+    // Taste D hinzufügen
+    keyboard.D = false;
+    console.log("D released", keyboard);
+  }
+});
 
 function restartGame() {
   // Verstecke den Game-Over-Screen
