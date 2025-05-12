@@ -6,26 +6,20 @@ let level;
 document.addEventListener("DOMContentLoaded", () => {
   // Hole den Start-Button
   const startButton = document.getElementById("start-button");
-  startButton.addEventListener("click", startGame);
+  startButton.addEventListener("click", () => {
+    gameManager.startGame();
+  });
+
   initializeEventListeners();
+  initializeGameManager();
 });
 
-// Funktion, die das Spiel startet
-function startGame() {
-  // Verstecke den Startbildschirm
-  const startScreen = document.getElementById("start-screen");
-  startScreen.style.display = "none";
-
-   // Verstecke den Game-Over-Screen
-  const gameOverScreen = document.getElementById("game-over-screen");
-  if (gameOverScreen) gameOverScreen.classList.add("hidden");
-  
-  // Zeige das Canvas an
-  const canvas = document.getElementById("canvas");
-  canvas.style.display = "block";
-
-  // Initialisiere das Spiel
-  initGame();
+// Initialisiere den GameManager
+function initializeGameManager() {
+  canvas = document.getElementById("canvas");
+  level = level1;
+  world = new World(canvas, keyboard, level);
+  gameManager = new GameManager(world); // GameManager-Instanz erstellen
 }
 
 function initGame() {
@@ -59,7 +53,6 @@ function initializeEventListeners() {
 
   const learnButton = document.getElementById("learn-button");
   if (learnButton) learnButton.addEventListener("click", showInstructions);
-
 }
 
 // Funktion für Keydown-Event
@@ -112,15 +105,8 @@ window.addEventListener("keyup", (e) => {
 });
 
 function restartGame() {
-  // Verstecke den Game-Over-Screen
-  const gameOverScreen = document.getElementById("game-over-screen");
-  console.log("Game Over Screen Klassen:", gameOverScreen.classList);
-  console.log(
-    "Game Over Screen Style:",
-    window.getComputedStyle(gameOverScreen).display
-  );
-  if (gameOverScreen) gameOverScreen.classList.add("hidden");
-
-  // Starte das Spiel neu
-  initGame();
+  console.log("Spiel wird neu gestartet...");
+  if (gameManager) {
+    gameManager.startGame(); // Neustart über den GameManager
+  }
 }
