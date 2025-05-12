@@ -5,7 +5,8 @@ class Chicken extends MoveableObject {
     imageDeadArray,
     width,
     height,
-    speedRange
+    speedRange,
+    soundPath //Adding parameter for sound file
   ) {
     super();
 
@@ -19,9 +20,34 @@ class Chicken extends MoveableObject {
 
     this.imageCache = {};
     this.loadImage(imagePath);
-
     this.loadImages(this.IMAGES_WALKING);
     this.animate();
+
+    //Adding sound property
+    this.runningSound = new Audio(soundPath);
+    this.runningSound.volume = 0.01;
+    this.runningSound.loop = true;
+
+    this.isRunning = false;
+
+    //adding user interaction
+    document.addEventListener("click", this.enableAudioPlayback.bind(this));
+    document.addEventListener("keydown", this.enableAudioPlayback.bind(this));
+  }
+
+  enableAudioPlayback() {
+    if (!this.userInteracted) {
+      this.userInteracted = true;
+      console.log("Audio playback enabled");
+    }
+  }
+
+  moveLeft() {
+    super.moveLeft();
+    if (this.userInteracted && !this.isRunning) {
+      this.runningSound.play();
+      this.isRunning = true;
+    }
   }
 
   animate() {
@@ -43,14 +69,14 @@ class Chicken extends MoveableObject {
     this.hitbox = null;
 
     setTimeout(() => {
-        this.speed = 0;
-        this.y += 5;
+      this.speed = 0;
+      this.y += 5;
 
-        // Entferne das Huhn aus dem Array
-        if (enemies && typeof index === "number") {
-            console.log("Removing chicken from enemies array...", this);
-            enemies.splice(index, 1);
-        }
+      // Entferne das Huhn aus dem Array
+      if (enemies && typeof index === "number") {
+        console.log("Removing chicken from enemies array...", this);
+        enemies.splice(index, 1);
+      }
     }, 500); // Wartezeit für die Todesanimation
-}
+  }
 }
