@@ -5,8 +5,8 @@
 
 @font-face {
   font-family: "Mountains of Christmas";
-  src: url("MountainsofChristmas-Regular.woff2") format("woff2"),
-    url("MountainsofChristmas-Regular.woff") format("woff");
+  src: url("fonts/MountainsofChristmas-Regular.woff2") format("woff2"),
+    url("fonts/MountainsofChristmas-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -14,8 +14,8 @@
 
 @font-face {
   font-family: "Mountains of Christmas";
-  src: url("MountainsofChristmas-Bold.woff2") format("woff2"),
-    url("MountainsofChristmas-Bold.woff") format("woff");
+  src: url("fonts/MountainsofChristmas-Bold.woff2") format("woff2"),
+    url("fonts/MountainsofChristmas-Bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -26,7 +26,8 @@ body {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
-  font-family: "Mountains of Christmas", "Comic Sans MS", "Brush Script MT", cursive;
+  font-family: "Mountains of Christmas", "Comic Sans MS", "Brush Script MT",
+    cursive;
 }
 
 canvas {
@@ -36,12 +37,15 @@ canvas {
   transform: translate(-50%, -50%);
   z-index: 5;
   background-color: black;
+  display: block;
 }
 
 h1 {
+  font-family: "Mountains of Christmas", cursive;
   font-size: 4rem;
   padding: 40px 0;
   font-weight: bold;
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 #background-image {
@@ -160,4 +164,16 @@ h1 {
 
 #game-over-screen.hidden {
   display: none;
+}
+
+@media only screen and (max-width: 720px) {
+  canvas {
+    width: 100%;
+  }
+}
+
+@media only screen and (max-height: 480px) {
+  canvas {
+    height: 100vh;
+  }
 }
