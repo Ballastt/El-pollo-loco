@@ -1,10 +1,10 @@
 class GameManager {
   constructor(world) {
     this.world = world; // Referenz auf die Spielwelt
-    this.isGameStopped = false;
     this.gameOverScreen = document.getElementById("game-over-screen");
     this.startScreen = document.getElementById("start-screen");
     this.canvas = document.getElementById("canvas");
+    this.isGameRunning = false;
   }
 
   startGame() {
@@ -43,13 +43,13 @@ class GameManager {
     if (this.gameOverScreen) {
       this.gameOverScreen.classList.remove("hidden");
     }
-    this.isGameStopped = true;
+    this.isGameRunning = true;
     this.stopGame();
   }
 
   stopGame() {
     clearInterval(this.world.characterMovementInterval);
     clearInterval(this.world.characterAnimationInterval);
-    this.isGameStopped = true;
+    this.isGameRunning = true;
   }
 }
