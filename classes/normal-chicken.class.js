@@ -10,8 +10,10 @@ class NormalChicken extends Chicken {
       ["img/3_enemies_chicken/chicken_normal/2_dead/dead.png"],
       55,
       55,
-      [0.15, 0.55]
+      [0.15, 0.55],
+      "audio/normal_chicken_walking.mp3"
     );
     this.y = 362;
+
   }
 }
