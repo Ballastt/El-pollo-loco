@@ -2,39 +2,34 @@ let canvas;
 let world;
 let keyboard = new Keyboard();
 let level;
+let gameManager;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Hole den Start-Button
   const startButton = document.getElementById("start-button");
   startButton.addEventListener("click", () => {
+    if (!gameManager) {
+      initializeGameManager();
+    }
     gameManager.startGame();
   });
 
   initializeEventListeners();
-  initializeGameManager();
 });
 
 // Initialisiere den GameManager
 function initializeGameManager() {
   canvas = document.getElementById("canvas");
   level = level1;
-  world = new World(canvas, keyboard, level);
-  gameManager = new GameManager(world); // GameManager-Instanz erstellen
-}
-
-function initGame() {
-  canvas = document.getElementById("canvas");
-  level = level1;
-  level.regenerateEnemies();
-
-  world = new World(canvas, keyboard, level); // Hier wird die World-Klasse instanziert
-
-  const gameManager = new GameManager(world); // Hier wird der GameManager instanziert
-  world.gameManager = gameManager; // Hier wird die Instanz des GameManagers an die World-Klasse übergeben
+  keyboard = new Keyboard(); // Initialisiere die Tastatur nur einmal
+  world = new World(canvas, keyboard, level); // Erstelle eine World-Instanz
+  gameManager = new GameManager(world); // Verknüpfe die World mit dem GameManager
+  world.gameManager = gameManager; // Verknüpfung in beide Richtungen sicherstellen
 
   console.log("Spiel erfolgreich initialisiert");
   console.log("my character is", world.character);
 }
+
 
 // Funktion, um Spielanweisungen zu zeigen
 function showInstructions() {
