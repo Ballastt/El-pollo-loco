@@ -110,9 +110,15 @@ class Character extends MoveableObject {
     };
 
     this.walkingSound = new Audio("audio/character_walk_on_sand.mp3");
+    this.walkingSound.volume = 1;
     this.walkingSound.loop = true;
 
     this.jumpSound = new Audio("audio/character_jumping.mp3");
+
+
+    // "Aua"-Sound initialisieren
+    this.hurtSound = new Audio("audio/pepe_hurting.mp3");
+    this.hurtSound.volume = 0.9; // Lautstärke anpassen
 
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_JUMPING);
@@ -180,6 +186,10 @@ class Character extends MoveableObject {
       super.hit(damage);
       this.lastHit = now;
 
+      // "Aua"-Sound abspielen
+      this.hurtSound.currentTime = 0; // Zurücksetzen, falls der Sound bereits läuft
+      //this.hurtSound.play();
+
       this.health = Math.max(0, this.health);
       const percentage = (this.health / this.maxHealth) * 100;
 
@@ -244,7 +254,7 @@ class Character extends MoveableObject {
     } else {
       const idleDuration = now - (this.lastMoveTime || now);
       this.currentState =
-        idleDuration > 10000 ? this.STATES.LONG_IDLE : this.STATES.IDLE;
+        idleDuration > 100000 ? this.STATES.LONG_IDLE : this.STATES.IDLE;
     }
   }
 
@@ -285,6 +295,7 @@ class Character extends MoveableObject {
 
   // --- Aktionen ---
   throwBottle() {
+      console.log("Available bottles:", this.bottles); // Debugging log
     if (this.bottles > 0) {
       this.bottles--;
 
