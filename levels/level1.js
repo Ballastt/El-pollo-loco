@@ -27,9 +27,9 @@ for (let i = -1; i < numberOfBackgrounds; i++) {
 
 function generateEnemies() {
     const enemies = [];
-    const amount = 20; // Anzahl der Feinde (kann angepasst werden)
+    const amount = 25; // Anzahl der Feinde (kann angepasst werden)
     const level_end_x = 6000; // Ende des Levels
-    const startX = 1500; // Feinde erscheinen erst nach diesem Punkt
+    const startX = 600; // Feinde erscheinen erst nach diesem Punkt
     const spacing = (level_end_x - startX) / amount;
 
     for (let i = 0; i < amount; i++) {
