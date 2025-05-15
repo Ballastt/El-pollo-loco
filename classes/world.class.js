@@ -52,14 +52,24 @@ class World {
 
   // --- Hauptlogik ---
   run() {
+    if (this.gameManager.isPaused || !this.gameManager.isGameRunning) {
+      return; // Skip game loop when paused or game is not running
+    }
+
     setInterval(() => {
-      this.checkCollisions();
-      this.checkThrowObjects();
-      this.checkGameOver();
-    }, 200);
+      if (!this.gameManager.isPaused) {
+        this.checkCollisions();
+        this.checkThrowObjects();
+        this.checkGameOver();
+      }
+    }, 200); // Only process logic if the game is not paused
   }
 
   draw() {
+    if (this.gameManager.isPaused || !this.gameManager.isGameRunning) {
+      return; // Skip drawing when paused or game is not running
+    }
+    
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.checkCoinCollection();
@@ -106,10 +116,11 @@ class World {
   bottleEnemyCollision() {
     this.throwableObjects.forEach((bottle, bottleIndex) => {
       this.level.enemies.forEach((enemy) => {
-        if (bottle.isColliding(enemy)) {
+        // Prüfen, ob die Flasche mit einem lebenden Feind kollidiert
+        if (bottle.isColliding(enemy) && !enemy.isDead) {
           console.log("Flasche trifft Feind", enemy);
 
-          enemy.die(); // Huhn stirbt und entfernt sich selbst
+          enemy.die(); // Nur lebende Feinde sterben lassen
           this.throwableObjects.splice(bottleIndex, 1); // Flasche entfernen
         }
       });
