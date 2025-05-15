@@ -6,7 +6,8 @@ class Chicken extends MoveableObject {
     width,
     height,
     speedRange,
-    soundPath //Adding parameter for sound file
+    soundPath, //Adding parameter for sound file
+    enemies = []
   ) {
     super();
 
@@ -18,16 +19,19 @@ class Chicken extends MoveableObject {
     this.IMAGES_WALKING = imageArray;
     this.IMAGES_DEAD = imageDeadArray;
 
+    this.enemies = enemies;
+
     this.imageCache = {};
     this.loadImage(imagePath);
     this.loadImages(this.IMAGES_WALKING);
+    this.loadImages(this.IMAGES_DEAD);
     this.animate();
 
     //Adding sound property
     this.runningSound = new Audio(soundPath);
-    this.runningSound.volume = 0.01;
     this.runningSound.loop = true;
 
+    this.userInteracted = false;
     this.isRunning = false;
 
     //adding user interaction
@@ -61,22 +65,40 @@ class Chicken extends MoveableObject {
     }, 200);
   }
 
-  die(enemies, index) {
-    console.log("Chicken is dying..."); // Debugging
+  removeEnemy() {
+    console.log("removeEnemy wurde aufgerufen:", this);
+    const index = this.enemies.indexOf(this);
+    console.log("Enemy index in array:", index);
+
+    if (index > -1) {
+      const removedEnemy = this.enemies.splice(index, 1)[0];
+      console.log(`Removed enemy:`, removedEnemy);
+    } else {
+      console.error("Enemy not found in the array!");
+    }
+    console.log("Enemies array after removal:", this.enemies);
+  }
+
+  die() {
+    console.log("Chicken is dying...");
+    this.isDead = true;
     clearInterval(this.walkingInterval);
     clearInterval(this.animationInterval);
-    this.playAnimation(this.IMAGES_DEAD);
-    this.hitbox = null;
 
-    setTimeout(() => {
-      this.speed = 0;
-      this.y += 5;
+    this.runningSound.pause();
+    this.runningSound.currentTime = 0;
+    this.isRunning = false;
 
-      // Entferne das Huhn aus dem Array
-      if (enemies && typeof index === "number") {
-        console.log("Removing chicken from enemies array...", this);
-        enemies.splice(index, 1);
+    let frameIndex = 0;
+    const deathInterval = setInterval(() => {
+      if (frameIndex < this.IMAGES_DEAD.length) {
+        this.img = this.imageCache[this.IMAGES_DEAD[frameIndex]];
+        frameIndex++;
+      } else {
+        clearInterval(deathInterval);
+        console.log("Chicken animation completed. Ready to remove.");
+        this.removeEnemy(); // Richtiges Aufrufen der Methode
       }
-    }, 500); // Wartezeit für die Todesanimation
+    }, 100);
   }
 }
