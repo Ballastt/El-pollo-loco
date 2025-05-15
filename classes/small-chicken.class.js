@@ -10,7 +10,7 @@ class SmallChicken extends Chicken {
       ["img/3_enemies_chicken/chicken_small/2_dead/dead.png"],
       35,
       35,
-      [0.35, 0.55],
+      [0.25, 0.45],
       "audio/small_chicken_walking.mp3"
     );
 
