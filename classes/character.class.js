@@ -208,7 +208,21 @@ class Character extends MoveableObject {
   die() {
     super.die();
     this.playAnimation(this.IMAGES_DEAD);
+    this.isDead = true;
+
     console.log("Der Charakter ist gestorben!");
+
+    if (this.walkingSound) {
+      this.walkingSound.pause();
+      this.walkingSound.currentTime = 0;
+      console.log("walking sound gestoppt");
+    }
+    
+    if (this.world && this.world.gameManager) {
+        this.world.gameManager.gameOver();
+    } else {
+        console.error("Kein gameManager in world gefunden!");
+    }
   }
 
   // --- Bewegungs- und Statussteuerung ---
