@@ -97,10 +97,17 @@ function generateBottles(maxBottles = 30) {
   return bottles;
 }
 
-const level1 = new Level(
-  generateEnemies(),
-  generateClouds(),
-  backgroundObjects,
-  generateCoins(40),
-  generateBottles(30)
-);
+let level1;
+
+// Initialisiere `level1`, sobald das Skript geladen wird
+function initLevel() {
+  level1 = new Level(
+    generateEnemies(),
+    generateClouds(),
+    backgroundObjects,
+    generateCoins(40),
+    generateBottles(30)
+  );
+  console.log("Level 1 initialisiert:", level1);
+}
+
