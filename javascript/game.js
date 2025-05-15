@@ -5,12 +5,15 @@ let level;
 let gameManager;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Hole den Start-Button
   const startButton = document.getElementById("start-button");
+
   startButton.addEventListener("click", () => {
+    // Stelle sicher, dass level1 erst erstellt wird, wenn das Spiel startet
+  
     if (!gameManager) {
       initializeGameManager();
     }
+
     gameManager.startGame();
   });
 
@@ -20,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Initialisiere den GameManager
 function initializeGameManager() {
   canvas = document.getElementById("canvas");
-  level = level1;
+  if (!level) level = level1;
   keyboard = new Keyboard(); // Initialisiere die Tastatur nur einmal
   world = new World(canvas, keyboard, level); // Erstelle eine World-Instanz
   gameManager = new GameManager(world); // Verknüpfe die World mit dem GameManager
