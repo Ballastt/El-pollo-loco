@@ -108,8 +108,9 @@ class World {
       this.level.enemies.forEach((enemy) => {
         if (bottle.isColliding(enemy)) {
           console.log("Flasche trifft Feind", enemy);
-          enemy.die();
-          this.throwableObjects.splice(bottleIndex, 1); // Entfernt Flasche aus dem Array
+
+          enemy.die(); // Huhn stirbt und entfernt sich selbst
+          this.throwableObjects.splice(bottleIndex, 1); // Flasche entfernen
         }
       });
     });
@@ -145,11 +146,11 @@ class World {
       sound: this.bottleCollectSound,
       bar: this.throwBar,
       maxItems: this.level.totalBottles,
-       onCollect: () => {
-            this.character.bottles++; // Increment available throwable bottles
-            console.log(`Bottle added. Total bottles: ${this.character.bottles}`);
-            this.character.updateThrowBar();
-        },
+      onCollect: () => {
+        this.character.bottles++; // Increment available throwable bottles
+        console.log(`Bottle added. Total bottles: ${this.character.bottles}`);
+        this.character.updateThrowBar();
+      },
     });
   }
 
@@ -185,10 +186,14 @@ class World {
     });
   }
 
+  get isDead() {
+    return this.health <= 0;
+  }
+
   checkGameOver() {
-    if (this.character.isDead) {
-        console.log("Game Over detected in World");
-        this.gameManager.gameOver();
+    if (!this.gameManager.isGameRunning || this.character.isDead) {
+      console.log("Game Over detected in World");
+      this.gameManager.gameOver();
     }
   }
 
