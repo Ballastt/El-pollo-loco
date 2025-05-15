@@ -4,20 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google" content="notranslate" />
-    <link
-      rel="preload"
-      href="fonts/MountainsOfChristmas-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="preload"
-      href="fonts/MountainsOfChristmas-Bold.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin="anonymous"
-    />
+  
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/x-icon" href="img/favicon/tabasco.png" />
     <title>El Pollo Loco</title>
@@ -47,6 +34,16 @@
     </div>
     <div id="background-image">
       <h1>El Pollo Loco</h1>
+      <button id="pause-btn">
+        <img src="img/icons_bg/pause.png" alt="pause" />
+      </button>
+      <button id="mute-btn">
+        <img
+          src="img/9_intro_outro_screens/start/sound-off.png"
+          alt="Mute Button"
+          id="mute"
+        />
+      </button>
     </div>
     <canvas
       id="canvas"
@@ -60,26 +57,35 @@
       <button onclick="restartGame()">Neu starten</button>
     </div>
 
+    <!-- Basis-Klassen -->
     <script src="classes/drawable-object.class.js"></script>
     <script src="classes/moveable-objects.class.js"></script>
-    <script src="classes/character.class.js"></script>
+
+    <!-- Spezialisierte Klassen -->
     <script src="classes/chicken.class.js"></script>
     <script src="classes/normal-chicken.class.js"></script>
     <script src="classes/small-chicken.class.js"></script>
     <script src="classes/cloud.class.js"></script>
+    <script src="classes/character.class.js"></script>
     <script src="classes/status-bar.class.js"></script>
     <script src="classes/collectable-object.class.js"></script>
     <script src="classes/collectable-bottle.class.js"></script>
     <script src="classes/throwable-object.class.js"></script>
-    <script src="classes/world.class.js"></script>
     <script src="classes/background-object.class.js"></script>
+    <script src="classes/coin.class.js"></script>
+    <script src="classes/salsaBottle-object.class.js"></script>
+
+    <!-- Welt und Level -->
+    <script src="classes/world.class.js"></script>
     <script src="classes/keyboard.class.js"></script>
     <script src="classes/level.class.js"></script>
     <script src="classes/endboss.class.js"></script>
-    <script src="classes/coin.class.js"></script>
-    <script src="classes/salsaBottle-object.class.js"></script>
+
+    <!-- Game-Management -->
     <script src="levels/level1.js"></script>
     <script src="classes/gameManager.class.js"></script>
+
+    <!-- Sonstige Funktionen -->
     <script src="javascript/audio.js"></script>
     <script src="javascript/game.js"></script>
   </body>
