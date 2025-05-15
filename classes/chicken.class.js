@@ -6,7 +6,7 @@ class Chicken extends MoveableObject {
     width,
     height,
     speedRange,
-    soundPath, //Adding parameter for sound file
+    soundPath, // Adding parameter for sound file
     enemies = []
   ) {
     super();
@@ -20,6 +20,8 @@ class Chicken extends MoveableObject {
     this.IMAGES_DEAD = imageDeadArray;
 
     this.enemies = enemies;
+    this.isDead = false; // Zustand, ob das Huhn tot ist
+    this.isRemoved = false; // Zustand, ob das Huhn bereits entfernt wurde
 
     this.imageCache = {};
     this.loadImage(imagePath);
@@ -27,14 +29,14 @@ class Chicken extends MoveableObject {
     this.loadImages(this.IMAGES_DEAD);
     this.animate();
 
-    //Adding sound property
+    // Adding sound property
     this.runningSound = new Audio(soundPath);
     this.runningSound.loop = true;
 
     this.userInteracted = false;
     this.isRunning = false;
 
-    //adding user interaction
+    // Adding user interaction
     document.addEventListener("click", this.enableAudioPlayback.bind(this));
     document.addEventListener("keydown", this.enableAudioPlayback.bind(this));
   }
@@ -66,6 +68,11 @@ class Chicken extends MoveableObject {
   }
 
   removeEnemy() {
+    if (this.isRemoved) {
+      console.warn("Enemy already removed:", this);
+      return;
+    }
+
     console.log("removeEnemy wurde aufgerufen:", this);
     const index = this.enemies.indexOf(this);
     console.log("Enemy index in array:", index);
@@ -73,6 +80,7 @@ class Chicken extends MoveableObject {
     if (index > -1) {
       const removedEnemy = this.enemies.splice(index, 1)[0];
       console.log(`Removed enemy:`, removedEnemy);
+      this.isRemoved = true; // Markiere das Huhn als entfernt
     } else {
       console.error("Enemy not found in the array!");
     }
@@ -80,6 +88,11 @@ class Chicken extends MoveableObject {
   }
 
   die() {
+    if (this.isDead) {
+      console.warn("Chicken is already dead:", this);
+      return;
+    }
+
     console.log("Chicken is dying...");
     this.isDead = true;
     clearInterval(this.walkingInterval);
