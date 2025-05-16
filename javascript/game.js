@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // Initialisiere den GameManager
 function initializeGameManager() {
   canvas = document.getElementById("canvas");
+  if (!canvas) console.error("Canvas element not found!");
   if (!level) level = level1;
   keyboard = new Keyboard(); // Initialisiere die Tastatur nur einmal
   world = new World(canvas, keyboard, level1); // Erstelle eine World-Instanz
@@ -49,7 +50,7 @@ function initializeEventListeners() {
   const learnButton = document.getElementById("learn-button");
   if (learnButton) learnButton.addEventListener("click", showInstructions);
 
-  /*const pauseButton = document.getElementById("pause-btn");
+  const pauseButton = document.getElementById("pause-btn");
   if (pauseButton) {
     // Ensure gameManager is used to call pauseGame
     pauseButton.addEventListener("click", () => {
@@ -59,7 +60,7 @@ function initializeEventListeners() {
         console.error("GameManager is not initialized!");
       }
     });
-  }*/
+  }
 
   window.addEventListener("keydown", (e) => handleKeyDown(e));
   window.addEventListener("keyup", (e) => handleKeyUp(e));
