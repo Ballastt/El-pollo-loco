@@ -60,6 +60,24 @@
       <button onclick="restartGame()">Neu starten</button>
     </div>
 
+    <!-- Dialog Overlay -->
+    <div id="instructions-overlay" class="instructions-dialog-overlay" onclick="closeInstructionsOnOutsideClick(event)">
+      <div class="instructions-dialog" onclick="event.stopPropagation()">
+        <button class="close" onclick="closeInstructions()">&times;</button>
+        <h2>Spielanweisungen</h2>
+        <p>Willkommen zu meinem Spiel! Hier sind die Anweisungen:</p>
+        <ul>
+          <li>Pfeiltaste Arrow-LEFT, Arrow-RIGHT: Bewege dich!</li>
+          <li>Pfeiltaste Arrow-UP: Springe!</li>
+          <li>Keyboard - Taste 'd': Wirf Tabasco um die Feinde zu bekämpfen</li>
+          <li>Sammle Münzen und Tabasco-Flaschen!</li>
+          <li>Vermeide Feinde!</li>
+          <li>Achtung Endboss!</li>
+        </ul>
+        <button onclick="closeInstructions()" class="close-instructions-btn">Los geht's!</button>
+      </div>
+    </div>
+
     <footer>
       <p>
         Icons by
