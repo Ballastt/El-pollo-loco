@@ -33,17 +33,18 @@ class GameManager {
     }
   }
 
-  /*pauseGame() {
-    console.log("Spiel wird angehalten...");
-    this.isPaused = !this.isPaused;
-      if (this.isPaused) {
-        console.log("Spiel ist angehalten");
-      } else {
-        console.log("Spiel läuft weiter");
-        this.world.run();
-      }
-  }*/
-  
+  pauseGame() {
+    console.log("Spiel wird pausiert...");
+    this.isPaused = true;
+    this.world.pauseObjects(); // Alle Objekte pausieren
+  }
+
+  resumeGame() {
+    console.log("Spiel wird fortgesetzt...");
+    this.isPaused = false;
+    this.world.resumeObjects(); // Alle Objekte fortsetzen
+  }
+
   stopGame() {
     console.log("Spiel wird gestoppt...");
     clearInterval(this.world.characterMovementInterval);
