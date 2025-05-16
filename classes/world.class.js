@@ -47,7 +47,7 @@ class World {
 
     this.draw();
     this.run();
-    this.checkCollisions();
+   
   }
 
   // --- Hauptlogik ---
@@ -66,10 +66,6 @@ class World {
   }
 
   draw() {
-    if (this.gameManager.isPaused || !this.gameManager.isGameRunning) {
-      return; // Skip drawing when paused or game is not running
-    }
-    
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.checkCoinCollection();
@@ -195,6 +191,26 @@ class World {
         }
       }
     });
+  }
+
+  pauseObjects() {
+    if (this.level) {
+      this.character.pause();
+      this.endboss.pause();
+      this.level.enemies.forEach(enemy => enemy.pause());
+      this.level.clouds.forEach(cloud => cloud.pause());
+      console.log("Alle Objekte pausiert");
+    }
+  }
+
+  resumeObjects() {
+    if (this.level) {
+      this.character.resume();
+      this.endboss.resume();
+      this.level.enemies.forEach(enemy => enemy.resume());
+      this.level.clouds.forEach(cloud => cloud.resume());
+      console.log("Alle Objekte fortgesetzt");
+    }
   }
 
   get isDead() {
