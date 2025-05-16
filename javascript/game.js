@@ -32,17 +32,33 @@ function initializeGameManager() {
   console.log("my character is", world.character);
 }
 
-// Funktion, um Spielanweisungen zu zeigen
-function showInstructions() {
-  alert(
-    "Welcome to the game! Here are the instructions:\n\n" +
-      "- Use arrow keys to move.\n" +
-      "- Avoid enemies and collect items.\n" +
-      "- Have fun!"
-  );
+/// Funktion zum Initialisieren der Pause-Events
+function initializePauseEvents() {
+  const pauseButton = document.getElementById("pause-btn");
+  if (pauseButton) {
+    pauseButton.addEventListener("click", () => {
+      if (gameManager) {
+        gameManager.pauseGame();
+      } else {
+        console.error("GameManager is not initialized!");
+      }
+    });
+  }
 }
 
-// Funktion, um Event Listener zu bündeln
+// Funktion zum Initialisieren der Resume-Events
+function initializeResumeEvents() {
+  const resumeButton = document.getElementById("resume-btn");
+  if (resumeButton) {
+    resumeButton.addEventListener("click", () => {
+      if (gameManager) {
+        gameManager.resumeGame();
+      }
+    });
+  }
+}
+
+// Hauptfunktion zur Initialisierung aller Event Listener
 function initializeEventListeners() {
   const restartButton = document.getElementById("restart-button");
   if (restartButton) restartButton.addEventListener("click", restartGame);
@@ -50,20 +66,13 @@ function initializeEventListeners() {
   const learnButton = document.getElementById("learn-button");
   if (learnButton) learnButton.addEventListener("click", showInstructions);
 
-  const pauseButton = document.getElementById("pause-btn");
-  if (pauseButton) {
-    // Ensure gameManager is used to call pauseGame
-    pauseButton.addEventListener("click", () => {
-      if (gameManager) {
-        gameManager.pauseGame(); // Directly call pauseGame on gameManager
-      } else {
-        console.error("GameManager is not initialized!");
-      }
-    });
-  }
+  // Pause- und Resume-Events initialisieren
+  initializePauseEvents();
+  initializeResumeEvents();
 
-  window.addEventListener("keydown", (e) => handleKeyDown(e));
-  window.addEventListener("keyup", (e) => handleKeyUp(e));
+  // Globale Tastatureingaben initialisieren
+  window.addEventListener("keydown", handleKeyDown);
+  window.addEventListener("keyup", handleKeyUp);
 }
 
 // Funktion für Keydown-Event
@@ -89,5 +98,25 @@ function restartGame() {
   console.log("Spiel wird neu gestartet...");
   if (gameManager) {
     gameManager.startGame(); // Neustart über den GameManager
+  }
+}
+
+// Funktion, um Spielanweisungen zu zeigen
+function showInstructions() {
+  const overlay = document.getElementById("instructions-overlay");
+  overlay.style.display = "flex";
+  setTimeout(() => overlay.classList.add("active"), 10);
+}
+
+function closeInstructions() {
+  const overlay = document.getElementById("instructions-overlay");
+  overlay.classList.remove("active");
+  setTimeout(() => (overlay.style.display = "none"), 500); // Match the transition duration
+}
+
+function closeInstructionsOnOutsideClick(event) {
+  const dialog = document.querySelector(".instructions-dialog");
+  if (!dialog.contains(event.target)) {
+    closeInstructions();
   }
 }
