@@ -40,12 +40,15 @@
       <button id="resume-btn">
         <img src="img/icons_bg/play-taste.png" alt="resume" />
       </button>
-      <button id="mute-btn">
+      <button id="mute-btn" style="display: inline-block">
         <img
           src="img/9_intro_outro_screens/start/sound-off.png"
           alt="Mute Button"
           id="mute"
         />
+      </button>
+      <button id="sound-btn" style="display: none">
+        <img src="img/icons_bg/sound_on_ingame.png" alt="Unmute Button" />
       </button>
     </div>
     <canvas
@@ -61,7 +64,11 @@
     </div>
 
     <!-- Dialog Overlay -->
-    <div id="instructions-overlay" class="instructions-dialog-overlay" onclick="closeInstructionsOnOutsideClick(event)">
+    <div
+      id="instructions-overlay"
+      class="instructions-dialog-overlay"
+      onclick="closeInstructionsOnOutsideClick(event)"
+    >
       <div class="instructions-dialog" onclick="event.stopPropagation()">
         <button class="close" onclick="closeInstructions()">&times;</button>
         <h2>Spielanweisungen</h2>
@@ -74,7 +81,9 @@
           <li>Vermeide Feinde!</li>
           <li>Achtung Endboss!</li>
         </ul>
-        <button onclick="closeInstructions()" class="close-instructions-btn">Los geht's!</button>
+        <button onclick="closeInstructions()" class="close-instructions-btn">
+          Los geht's!
+        </button>
       </div>
     </div>
 
@@ -104,6 +113,7 @@
     <script src="classes/moveable-objects.class.js"></script>
 
     <!-- Spezialisierte Klassen -->
+     <script src="javascript/audio.js"></script>
     <script src="classes/chicken.class.js"></script>
     <script src="classes/normal-chicken.class.js"></script>
     <script src="classes/small-chicken.class.js"></script>
@@ -117,6 +127,9 @@
     <script src="classes/coin.class.js"></script>
     <script src="classes/salsaBottle-object.class.js"></script>
 
+    <script src="classes/soundManager.class.js"></script>
+    
+
     <!-- Welt und Level -->
     <script src="classes/world.class.js"></script>
     <script src="classes/keyboard.class.js"></script>
@@ -128,7 +141,6 @@
     <script src="classes/gameManager.class.js"></script>
 
     <!-- Sonstige Funktionen -->
-    <script src="javascript/audio.js"></script>
     <script src="javascript/game.js"></script>
   </body>
 </html>
