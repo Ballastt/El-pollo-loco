@@ -1,6 +1,7 @@
 class GameManager {
   constructor(world) {
     this.world = world; // Referenz auf die Spielwelt
+    this.soundManager = new SoundManager();
     this.isGameRunning = false; // Standard: Spiel läuft nicht
     this.isPaused = false;
     this.gameOverScreen = document.getElementById("game-over-screen");
@@ -22,7 +23,6 @@ class GameManager {
 
     if (this.startScreen) this.startScreen.style.display = "none";
     if (this.gameOverScreen) this.gameOverScreen.classList.add("hidden");
-
     if (this.canvas) this.canvas.style.display = "block";
 
     // Initialisiere das Spiel
@@ -31,18 +31,22 @@ class GameManager {
     } else {
       console.error("World wird nicht richtig initialisiert!");
     }
+
+    if (this.soundManager) this.soundManager.play("backgroundMusic");
   }
 
   pauseGame() {
     console.log("Spiel wird pausiert...");
     this.isPaused = true;
     this.world.pauseObjects(); // Alle Objekte pausieren
+    if (this.soundManager) soundManager.pauseAll();
   }
 
   resumeGame() {
     console.log("Spiel wird fortgesetzt...");
     this.isPaused = false;
     this.world.resumeObjects(); // Alle Objekte fortsetzen
+    if (this.soundManager) soundManager.resumeAll();
   }
 
   stopGame() {
@@ -50,6 +54,7 @@ class GameManager {
     clearInterval(this.world.characterMovementInterval);
     clearInterval(this.world.characterAnimationInterval);
     this.isGameRunning = false; // Spielzustand auf "gestoppt" setzen
+    if (this.soundManager) soundManager.stopAll();
   }
 
   gameOver() {
