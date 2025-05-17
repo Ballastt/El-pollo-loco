@@ -87,8 +87,8 @@ class Character extends MoveableObject {
 
     this.health = 100;
     this.maxHealth = 100;
-    this.coins = 0;
-    this.bottles = 0;
+    this.collectedCoins = 0;
+    this.collectedBottles = 0;
 
     this.healthBar;
 
@@ -108,17 +108,6 @@ class Character extends MoveableObject {
       width: 86,
       height: 146,
     };
-
-    this.walkingSound = new Audio("audio/character_walk_on_sand.mp3");
-    this.walkingSound.volume = 1;
-    this.walkingSound.loop = true;
-
-    this.jumpSound = new Audio("audio/character_jumping.mp3");
-
-
-    // "Aua"-Sound initialisieren
-    this.hurtSound = new Audio("audio/pepe_hurting.mp3");
-    this.hurtSound.volume = 0.9; // Lautstärke anpassen
 
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_JUMPING);
@@ -187,8 +176,9 @@ class Character extends MoveableObject {
       this.lastHit = now;
 
       // "Aua"-Sound abspielen
-      this.hurtSound.currentTime = 0; // Zurücksetzen, falls der Sound bereits läuft
-      //this.hurtSound.play();
+      if (this.world.soundManager) {
+        this.world.soundManager.play("hurtSound");
+      }
 
       this.health = Math.max(0, this.health);
       const percentage = (this.health / this.maxHealth) * 100;
@@ -212,16 +202,14 @@ class Character extends MoveableObject {
 
     console.log("Der Charakter ist gestorben!");
 
-    if (this.walkingSound) {
-      this.walkingSound.pause();
-      this.walkingSound.currentTime = 0;
-      console.log("walking sound gestoppt");
+    if (this.world.soundManager) {
+      this.world.soundManager.stop("walkingSound");
     }
-    
+
     if (this.world && this.world.gameManager) {
-        this.world.gameManager.gameOver();
+      this.world.gameManager.gameOver();
     } else {
-        console.error("Kein gameManager in world gefunden!");
+      console.error("Kein gameManager in world gefunden!");
     }
   }
 
@@ -248,7 +236,7 @@ class Character extends MoveableObject {
 
     if (this.world.keyboard.UP && !this.isAboveGround()) {
       this.jump();
-      this.jumpSound.play();
+      if (this.world.soundManager) this.world.soundManager.play("jumpSound");
     }
   }
 
@@ -274,12 +262,9 @@ class Character extends MoveableObject {
 
   handleWalkingSound() {
     if (this.isMoving) {
-      if (this.walkingSound.paused) {
-        this.walkingSound.play();
-      }
+      if (this.world.soundManager) this.world.soundManager.play("walkingSound");
     } else {
-      this.walkingSound.pause();
-      this.walkingSound.currentTime = 0;
+      if (this.world.soundManager) this.world.soundManager.stop("walkingSound");
     }
   }
 
@@ -309,9 +294,9 @@ class Character extends MoveableObject {
 
   // --- Aktionen ---
   throwBottle() {
-      console.log("Available bottles:", this.bottles); // Debugging log
-    if (this.bottles > 0) {
-      this.bottles--;
+    console.log("Available bottles:", this.collectedBottles); // Debugging log
+    if (this.collectedBottles > 0) {
+      this.collectedBottles--;
 
       const offsetX = this.otherDirection ? -10 : 60;
       const offsetY = 80;
