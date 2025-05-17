@@ -18,11 +18,11 @@ class World {
 
   throwableObjects = [];
 
-  coinCollectSound;
-  bottleCollectSound;
-  soundVolume = 0.15;
-
   gameManager;
+
+  // Add properties to control collection delay
+  startTime;
+  allowCollection = false;
 
   // --- Konstruktor ---
   constructor(canvas) {
@@ -34,10 +34,6 @@ class World {
     this.endboss = new Endboss(this.character);
     this.gameManager = new GameManager(this);
 
-    this.coinCollectSound = new Audio("audio/get_coin.mp3");
-    this.bottleCollectSound = new Audio("audio/get_bottle.mp3");
-    this.updateSoundVolume();
-
     // Statusbars mit den jeweiligen Bildern initialisieren
     this.healthBar = new StatusBar("health", 0, 0, 250, 60);
     this.throwBar = new StatusBar("throw", 0, 50, 250, 60, true);
@@ -45,9 +41,11 @@ class World {
 
     this.coinBar.setPercentage(0);
 
+    // Set start time on creation
+    this.startTime = Date.now();
+
+
     this.draw();
-    this.run();
-   
   }
 
   // --- Hauptlogik ---
@@ -68,8 +66,15 @@ class World {
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.checkCoinCollection();
-    this.checkBottleCollection();
+    // Enable collection only after 1 second delay
+    if (!this.allowCollection && Date.now() - this.startTime > 1000) {
+      this.allowCollection = true;
+    }
+
+    if (this.allowCollection) {
+      this.checkCoinCollection();
+      this.checkBottleCollection();
+    }
 
     // Kamerabewegung nur bis zum Levelende
     if (this.camera_x < this.level_end_x - this.canvas.width) {
@@ -135,13 +140,17 @@ class World {
     this.checkItemCollection("Coin", {
       items: this.level.coins,
       characterProperty: "collectedCoins",
-      sound: this.coinCollectSound,
+      sound: "coinCollect",
       bar: this.coinBar,
       maxItems: this.level.totalCoins,
       onCollect: () => {
+        console.log("onCollect() for coin called");
+        console.log("Character in onCollect (coins):", this.character);
+        this.character.collectedCoins++;
         console.log(
-          `Coins collected: ${this.character.collectedCoins} / ${this.level.totalCoins}`
+          `Coin added. Total coins: ${this.character.collectedCoins}`
         );
+        this.updateCoinBar();
       },
     });
   }
@@ -150,13 +159,15 @@ class World {
     this.checkItemCollection("Bottle", {
       items: this.level.bottles,
       characterProperty: "collectedBottles",
-      sound: this.bottleCollectSound,
+      sound: "bottleCollect",
       bar: this.throwBar,
       maxItems: this.level.totalBottles,
       onCollect: () => {
-        this.character.bottles++; // Increment available throwable bottles
-        console.log(`Bottle added. Total bottles: ${this.character.bottles}`);
-        this.character.updateThrowBar();
+        this.character.collectedBottles++;
+        console.log(
+          `Bottle added. Total bottles: ${this.character.collectedBottles}`
+        );
+        this.updateThrowBar();
       },
     });
   }
@@ -170,17 +181,14 @@ class World {
         console.log(`${itemType} gesammelt`);
         items.splice(index, 1); // Entferne Item aus dem Level
 
-        // Charakter-Zähler aktualisieren
-        this.character[characterProperty] =
-          (this.character[characterProperty] || 0) + 1;
-
         // Aktion beim Sammeln
         if (onCollect) onCollect();
 
         // Audio abspielen
-        if (sound) {
-          sound.currentTime = 0;
-          sound.play();
+        if (sound && soundManager) {
+          soundManager.play(sound);
+        } else {
+          console.warn(`SoundManager or soundName is not defined`);
         }
 
         // Statusleiste aktualisieren
@@ -197,8 +205,8 @@ class World {
     if (this.level) {
       this.character.pause();
       this.endboss.pause();
-      this.level.enemies.forEach(enemy => enemy.pause());
-      this.level.clouds.forEach(cloud => cloud.pause());
+      this.level.enemies.forEach((enemy) => enemy.pause());
+      this.level.clouds.forEach((cloud) => cloud.pause());
       console.log("Alle Objekte pausiert");
     }
   }
@@ -207,8 +215,8 @@ class World {
     if (this.level) {
       this.character.resume();
       this.endboss.resume();
-      this.level.enemies.forEach(enemy => enemy.resume());
-      this.level.clouds.forEach(cloud => cloud.resume());
+      this.level.enemies.forEach((enemy) => enemy.resume());
+      this.level.clouds.forEach((cloud) => cloud.resume());
       console.log("Alle Objekte fortgesetzt");
     }
   }
@@ -260,7 +268,24 @@ class World {
   updateThrowBar() {
     const maxBottles = this.level.totalBottles || 30;
     const percentage = (this.character.collectedBottles / maxBottles) * 100;
-    console.log(`Updating ThrowBar: ${percentage}%`);
-    this.throwBar.setPercentage(percentage);
+
+    console.log(
+      `Updating ThrowBar: ${percentage}% (Collected: ${this.character.collectedBottles}, Total: ${maxBottles})`
+    );
+
+    if (this.throwBar) {
+      this.throwBar.setPercentage(percentage);
+    } else {
+      console.error("ThrowBar is not initialized!");
+    }
+  }
+
+  updateCoinBar() {
+    if (this.world && this.world.coinBar) {
+      const maxCoins = this.world.level.totalCoins || 40;
+      const percentage = (this.character.collectedCoins / maxCoins) * 100;
+      this.world.coinBar.setPercentage(percentage);
+      console.log(`Updated CoinBar: ${percentage}%`);
+    }
   }
 }
