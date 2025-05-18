@@ -303,7 +303,8 @@ class Character extends MoveableObject {
       const bottle = new SalsaBottle(
         this.x + offsetX,
         this.y + offsetY,
-        this.otherDirection
+        this.otherDirection,
+        this.world //WOrld referenz
       );
 
       this.world.throwableObjects.push(bottle);
@@ -319,11 +320,11 @@ class Character extends MoveableObject {
   }
 
   updateThrowBar() {
-    if (this.world && this.world.throwBar) {
-      const maxBottles = this.world.level.totalBottles || 30;
-      const percentage = (this.bottles / maxBottles) * 100;
-      this.world.throwBar.setPercentage(percentage);
-      console.log(`Updated ThrowBar: ${percentage}%`);
-    }
+    const totalBottles = this.world.level.bottles.length;
+    const collectedBottles = this.collectedBottles;
+    const percent = (collectedBottles / totalBottles) * 100;
+    console.log(
+      `Updating ThrowBar: ${percent}% (Collected: ${collectedBottles}, Total: ${totalBottles})`
+    );
   }
 }
