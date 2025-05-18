@@ -1,27 +1,26 @@
 class Level {
-    enemies;
-    clouds;
-    backgroundObjects;
-    coins;
-    bottles;
-    level_end_x = 6000;
-    totalCoins = 0;
-    totalBottles = 0;
+  enemies;
+  clouds;
+  backgroundObjects;
+  coins;
+  bottles;
+  level_end_x = 6000;
+  totalCoins = 0;
+  totalBottles = 0;
 
-    constructor(enemies, clouds, backgroundObjects, coins, bottles) {
-        // Sicherheitsprüfungen: Fallback auf leere Arrays
-        this.enemies = enemies || [];
-        this.clouds = clouds || [];
-        this.backgroundObjects = backgroundObjects || [];
-        this.coins = coins || [];
-        this.bottles = bottles || [];
+  constructor(enemies, clouds, backgroundObjects, coins, bottles) {
+    this.enemies = enemies;
+    this.clouds = clouds;
+    this.backgroundObjects = backgroundObjects;
+    this.coins = coins;
+    this.bottles = bottles;
 
-        // Setze das Maximum der Coins und Bottles
-        this.totalCoins = this.coins.length;
-        this.totalBottles = this.bottles.length;
-    }
+    // Automatically set the totals
+    this.totalCoins = coins.length;
+    this.totalBottles = bottles.length;
+  }
 
-    regenerateEnemies() {
-        this.enemies = generateEnemies();
-    }
+  regenerateEnemies() {
+    this.enemies = generateEnemies();
+  }
 }
