@@ -75,7 +75,6 @@ function generateCoins(maxCoins = 40) {
     const x = startX + i * coinDistance + Math.random() * 100; // Zufällige Position im Bereich
     const y = 30 + Math.random() * 300;
 
-    // Erstelle den Coin mit x und y
     const coin = new Coin(x, y);
     coins.push(coin);
   }
@@ -102,8 +101,8 @@ let level1;
 // Initialisiere `level1`, sobald das Skript geladen wird
 function initLevel() {
   level1 = new Level(
-    generateEnemies(),
-    generateClouds(),
+    generateEnemies(25),
+    generateClouds(80),
     backgroundObjects,
     generateCoins(40),
     generateBottles(30)
