@@ -6,8 +6,10 @@ class Chicken extends MoveableObject {
     width,
     height,
     speedRange,
-    soundPath, // Adding parameter for sound file
-    enemies = []
+    walkSoundKey,
+    deathSoundKey,
+    enemies = [],
+    world = null
   ) {
     super();
 
@@ -23,13 +25,16 @@ class Chicken extends MoveableObject {
     this.isDead = false; // Zustand, ob das Huhn tot ist
     this.isRemoved = false; // Zustand, ob das Huhn bereits entfernt wurde
     this.gameManager = gameManager; // Reference to GameManager
+    this.soundManager = soundManager;
+    this.world = world; //Verknüpfung zzur Welt für den Soundmanager
+
+    this.walkSoundKey = walkSoundKey;
+    this.deathSoundKey = deathSoundKey;
 
     this.imageCache = {};
     this.loadImage(imagePath);
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_DEAD);
-    this.runningSound = new Audio(soundPath);
-    this.runningSound.loop = true;
 
     this.userInteracted = false;
     this.isRunning = false;
@@ -52,7 +57,8 @@ class Chicken extends MoveableObject {
   moveLeft() {
     super.moveLeft();
     if (this.userInteracted && !this.isRunning) {
-      this.runningSound.play();
+      console.log("Playing walking sound:", this.walkSoundKey);
+      this.soundManager.play(this.walkSoundKey);
       this.isRunning = true;
     }
   }
@@ -99,8 +105,15 @@ class Chicken extends MoveableObject {
     clearInterval(this.walkingInterval);
     clearInterval(this.animationInterval);
 
-    this.runningSound.pause();
-    this.runningSound.currentTime = 0;
+    // Add a check for this.world before accessing soundManager
+    if (this.world && this.world.soundManager) {
+      const soundKey =
+        this instanceof SmallChicken
+          ? "smallChickenDeath"
+          : "normalChickenDeath";
+      this.world.soundManager.play(this.deathSoundKey);
+    }
+
     this.isRunning = false;
 
     let frameIndex = 0;
