@@ -3,8 +3,6 @@ function generateEnemies() {
   const amount = 25; // Gesamtanzahl der Feinde
   const level_end_x = 6000;
   const startX = 600;
-
-  // Schrittweite für gleichmäßige Verteilung
   const spacing = (level_end_x - startX) / amount;
 
   for (let i = 0; i < amount; i++) {
@@ -22,7 +20,7 @@ function generateEnemies() {
         : new SmallChicken(x, enemies); // 30% Wahrscheinlichkeit für SmallChicken
 
     // Setze das enemies-Array korrekt
-    enemy.enemies = enemies;
+    if (world) enemy.world = world;
 
     enemies.push(enemy);
   }
@@ -63,15 +61,15 @@ function generateCoins(maxCoins = 40) {
   return coins;
 }
 
-function generateBottles(maxBottles = 30) {
+function generateBottles(world, maxBottles = 30) {
   const bottles = [];
   const bottleDistance = 5700 / maxBottles;
   const startX = 300; // Startposition der Flaschen (nach der Statusbar)
 
   for (let i = 0; i < maxBottles; i++) {
     const x = startX + i * bottleDistance + Math.random() * 100; // Zufällige Position im Bereich
-    const y = 30 + Math.random() * 300; // Zufällige Höhe zwischen 100px und 300px
-    bottles.push(new CollectableBottle(x, y));
+    const y = 30 + Math.random() * 300; // Zufällige Höhe zwischen 100px und 300p
+    bottles.push(new CollectableBottle(x, y, world));
   }
 
   return bottles;
