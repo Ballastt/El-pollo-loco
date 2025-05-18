@@ -90,16 +90,19 @@ window.addEventListener("load", () => {
 function initializeSoundManager() {
   if (!window.soundManager) {
     window.soundManager = new SoundManager(); // global verfügbar
+    soundManager.addSound("normalChickenWalking", "audio/normal_chicken_walking.mp3", true, 0.9);
+    soundManager.addSound("normalChickenDeath", "audio/dying_chicken.mp3", false, 0.5);
+    soundManager.addSound("smallChickenWalking", "audio/small_chicken_walking.mp3", true, 0.1);
+    soundManager.addSound("smallChickenDeath", "audio/dying_chicken.mp3", false, 0.5);
     soundManager.addSound("chickenHit", "audio/hitting_a_chicken.mp3");
-    soundManager.addSound("chickenDeath", "audio/chickenDeath.mp3");
-    soundManager.addSound("coinCollect", "audio/get_coin.mp3");
-    soundManager.addSound("bottleCollect", "audio/get_bottle.mp3");
+    soundManager.addSound("coinCollect", "audio/get_coin.mp3", false, 0.5);
+    soundManager.addSound("bottleCollect", "audio/get_bottle.mp3", false, 0.5);
     soundManager.addSound("gamePause", "audio/pause.mp3");
     soundManager.addSound("gameResume", "audio/resume.mp3");
     soundManager.addSound("walkingSound", "audio/character_walk_on_sand.mp3");
-    soundManager.addSound("jumpSound", "audio/character_jumping.mp3");
-    soundManager.addSound("hurtSound", "audio/pepe_hurting.mp3");
-    soundManager.setVolume(0.15);
+    soundManager.addSound("jumpSound", "audio/character_jumping.mp3", false, 0.8);
+    soundManager.addSound("hurtSound", "audio/pepe_hurting.mp3", false, 0.8);
+    soundManager.setVolume(0.40);
     console.log("SoundManager erfolgreich initialisiert");
   }
 }
