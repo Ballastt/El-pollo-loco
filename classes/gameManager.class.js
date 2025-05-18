@@ -46,7 +46,7 @@ class GameManager {
     console.log("Spiel wird fortgesetzt...");
     this.isPaused = false;
     this.world.resumeObjects(); // Alle Objekte fortsetzen
-    if (this.soundManager) soundManager.resumeAll();
+    if (this.soundManager) soundManager.play();
   }
 
   stopGame() {
