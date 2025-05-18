@@ -11,11 +11,10 @@ class SmallChicken extends Chicken {
       35,
       35,
       [0.25, 0.45],
-      "audio/small_chicken_walking.mp3"
+      "smallChickenWalking",
+      "smallChickenDeath"
     );
 
-    // Lautstärke für NormalChicken einstellen
-    this.runningSound.volume = 0.01;
     this.y = 380;
   }
 }
