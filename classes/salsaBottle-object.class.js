@@ -22,15 +22,30 @@ class SalsaBottle extends ThrowableObject {
 
   IMAGE_BOTTLE = ["img/6_salsa_bottle/salsa_bottle.png"];
 
-  constructor(x, y, otherDirection) {
+  world;
+
+  constructor(x, y, otherDirection, world) {
     super(x, y, 70, 70); // Übergibt Position und Größe an ThrowableObject
+    this.world = world;
     this.loadImage("img/6_salsa_bottle/salsa_bottle.png");
     this.otherDirection = otherDirection;
     this.loadImages(this.IMAGES_ROTATION);
     this.loadImages(this.IMAGES_SPLASH);
     this.loadImages(this.IMAGES_GROUND);
+    console.log("SalsaBottle created:", this);
+
+    this.isSplashing = false;
+    this.isRemoved = false;
 
     this.throw(); // Sofort nach Erstellung werfen
+  }
+
+  setWorld(world) {
+    this.world = world;
+  }
+
+  startSplashAndRemove() {
+    this.splash();
   }
 
   throw() {
@@ -51,15 +66,33 @@ class SalsaBottle extends ThrowableObject {
   }
 
   splash() {
+    console.log("this.world:", this.world);
+    console.log("Splash called for bottle:", this);
     this.isFlying = false;
 
     let index = 0;
     const interval = setInterval(() => {
       if (index >= this.IMAGES_SPLASH.length) {
         clearInterval(interval);
+        console.log("Splash animation finished for bottle:", this);
         this.setGroundImage();
+
+        // Ensure removeBottleFromWorld is called after accessing this.world
+        // or handle the case where this.world is undefined.
+        // If removeBottleFromWorld() sets this.world to undefined,
+        // move this line after the console.log statements that access this.world.
+        // Alternatively, check if this.world exists before accessing its properties.
+
+        if (this.world) {
+          // Add a check for this.world
+          console.log("Throwables:", this.world.throwableObjects);
+          console.log("Enemies:", this.world.level.enemies);
+        }
+
+        this.removeBottleFromWorld(); // Moved after console.logs that use this.world
         return;
       }
+      console.log(`Splash frame ${index} for bottle:`, this);
       this.img = this.imageCache[this.IMAGES_SPLASH[index]];
       index++;
     }, 100);
@@ -68,5 +101,29 @@ class SalsaBottle extends ThrowableObject {
   setGroundImage() {
     const index = Math.floor(Math.random() * this.IMAGES_GROUND.length); // Zufallsindex für Ground-Image
     this.img = this.imageCache[this.IMAGES_GROUND[index]];
+  }
+
+  removeBottleFromWorld() {
+    console.log("this.world:", this.world);
+
+    console.log("Removing bottle from world:", this);
+
+    // Aus throwableObjects entfernen
+    if (this.world && this.world.throwableObjects) {
+      const index = this.world.throwableObjects.indexOf(this);
+      if (index > -1) {
+        console.log("Flasche aus world.throwableObjects entfernt");
+        this.world.throwableObjects.splice(index, 1);
+      }
+    }
+
+    // Aus enemies entfernen (falls versehentlich hier gelandet)
+    if (this.world && this.world.level && this.world.level.enemies) {
+      const index = this.world.level.enemies.indexOf(this);
+      if (index > -1) {
+        console.log("Flasche aus world.level.enemies entfernt");
+        this.world.level.enemies.splice(index, 1);
+      }
+    }
   }
 }
