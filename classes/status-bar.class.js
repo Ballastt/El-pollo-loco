@@ -66,17 +66,22 @@ class StatusBar extends DrawableObject {
   }
 
   resolveImageIndex() {
-    const thresholds = [0, 20, 40, 60, 80, 100];
-    const isReversed = this.isReversed;
-
-    // Finde den richtigen Index basierend auf dem aktuellen Prozentsatz
-    for (let i = thresholds.length - 1; i >= 0; i--) {
-      if (isReversed) {
-        if (this.percentage >= thresholds[i]) return i;
-      } else {
-        if (this.percentage <= thresholds[i]) return i;
-      }
+    if (this.isReversed) {
+      // Logik für aufwärtszählende StatusBar (z. B. CoinBar)
+      if (this.percentage >= 100) return 5;
+      if (this.percentage > 80) return 4;
+      if (this.percentage > 60) return 3;
+      if (this.percentage > 40) return 2;
+      if (this.percentage > 20) return 1;
+      return 0;
+    } else {
+      // Standard-Logik (abwärtszählende StatusBars, z. B. HealthBar)
+      if (this.percentage >= 100) return 5;
+      if (this.percentage >= 80) return 4;
+      if (this.percentage >= 60) return 3;
+      if (this.percentage >= 40) return 2;
+      if (this.percentage >= 20) return 1;
+      return 0;
     }
-    return 0;
   }
 }
