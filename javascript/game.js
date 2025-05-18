@@ -7,6 +7,8 @@ let gameManager;
 document.addEventListener("DOMContentLoaded", () => {
   const startButton = document.getElementById("start-button");
 
+  initializeSoundManager();
+
   startButton.addEventListener("click", () => {
     // Stelle sicher, dass level1 erst erstellt wird, wenn das Spiel startet
     if (!level1) initLevel();
@@ -15,8 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
     gameManager.startGame();
   });
 
-  initializeSoundManager();
   initializeEventListeners();
+  console.log("Aktive Sounds:", soundManager.sounds);
+
 });
 
 // Initialisiere den GameManager
@@ -24,8 +27,16 @@ function initializeGameManager() {
   canvas = document.getElementById("canvas");
   if (!canvas) console.error("Canvas element not found!");
   if (!level) level = level1;
+
+  // SoundManager wurde bereits initialisiert, hier nur verknüpfen
+  if (!soundManager) {
+    console.warn("SoundManager was not initialized, initializing now...");
+    soundManager = new SoundManager();
+  }
+
   keyboard = new Keyboard(); // Initialisiere die Tastatur nur einmal
   world = new World(canvas, keyboard, level1); // Erstelle eine World-Instanz
+  world.soundManager = soundManager; // Verknüpfe den SoundManager mit der Welt
   gameManager = new GameManager(world); // Verknüpfe die World mit dem GameManager
   world.gameManager = gameManager; // Verknüpfung in beide Richtungen sicherstellen
 
