@@ -96,8 +96,6 @@ function initializeSoundManager() {
     soundManager.addSound("chickenHit", "audio/hitting_a_chicken.mp3");
     soundManager.addSound("coinCollect", "audio/get_coin.mp3", false, 0.5);
     soundManager.addSound("bottleCollect", "audio/get_bottle.mp3", false, 0.5);
-    soundManager.addSound("gamePause", "audio/pause.mp3");
-    soundManager.addSound("gameResume", "audio/resume.mp3");
     soundManager.addSound("walkingSound", "audio/character_walk_on_sand.mp3");
     soundManager.addSound("jumpSound", "audio/character_jumping.mp3", false, 0.8);
     soundManager.addSound("hurtSound", "audio/pepe_hurting.mp3", false, 0.8);
