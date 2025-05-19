@@ -105,16 +105,16 @@ class Chicken extends MoveableObject {
     clearInterval(this.walkingInterval);
     clearInterval(this.animationInterval);
 
-    // Add a check for this.world before accessing soundManager
-    if (this.world && this.world.soundManager) {
-      const soundKey =
-        this instanceof SmallChicken
-          ? "smallChickenDeath"
-          : "normalChickenDeath";
-      this.world.soundManager.play(this.deathSoundKey);
-    }
+    this.soundManager.play(this.deathSoundKey);
 
     this.isRunning = false;
+
+    // Sicherheitsprüfung für die Death-Animation
+    if (!this.IMAGES_DEAD || this.IMAGES_DEAD.length === 0) {
+      console.error("IMAGES_DEAD is not defined or empty!");
+      this.removeEnemy();
+      return;
+    }
 
     let frameIndex = 0;
     const deathInterval = setInterval(() => {
@@ -124,8 +124,19 @@ class Chicken extends MoveableObject {
       } else {
         clearInterval(deathInterval);
         console.log("Chicken animation completed. Ready to remove.");
-        this.removeEnemy(); // Richtiges Aufrufen der Methode
+
+        // Verzögertes Entfernen
+        setTimeout(() => {
+          this.removeEnemy();
+        }, 1000); // 1 Sekunde Verzögerung
       }
-    }, 100);
+    }, 200); // Verlängertes Intervall für bessere Sichtbarkeit
+
+    // Fallback-Timeout, um sicherzustellen, dass das Intervall beendet wird
+    const maxAnimationTime = this.IMAGES_DEAD.length * 200;
+    setTimeout(() => {
+      clearInterval(deathInterval);
+      this.removeEnemy();
+    }, maxAnimationTime + 500); // Pufferzeit von 500ms
   }
 }
