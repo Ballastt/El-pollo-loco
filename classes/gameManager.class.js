@@ -35,6 +35,14 @@ class GameManager {
     if (this.soundManager) this.soundManager.play("backgroundMusic");
   }
 
+  togglePause() {
+    if (this.isPaused) {
+      this.resumeGame();
+    } else {
+      this.pauseGame();
+    }
+  }
+
   pauseGame() {
     console.log("Spiel wird pausiert...");
     this.isPaused = true;
