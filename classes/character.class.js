@@ -156,16 +156,38 @@ class Character extends MoveableObject {
     if (now - this.lastHit < 2000) return;
 
     enemies.forEach((enemy) => {
+      if (enemy.isDead) return; // Überspringe tote Feinde
+
       if (this.isColliding(enemy)) {
-        this.currentState = this.STATES.HURT;
-        this.hit(10);
-        console.log(
-          `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
-        );
-        this.lastHit = now;
-        this.hurtUntil = now + 500;
+        if (this.isJumpingOnEnemy(enemy)) {
+          console.log(`Enemy defeated by jumping: ${enemy.constructor.name}`);
+          enemy.die(); // Feind eliminieren
+          this.bounceOffEnemy(); // Charakter zurückspringen lassen
+        } else {
+          this.currentState = this.STATES.HURT;
+          this.hit(10);
+          console.log(
+            `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
+          );
+          this.lastHit = now;
+          this.hurtUntil = now + 500;
+        }
       }
     });
+  }
+
+  isJumpingOnEnemy(enemy) {
+    const characterBottom = this.y + this.height;
+    const enemyTop = enemy.y;
+    const horizontalOverlap =
+      this.x + this.width > enemy.x && this.x < enemy.x + enemy.width;
+
+    // Prüfen, ob der Charakter von oben kommt
+    return characterBottom >= enemyTop && horizontalOverlap;
+  }
+
+  bounceOffEnemy() {
+    this.speedY = -10; // Rückfederung nach oben
   }
 
   hit(damage) {
@@ -202,9 +224,7 @@ class Character extends MoveableObject {
 
     console.log("Der Charakter ist gestorben!");
 
-    if (this.world.soundManager) {
-      this.world.soundManager.stop("walkingSound");
-    }
+    if (this.world.soundManager) this.world.soundManager.stop("walkingSound");
 
     if (this.world && this.world.gameManager) {
       this.world.gameManager.gameOver();
