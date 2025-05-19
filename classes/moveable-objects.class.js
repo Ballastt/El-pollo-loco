@@ -11,24 +11,26 @@ class MoveableObject extends DrawableObject {
   paused = false;
 
   applyGravity() {
+    const tolerance = 2; // Kleine Toleranz
     this.gravityInterval = setInterval(() => {
       if (!this.paused) {
         if (this.isAboveGround() || this.speedY > 0) {
           this.y -= this.speedY;
           this.speedY -= this.acceleration;
-        } else {
-          this.y = this.groundY;
-          this.speedY = 0;
+        } else if (this.y >= this.groundY - tolerance) {
+          this.y = this.groundY; // Charakter landet auf dem Boden
+          this.speedY = 0; // Geschwindigkeit wird gestoppt
         }
       }
     }, 1000 / 25);
   }
 
   isAboveGround() {
+    const tolerance = 5;
     if (this instanceof ThrowableObject) {
       return true;
     } else {
-      return this.y < this.groundY;
+      return this.y < this.groundY - tolerance;
     }
   }
 
@@ -116,7 +118,7 @@ class MoveableObject extends DrawableObject {
   die() {
     if (!this.isDead) {
       this.isDead = true;
-    
+
       clearInterval(this.gravityInterval); // Schwerkraft beenden
       console.log(`${this.constructor.name} ist gestorben!`);
     }
