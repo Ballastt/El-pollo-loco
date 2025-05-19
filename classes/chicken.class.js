@@ -109,13 +109,6 @@ class Chicken extends MoveableObject {
 
     this.isRunning = false;
 
-    // Sicherheitsprüfung für die Death-Animation
-    if (!this.IMAGES_DEAD || this.IMAGES_DEAD.length === 0) {
-      console.error("IMAGES_DEAD is not defined or empty!");
-      this.removeEnemy();
-      return;
-    }
-
     let frameIndex = 0;
     const deathInterval = setInterval(() => {
       if (frameIndex < this.IMAGES_DEAD.length) {
@@ -131,12 +124,5 @@ class Chicken extends MoveableObject {
         }, 1000); // 1 Sekunde Verzögerung
       }
     }, 200); // Verlängertes Intervall für bessere Sichtbarkeit
-
-    // Fallback-Timeout, um sicherzustellen, dass das Intervall beendet wird
-    const maxAnimationTime = this.IMAGES_DEAD.length * 200;
-    setTimeout(() => {
-      clearInterval(deathInterval);
-      this.removeEnemy();
-    }, maxAnimationTime + 500); // Pufferzeit von 500ms
   }
 }
