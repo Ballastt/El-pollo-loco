@@ -40,8 +40,18 @@ function initializeGameManager() {
   gameManager = new GameManager(world); // Verknüpfe die World mit dem GameManager
   world.gameManager = gameManager; // Verknüpfung in beide Richtungen sicherstellen
 
+  initializePauseToggleEvent();
+
   console.log("Spiel erfolgreich initialisiert");
   console.log("my character is", world.character);
+}
+
+function initializePauseToggleEvent() {
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && gameManager && gameManager.isGameRunning) {
+      gameManager.togglePause();
+    }
+  });
 }
 
 /// Funktion zum Initialisieren der Pause-Events
