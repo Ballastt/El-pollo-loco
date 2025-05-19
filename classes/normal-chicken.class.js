@@ -12,7 +12,7 @@ class NormalChicken extends Chicken {
       55,
       [0.15, 0.55],
       "normalChickenwalking",
-      "normalChickenDeath"
+      "chickenDeath"
     );
     this.y = 362;
   }
