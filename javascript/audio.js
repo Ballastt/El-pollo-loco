@@ -91,9 +91,8 @@ function initializeSoundManager() {
   if (!window.soundManager) {
     window.soundManager = new SoundManager(); // global verfügbar
     soundManager.addSound("normalChickenWalking", "audio/normal_chicken_walking.mp3", true, 0.9);
-    soundManager.addSound("normalChickenDeath", "audio/dying_chicken.mp3", false, 0.5);
+    soundManager.addSound("chickenDeath", "audio/dying_chicken.mp3", false, 0.5);
     soundManager.addSound("smallChickenWalking", "audio/small_chicken_walking.mp3", true, 0.1);
-    soundManager.addSound("smallChickenDeath", "audio/dying_chicken.mp3", false, 0.5);
     soundManager.addSound("chickenHit", "audio/hitting_a_chicken.mp3");
     soundManager.addSound("coinCollect", "audio/get_coin.mp3", false, 0.5);
     soundManager.addSound("bottleCollect", "audio/get_bottle.mp3", false, 0.5);
