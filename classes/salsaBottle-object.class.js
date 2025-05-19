@@ -66,22 +66,13 @@ class SalsaBottle extends ThrowableObject {
   }
 
   splash() {
-    console.log("this.world:", this.world);
-    console.log("Splash called for bottle:", this);
     this.isFlying = false;
 
     let index = 0;
     const interval = setInterval(() => {
       if (index >= this.IMAGES_SPLASH.length) {
         clearInterval(interval);
-        console.log("Splash animation finished for bottle:", this);
         this.setGroundImage();
-
-        // Ensure removeBottleFromWorld is called after accessing this.world
-        // or handle the case where this.world is undefined.
-        // If removeBottleFromWorld() sets this.world to undefined,
-        // move this line after the console.log statements that access this.world.
-        // Alternatively, check if this.world exists before accessing its properties.
 
         if (this.world) {
           // Add a check for this.world
@@ -104,25 +95,19 @@ class SalsaBottle extends ThrowableObject {
   }
 
   removeBottleFromWorld() {
-    console.log("this.world:", this.world);
-
     console.log("Removing bottle from world:", this);
 
-    // Aus throwableObjects entfernen
-    if (this.world && this.world.throwableObjects) {
-      const index = this.world.throwableObjects.indexOf(this);
-      if (index > -1) {
-        console.log("Flasche aus world.throwableObjects entfernt");
-        this.world.throwableObjects.splice(index, 1);
-      }
-    }
+    //Entfernen von Flaschen aus allen möglichen Collections
+    this.removeFromArray(this.world?.throwableObjects, "throwableObjects");
+    this.removeFromArray(this.world?.level?. enemies, "enemies");
+  }
 
-    // Aus enemies entfernen (falls versehentlich hier gelandet)
-    if (this.world && this.world.level && this.world.level.enemies) {
-      const index = this.world.level.enemies.indexOf(this);
+  removeFromArray(array, name) {
+    if (array) {
+      const index = array.indexOf(this);
       if (index > -1) {
-        console.log("Flasche aus world.level.enemies entfernt");
-        this.world.level.enemies.splice(index, 1);
+        console.log(`Flasche aus world.${name} entfernt`);
+        array.splice(index, 1);
       }
     }
   }
