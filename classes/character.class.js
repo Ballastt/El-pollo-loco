@@ -177,13 +177,13 @@ class Character extends MoveableObject {
   }
 
   isJumpingOnEnemy(enemy) {
-    const characterBottom = this.y + this.height;
+    const characterBottom = this.groundY + this.height;
     const enemyTop = enemy.y;
     const horizontalOverlap =
       this.x + this.width > enemy.x && this.x < enemy.x + enemy.width;
 
     // Prüfen, ob der Charakter von oben kommt
-    return characterBottom >= enemyTop && horizontalOverlap;
+    return characterBottom >= enemyTop && horizontalOverlap && this.isAboveGround();
   }
 
   bounceOffEnemy() {
