@@ -7,6 +7,7 @@ class Endboss extends MoveableObject {
   hurtUntil = 0;
   currentState = "walking";
   speed = 3;
+  introSoundPlayed = false;
 
   IMAGES_WALKING = [
     "img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -67,6 +68,7 @@ class Endboss extends MoveableObject {
     this.x = 6300;
     this.y = 50;
     this.character = character;
+    this.soundManager = soundManager;
     this.animate();
   }
 
@@ -116,6 +118,14 @@ class Endboss extends MoveableObject {
         this.currentState = this.STATES.ATTACK;
       } else if (distanceToPlayer < 400) {
         this.currentState = this.STATES.ALERT;
+
+          //Hier IntroSound abspielen
+          if (!this.introSoundPlayed) {
+            this.soundManager.play("introEndboss");
+            this.soundManager.setVolume("introEndboss, 1.0");
+            this.introSoundPlayed = true;
+             console.log("Endboss-Intro-Sound abgespielt");
+          }
       } else {
         this.currentState = this.STATES.WALKING;
       }
