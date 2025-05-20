@@ -17,7 +17,7 @@ let userInteracted = false;
 function toggleMute() {
   isMuted = !isMuted;
 
-  isMuted ? soundManager.muteAll() : soundManager.unmuteAll();
+  isMuted ? soundManager.mute() : soundManager.unmute();
 
   muteIcon.src = isMuted
     ? "img/9_intro_outro_screens/start/sound-off.png"
@@ -76,7 +76,7 @@ function setupEventListeners() {
 window.addEventListener("load", () => {
   isMuted = false;
   userInteracted = false;
-  soundManager.unmuteAll();
+  soundManager.unmute();
   muteIcon.src = "img/9_intro_outro_screens/start/sound-on.png";
 
   // Make sure the correct button is shown at the start
