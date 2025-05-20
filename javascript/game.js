@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initializeEventListeners();
   console.log("Aktive Sounds:", soundManager.sounds);
-
 });
 
 // Initialisiere den GameManager
@@ -27,8 +26,6 @@ function initializeGameManager() {
   canvas = document.getElementById("canvas");
   if (!canvas) console.error("Canvas element not found!");
   if (!level) level = level1;
-
-  // SoundManager wurde bereits initialisiert, hier nur verknüpfen
   if (!soundManager) {
     console.warn("SoundManager was not initialized, initializing now...");
     soundManager = new SoundManager();
@@ -41,9 +38,6 @@ function initializeGameManager() {
   world.gameManager = gameManager; // Verknüpfung in beide Richtungen sicherstellen
 
   initializePauseToggleEvent();
-
-  console.log("Spiel erfolgreich initialisiert");
-  console.log("my character is", world.character);
 }
 
 function initializePauseToggleEvent() {
@@ -88,9 +82,9 @@ function initializeEventListeners() {
   const learnButton = document.getElementById("learn-button");
   if (learnButton) learnButton.addEventListener("click", showInstructions);
 
-  // Pause- und Resume-Events initialisieren
   initializePauseEvents();
   initializeResumeEvents();
+  initializeImpressum();
 
   // Globale Tastatureingaben initialisieren
   window.addEventListener("keydown", handleKeyDown);
@@ -137,8 +131,48 @@ function closeInstructions() {
 }
 
 function closeInstructionsOnOutsideClick(event) {
-  const dialog = document.querySelector(".instructions-dialog");
-  if (!dialog.contains(event.target)) {
+  const instructionsDialog = document.querySelector(".instructions-dialog");
+  if (instructionsDialog && !instructionsDialog.contains(event.target)) {
     closeInstructions();
   }
+}
+
+function initializeImpressum() {
+  const impressumBtn = document.getElementById("impressum-button");
+  const impressumDialog = document.getElementById("impressum-dialog");
+  const closeImpressumBtn = document.getElementById("close-impressum");
+
+  if (impressumBtn && impressumDialog && closeImpressumBtn) {
+    impressumBtn.addEventListener("click", () => {
+      impressumDialog.style.display = "flex";
+      setTimeout(() => impressumDialog.classList.add("active"), 10);
+    });
+
+    closeImpressumBtn.addEventListener("click", () => {
+      closeImpressum();
+    });
+    closeImpressumOutsideClick();
+  }
+}
+
+function closeImpressumOutsideClick() {
+  const impressumDialog = document.getElementById("impressum-dialog");
+  const impressumContent = document.querySelector(".impressum-content");
+  const impressumBtn = document.getElementById("impressum-button");
+  
+  document.addEventListener("click", function (event) {
+    if (
+      impressumDialog.classList.contains("active") &&
+      !impressumContent.contains(event.target) &&
+      !impressumBtn.contains(event.target)
+    ) {
+      closeImpressum();
+    }
+  });
+}
+
+function closeImpressum() {
+  const overlay = document.getElementById("impressum-dialog");
+  overlay.classList.remove("active");
+  setTimeout(() => (overlay.style.display = "none"), 500);
 }
