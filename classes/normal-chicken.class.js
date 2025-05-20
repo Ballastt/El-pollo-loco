@@ -11,9 +11,10 @@ class NormalChicken extends Chicken {
       55,
       55,
       [0.15, 0.55],
-      "normalChickenwalking",
+      "normalChickenWalking",
       "chickenDeath"
     );
     this.y = 362;
+    console.log("NormalChicken created with walkSoundKey:", this.walkSoundKey);
   }
 }
