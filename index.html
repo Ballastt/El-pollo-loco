@@ -34,22 +34,25 @@
     </div>
     <div id="background-image">
       <h1>El Pollo Loco</h1>
-      <button id="pause-btn">
-        <img src="img/icons_bg/pause.png" alt="pause" />
-      </button>
-      <button id="resume-btn">
-        <img src="img/icons_bg/play-taste.png" alt="resume" />
-      </button>
-      <button id="mute-btn" style="display: inline-block">
-        <img
-          src="img/9_intro_outro_screens/start/sound-off.png"
-          alt="Mute Button"
-          id="mute"
-        />
-      </button>
-      <button id="sound-btn" style="display: none">
-        <img src="img/icons_bg/sound_on_ingame.png" alt="Unmute Button" />
-      </button>
+
+      <div id="btn-container-bg">
+        <button id="pause-btn">
+          <img src="img/icons_bg/pause.png" alt="pause" />
+        </button>
+        <button id="resume-btn">
+          <img src="img/icons_bg/play-taste.png" alt="resume" />
+        </button>
+        <button id="mute-btn" style="display: inline-block">
+          <img
+            src="img/9_intro_outro_screens/start/sound-off.png"
+            alt="Mute Button"
+            id="mute"
+          />
+        </button>
+        <button id="sound-btn" style="display: none">
+          <img src="img/icons_bg/sound_on_ingame.png" alt="Unmute Button" />
+        </button>
+      </div>
     </div>
     <canvas
       id="canvas"
@@ -80,6 +83,7 @@
           <li>Sammle Münzen und Tabasco-Flaschen!</li>
           <li>Vermeide Feinde!</li>
           <li>Achtung Endboss!</li>
+          <li>Pausiere das Spiel mit den Icons oder der SPACE-Taste</li>
         </ul>
         <button onclick="closeInstructions()" class="close-instructions-btn">
           Los geht's!
@@ -113,7 +117,7 @@
     <script src="classes/moveable-objects.class.js"></script>
 
     <!-- Spezialisierte Klassen -->
-     <script src="javascript/audio.js"></script>
+    <script src="javascript/audio.js"></script>
     <script src="classes/chicken.class.js"></script>
     <script src="classes/normal-chicken.class.js"></script>
     <script src="classes/small-chicken.class.js"></script>
@@ -128,7 +132,6 @@
     <script src="classes/salsaBottle-object.class.js"></script>
 
     <script src="classes/soundManager.class.js"></script>
-    
 
     <!-- Welt und Level -->
     <script src="classes/world.class.js"></script>
