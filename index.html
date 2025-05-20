@@ -26,6 +26,7 @@
             id="mute"
           />
         </button>
+        <button id="impressum-button" class="btn-grad">Impressum</button>
       </div>
     </div>
     <div id="background-image">
@@ -84,6 +85,33 @@
         <button onclick="closeInstructions()" class="close-instructions-btn">
           Los geht's!
         </button>
+      </div>
+    </div>
+
+    <!-- Modal für Impressum -->
+    <div
+      id="impressum-dialog"
+      style="display: none"
+      class="impressum-overlay"
+    >
+      <div class="impressum-content" onclick="event.stopPropagation()">
+        <button id="close-impressum">X</button>
+        <h2>Impressum</h2>
+        <p>
+          Anbieter: Birgit Leitner<br />
+          Große Neugasse 26<br />
+          1040 Wien<br />
+          E-Mail: birgit.leitner@yahoo.de
+        </p>
+        <p>Verantwortlich für den Inhalt: <strong>Birgit Leitner</strong></p>
+        <p>
+          <strong>Haftungsausschluss:</strong> Trotz sorgfältiger inhaltlicher
+          Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links.
+        </p>
+        <p>
+          <strong>Urheberrecht:</strong> Die Inhalte dieser Anwendung sind
+          urheberrechtlich geschützt. Vervielfältigung nur mit Genehmigung.
+        </p>
       </div>
     </div>
 
