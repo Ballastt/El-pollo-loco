@@ -26,7 +26,7 @@ for (let i = -1; i < numberOfBackgrounds; i++) {
 
 function generateEnemies() {
   const enemies = [];
-  const amount = 25;
+  const amount = 30;
   const level_end_x = 6000;
   const startX = 600;
   const spacing = (level_end_x - startX) / amount;
@@ -101,8 +101,8 @@ let level1;
 // Initialisiere `level1`, sobald das Skript geladen wird
 function initLevel() {
   level1 = new Level(
-    generateEnemies(25),
-    generateClouds(80),
+    generateEnemies(),
+    generateClouds(),
     backgroundObjects,
     generateCoins(40),
     generateBottles(30)
