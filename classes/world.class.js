@@ -44,7 +44,6 @@ class World {
     // Set start time on creation
     this.startTime = Date.now();
 
-
     this.draw();
   }
 
@@ -130,7 +129,10 @@ class World {
 
   checkThrowObjects() {
     if (this.keyboard.D) {
-      this.character.throwBottle(); // Wurfaktion an Character delegieren
+      const didThrow = this.character.throwBottle(); // Rückgabewert prüfen
+      if (didThrow) {
+        this.updateThrowBar(); // Flasche wurde geworfen → Bar aktualisieren
+      }
     }
     this.bottleEnemyCollision();
   }
@@ -281,11 +283,9 @@ class World {
   }
 
   updateCoinBar() {
-    if (this.world && this.world.coinBar) {
-      const maxCoins = this.world.level.totalCoins || 40;
-      const percentage = (this.character.collectedCoins / maxCoins) * 100;
-      this.world.coinBar.setPercentage(percentage);
-      console.log(`Updated CoinBar: ${percentage}%`);
-    }
+    const maxCoins = this.level.totalCoins || 40;
+    const percentage = (this.character.collectedCoins / maxCoins) * 100;
+    this.coinBar.setPercentage(percentage);
+    console.log(`Updated CoinBar: ${percentage}%`);
   }
 }
