@@ -2,10 +2,10 @@ class DrawableObject {
   img;
   imageCache = {};
 
-  x = 0; // Standardposition auf der x-Achse
-  y = 0; // Standardposition auf der y-Achse
-  width = 50; // Standardbreite
-  height = 50; // Standardhöhe
+  x = 0; 
+  y = 0; 
+  width = 50; 
+  height = 50; 
 
   //loadImage()
   loadImage(path) {
@@ -28,18 +28,13 @@ class DrawableObject {
   draw(ctx) {
     if (this.img instanceof HTMLImageElement && this.img.complete) {
       ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-    } else {
-      // Optional: Platzhalter oder Skip-Zeile
-      // console.log('Bild noch nicht geladen:', this.img);
-    }
+    } 
   }
 
   drawHitbox(ctx) {
     if (
       this instanceof Character ||
       this instanceof Chicken ||
-      this instanceof Coin ||
-      this instanceof CollectableBottle ||
       this instanceof Endboss
     ) {
       //Debug Hitbox
