@@ -13,7 +13,7 @@ class Chicken extends MoveableObject {
   ) {
     super();
 
-    this.x = 200 + Math.random() * 5700;
+    this.x = 200 + Math.random() * 6200;
     this.y = 370;
     this.speed = speedRange[0] + Math.random() * speedRange[1];
     this.height = height;
@@ -42,9 +42,6 @@ class Chicken extends MoveableObject {
     // Adding user interaction
     document.addEventListener("click", this.enableAudioPlayback.bind(this));
     document.addEventListener("keydown", this.enableAudioPlayback.bind(this));
-
-    // Start animation
-    this.animate();
   }
 
   enableAudioPlayback() {
@@ -94,6 +91,23 @@ class Chicken extends MoveableObject {
     console.log("Enemies array after removal:", this.enemies);
   }
 
+  deathAnimationChicken() {
+    let frameIndex = 0;
+    const deathInterval = setInterval(() => {
+      if (frameIndex < this.IMAGES_DEAD.length) {
+        this.img = this.imageCache[this.IMAGES_DEAD[frameIndex]];
+        frameIndex++;
+      } else {
+        clearInterval(deathInterval);
+        console.log("Chicken animation completed. Ready to remove.");
+
+        setTimeout(() => {
+          this.removeEnemy();
+        }, 1000); // 1 Sekunde Verzögerung
+      }
+    }, 200); // Verlängertes Intervall für bessere Sichtbarkeit
+  }
+
   die() {
     if (this.isDead) {
       console.warn("Chicken is already dead:", this);
@@ -109,20 +123,6 @@ class Chicken extends MoveableObject {
 
     this.isRunning = false;
 
-    let frameIndex = 0;
-    const deathInterval = setInterval(() => {
-      if (frameIndex < this.IMAGES_DEAD.length) {
-        this.img = this.imageCache[this.IMAGES_DEAD[frameIndex]];
-        frameIndex++;
-      } else {
-        clearInterval(deathInterval);
-        console.log("Chicken animation completed. Ready to remove.");
-
-        // Verzögertes Entfernen
-        setTimeout(() => {
-          this.removeEnemy();
-        }, 1000); // 1 Sekunde Verzögerung
-      }
-    }, 200); // Verlängertes Intervall für bessere Sichtbarkeit
+    this.deathAnimationChicken();
   }
 }
