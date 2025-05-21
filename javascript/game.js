@@ -55,6 +55,7 @@ function initializePauseEvents() {
     pauseButton.addEventListener("click", () => {
       if (gameManager) {
         gameManager.pauseGame();
+        togglePauseResumeButtons(true);
       } else {
         console.error("GameManager is not initialized!");
       }
@@ -69,8 +70,24 @@ function initializeResumeEvents() {
     resumeButton.addEventListener("click", () => {
       if (gameManager) {
         gameManager.resumeGame();
+        togglePauseResumeButtons(false);
       }
     });
+  }
+}
+// Hilfsfunktion, um Buttons zu toggeln
+function togglePauseResumeButtons(isPaused) {
+  const pauseButton = document.getElementById("pause-btn");
+  const resumeButton = document.getElementById("resume-btn");
+
+  if (pauseButton && resumeButton) {
+    if (isPaused) {
+      pauseButton.style.display = "none";
+      resumeButton.style.display = "inline-block"; // oder block, je nach Layout
+    } else {
+      pauseButton.style.display = "inline-block";
+      resumeButton.style.display = "none";
+    }
   }
 }
 
@@ -115,64 +132,4 @@ function restartGame() {
   if (gameManager) {
     gameManager.startGame(); // Neustart über den GameManager
   }
-}
-
-// Funktion, um Spielanweisungen zu zeigen
-function showInstructions() {
-  const overlay = document.getElementById("instructions-overlay");
-  overlay.style.display = "flex";
-  setTimeout(() => overlay.classList.add("active"), 10);
-}
-
-function closeInstructions() {
-  const overlay = document.getElementById("instructions-overlay");
-  overlay.classList.remove("active");
-  setTimeout(() => (overlay.style.display = "none"), 500); // Match the transition duration
-}
-
-function closeInstructionsOnOutsideClick(event) {
-  const instructionsDialog = document.querySelector(".instructions-dialog");
-  if (instructionsDialog && !instructionsDialog.contains(event.target)) {
-    closeInstructions();
-  }
-}
-
-function initializeImpressum() {
-  const impressumBtn = document.getElementById("impressum-button");
-  const impressumDialog = document.getElementById("impressum-dialog");
-  const closeImpressumBtn = document.getElementById("close-impressum");
-
-  if (impressumBtn && impressumDialog && closeImpressumBtn) {
-    impressumBtn.addEventListener("click", () => {
-      impressumDialog.style.display = "flex";
-      setTimeout(() => impressumDialog.classList.add("active"), 10);
-    });
-
-    closeImpressumBtn.addEventListener("click", () => {
-      closeImpressum();
-    });
-    closeImpressumOutsideClick();
-  }
-}
-
-function closeImpressumOutsideClick() {
-  const impressumDialog = document.getElementById("impressum-dialog");
-  const impressumContent = document.querySelector(".impressum-content");
-  const impressumBtn = document.getElementById("impressum-button");
-  
-  document.addEventListener("click", function (event) {
-    if (
-      impressumDialog.classList.contains("active") &&
-      !impressumContent.contains(event.target) &&
-      !impressumBtn.contains(event.target)
-    ) {
-      closeImpressum();
-    }
-  });
-}
-
-function closeImpressum() {
-  const overlay = document.getElementById("impressum-dialog");
-  overlay.classList.remove("active");
-  setTimeout(() => (overlay.style.display = "none"), 500);
 }
