@@ -1,7 +1,7 @@
 class SoundManager {
   constructor() {
     this.sounds = {};
-    this.isMuted = false;
+    this.isMuted = JSON.parse(localStorage.getItem('isMuted')) || false;
   }
 
   addSound(key, filePath, loop = false, volume = 1.0) {
@@ -54,11 +54,13 @@ class SoundManager {
 
   mute() {
     this.isMuted = true;
+    localStorage.setItem('isMuted', JSON.stringify(true));
     this.pauseAll();
   }
 
   unmute() {
     this.isMuted = false;
+    localStorage.setItem('isMuted', JSON.stringify(false));
     for (const key in this.sounds) {
       const sound = this.sounds[key];
       if (sound.loop) {
