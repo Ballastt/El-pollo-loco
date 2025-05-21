@@ -9,11 +9,10 @@ const muteIcon = document.getElementById("mute");
 const muteButtonInGame = document.getElementById("mute-btn");
 const soundButtonInGame = document.getElementById("sound-btn");
 
-// Variable to track sound state
 let isMuted = false;
 let userInteracted = false;
 
-// Function to toggle mute/unmute
+
 function toggleMute() {
   isMuted = !isMuted;
 
@@ -23,22 +22,17 @@ function toggleMute() {
     ? "img/9_intro_outro_screens/start/sound-off.png"
     : "img/9_intro_outro_screens/start/sound-on.png";
 
-  // Update in-game buttons
   if (muteButtonInGame && soundButtonInGame) {
     muteButtonInGame.style.display = isMuted ? "none" : "inline-block";
     soundButtonInGame.style.display = isMuted ? "inline-block" : "none";
   }
-
-  console.log("Sound is now", isMuted ? "muted" : "unmuted");
 }
 
-// Function to enable global audio playback
+
 function enableAudioPlayback() {
   if (!userInteracted) {
     userInteracted = true;
-    console.log("Audio playback enabled");
 
-    // Hier könntest du alle anderen Sounds auch starten, wenn nötig
     document.dispatchEvent(new Event("audio-enabled"));
   }
 }
@@ -75,17 +69,13 @@ function setupEventListeners() {
 // Set default sound state on load
 window.addEventListener("load", () => {
   isMuted = false;
-  userInteracted = false;
   soundManager.unmute();
   muteIcon.src = "img/9_intro_outro_screens/start/sound-on.png";
 
-  // Make sure the correct button is shown at the start
   if (muteButtonInGame && soundButtonInGame) {
     muteButtonInGame.style.display = "inline-block";
     soundButtonInGame.style.display = "none";
   }
-
-  console.log("Game loaded. Waiting for user interaction...");
 });
 
 function initializeSoundManager() {
@@ -95,14 +85,14 @@ function initializeSoundManager() {
       "backgroundMusic",
       "audio/audio_start_screen.mp3",
       true,
-      0.3
+      0.2
     ); // loop=true
 
     soundManager.addSound(
       "normalChickenWalking",
       "audio/normal_chicken_walking.mp3",
-      true,
-      0.2
+      false,
+      0.4
     );
     soundManager.addSound(
       "chickenDeath",
@@ -113,8 +103,8 @@ function initializeSoundManager() {
     soundManager.addSound(
       "smallChickenWalking",
       "audio/small_chicken_walking.mp3",
-      true,
-      0.05
+      false,
+      0.2
     );
     soundManager.addSound(
       "chickenHit",
