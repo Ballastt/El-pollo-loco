@@ -36,24 +36,15 @@ class Chicken extends MoveableObject {
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_DEAD);
 
-    this.userInteracted = false;
     this.isRunning = false;
 
-    // Adding user interaction
-    document.addEventListener("click", this.enableAudioPlayback.bind(this));
-    document.addEventListener("keydown", this.enableAudioPlayback.bind(this));
-  }
-
-  enableAudioPlayback() {
-    if (!this.userInteracted) {
-      this.userInteracted = true;
-      console.log("Audio playback enabled");
-    }
+    // Start animation
+    this.animate();
   }
 
   moveLeft() {
     super.moveLeft();
-    if (this.userInteracted && !this.isRunning) {
+    if (!this.isRunning) {
       console.log("Playing walking sound:", this.walkSoundKey);
       this.soundManager.play(this.walkSoundKey);
       this.isRunning = true;
