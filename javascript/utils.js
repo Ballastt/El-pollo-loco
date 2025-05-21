@@ -1,3 +1,8 @@
+const impressumBtn = document.getElementById("impressum-button");
+const impressumDialog = document.getElementById("impressum-dialog");
+const closeImpressumBtn = document.getElementById("close-impressum");
+const impressumContent = document.querySelector(".impressum-content");
+
 // Funktion, um Spielanweisungen zu zeigen
 function showInstructions() {
   const overlay = document.getElementById("instructions-overlay");
@@ -8,7 +13,7 @@ function showInstructions() {
 function closeInstructions() {
   const overlay = document.getElementById("instructions-overlay");
   overlay.classList.remove("active");
-  setTimeout(() => (overlay.style.display = "none"), 500); 
+  setTimeout(() => (overlay.style.display = "none"), 500);
 }
 
 function closeInstructionsOnOutsideClick(event) {
@@ -19,10 +24,6 @@ function closeInstructionsOnOutsideClick(event) {
 }
 
 function initializeImpressum() {
-  const impressumBtn = document.getElementById("impressum-button");
-  const impressumDialog = document.getElementById("impressum-dialog");
-  const closeImpressumBtn = document.getElementById("close-impressum");
-
   if (impressumBtn && impressumDialog && closeImpressumBtn) {
     impressumBtn.addEventListener("click", () => {
       impressumDialog.style.display = "flex";
@@ -37,10 +38,6 @@ function initializeImpressum() {
 }
 
 function closeImpressumOutsideClick() {
-  const impressumDialog = document.getElementById("impressum-dialog");
-  const impressumContent = document.querySelector(".impressum-content");
-  const impressumBtn = document.getElementById("impressum-button");
-  
   document.addEventListener("click", function (event) {
     if (
       impressumDialog.classList.contains("active") &&
