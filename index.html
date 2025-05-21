@@ -36,7 +36,7 @@
         <button id="pause-btn">
           <img src="img/icons_bg/pause.png" alt="pause" />
         </button>
-        <button id="resume-btn">
+        <button id="resume-btn" style="display: none">
           <img src="img/icons_bg/play-taste.png" alt="resume" />
         </button>
         <button id="mute-btn" style="display: inline-block">
@@ -89,11 +89,7 @@
     </div>
 
     <!-- Modal für Impressum -->
-    <div
-      id="impressum-dialog"
-      style="display: none"
-      class="impressum-overlay"
-    >
+    <div id="impressum-dialog" style="display: none" class="impressum-overlay">
       <div class="impressum-content" onclick="event.stopPropagation()">
         <button id="close-impressum">X</button>
         <h2>Impressum</h2>
@@ -142,6 +138,7 @@
 
     <!-- Spezialisierte Klassen -->
     <script src="javascript/audio.js"></script>
+    <script src="javascript/utils.js"></script>
     <script src="classes/chicken.class.js"></script>
     <script src="classes/normal-chicken.class.js"></script>
     <script src="classes/small-chicken.class.js"></script>
