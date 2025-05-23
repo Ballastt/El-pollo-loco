@@ -6,8 +6,8 @@ class World {
   canvas;
   ctx;
   keyboard;
-  camera_x = 0; // Kameradrehung
-  level_end_x = 6000;
+  camera_x = 0;
+  level_end_x = 6700;
 
   collectedCoins = 0;
   collectedBottles = 0;
@@ -50,16 +50,16 @@ class World {
   // --- Hauptlogik ---
   run() {
     if (this.gameManager.isPaused || !this.gameManager.isGameRunning) {
-      return; // Skip game loop when paused or game is not running
+      return;
     }
 
-    setInterval(() => {
+    this.gameLoopInterval = setInterval(() => {
       if (!this.gameManager.isPaused) {
         this.checkCollisions();
         this.checkThrowObjects();
         this.checkGameOver();
       }
-    }, 200); // Only process logic if the game is not paused
+    }, 200);
   }
 
   draw() {
@@ -221,6 +221,24 @@ class World {
       this.level.clouds.forEach((cloud) => cloud.resume());
       console.log("Alle Objekte fortgesetzt");
     }
+  }
+
+  stopObjects() {
+    if (this.gameLoopInterval) {
+      clearInterval(this.gameLoopInterval);
+      this.gameLoopInterval = null;
+      console.log("🌍 Game-Loop gestoppt");
+    }
+
+    if (this.character && typeof this.character.stop === "function") this.character.stop();
+    if (this.endboss && typeof this.endboss.stop === "function") this.endboss.stop();
+    
+    for (let enemy of this.enemies || []) {
+      if (typeof enemy.stop === "function") {
+        enemy.stop();
+      }
+    }
+    // weitere Objekte wie z. B. `coins`, `clouds`, `backgroundObjects`, wenn nötig
   }
 
   get isDead() {
