@@ -10,13 +10,7 @@ class GameManager {
   }
 
   startGame() {
-    console.log("Spiel wird gestartet...");
-
-    //Level Initialisieren
-    if (!level1) {
-      initLevel();
-      console.log("Level 1 initialisiert,", level1);
-    }
+    if (!level1) initLevel();
 
     this.isGameRunning = true; // Spielzustand auf "gestartet" setzen
     this.isPaused = false;
@@ -26,13 +20,24 @@ class GameManager {
     if (this.canvas) this.canvas.style.display = "block";
 
     // Initialisiere das Spiel
-    if (this.world) {
-      this.world.run();
-    } else {
-      console.error("World wird nicht richtig initialisiert!");
+    if (this.world) this.world.run();
+    if (this.soundManager) this.soundManager.play("backgroundMusic");
+  }
+
+  showEndScreen(won = false) {
+    const screen = this.gameOverScreen;
+    const img = document.getElementById("game-over-image");
+
+    if (!screen || !img) {
+      console.error("Endbildschirm-Elemente fehlen!");
+      return;
     }
 
-    if (this.soundManager) this.soundManager.play("backgroundMusic");
+    img.src = won
+      ? "img/You won, you lost/You Win A.png"
+      : "img/You won, you lost/Game over A.png";
+    screen.classList.remove("hidden");
+    this.canvas.style.opacity = 0.2;
   }
 
   togglePause() {
@@ -59,22 +64,30 @@ class GameManager {
 
   stopGame() {
     console.log("Spiel wird gestoppt...");
+
+    // Stoppe weltweite Loops (Canvas-Rendering, Bewegung etc.)
     clearInterval(this.world.characterMovementInterval);
     clearInterval(this.world.characterAnimationInterval);
-    this.isGameRunning = false; // Spielzustand auf "gestoppt" setzen
+    this.isGameRunning = false;
+
+    // Alle Soundquellen stoppen
     if (this.soundManager) this.soundManager.stopAll();
+
+    // ❗ Alle Spielobjekte stoppen
+    if (this.world && typeof this.world.stopObjects === "function") this.world.stopObjects();
   }
 
   gameOver() {
     console.log("Spiel ist vorbei");
-
     this.isGameRunning = false; // Spielstatus setzen
-    if (this.gameOverScreen) {
-      console.log("Game Over Screen wird angezeigt");
-      this.gameOverScreen.classList.remove("hidden");
-    } else {
-      console.error("Kein Game Over Screen gefunden!");
-    }
+    this.showEndScreen(false); //Niederlage anzeigen
+    this.stopGame();
+  }
+
+  gameWon() {
+    console.log("Spiel gewonnen!");
+    this.isGameRunning = false;
+    this.showEndScreen(true); // Sieg anzeigen
     this.stopGame();
   }
 }
