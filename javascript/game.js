@@ -26,10 +26,7 @@ function initializeGameManager() {
   canvas = document.getElementById("canvas");
   if (!canvas) console.error("Canvas element not found!");
   if (!level) level = level1;
-  if (!soundManager) {
-    console.warn("SoundManager was not initialized, initializing now...");
-    soundManager = new SoundManager();
-  }
+  if (!soundManager) soundManager = new SoundManager();
 
   keyboard = new Keyboard(); // Initialisiere die Tastatur nur einmal
   world = new World(canvas, keyboard, level1); // Erstelle eine World-Instanz
