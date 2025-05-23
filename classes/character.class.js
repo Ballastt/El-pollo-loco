@@ -77,6 +77,7 @@ class Character extends MoveableObject {
   lastHit = 0;
   isDead = false;
   hurtUntil = 0;
+  isSnoring = false;
 
   // --- Konstruktor ---
   constructor(world) {
@@ -115,8 +116,12 @@ class Character extends MoveableObject {
     this.loadImages(this.IMAGES_LONG_IDLE);
     this.loadImages(this.IMAGES_HURT);
     this.loadImages(this.IMAGES_DEAD);
+
+    this.soundManager = soundManager;
+
     this.applyGravity();
     this.animate();
+
     this.currentState = this.STATES.IDLE;
   }
 
@@ -127,33 +132,50 @@ class Character extends MoveableObject {
   }
 
   startMovementLoop() {
-    setInterval(() => {
+    this.movementInterval = setInterval(() => {
       this.handleMovement();
       this.handleWalkingSound();
       this.updateCamera();
       this.checkCollisionsWithEnemy(this.world.level.enemies);
+      this.checkCollisionsWithEndboss(this.world.endboss);
     }, 1000 / 60);
   }
 
   startAnimationLoop() {
-    setInterval(() => {
+    this.animationInterval = setInterval(() => {
       this.handleAnimations();
     }, 50);
+  }
+
+  stop() {
+    if (this.movementInterval) {
+      clearInterval(this.movementInterval);
+      this.movementInterval = null;
+    }
+    if (this.animationInterval) {
+      clearInterval(this.animationInterval);
+      this.animationInterval = null;
+    }
+
+    console.log("🛑 Charakter gestoppt.");
   }
 
   // --- Kollision und Treffer ---
   checkCollisionsWithEndboss(endboss) {
     if (this.isColliding(endboss)) {
       console.log("Kollision mit dem Endboss");
-      this.currentState = this.STATES.HURT;
-      endboss.hurt(10);
-      this.hit(20);
+      if (Date.now() > (this.lastCollision || 0) + 1000) {
+        this.lastCollision = Date.now();
+        this.currentState = this.STATES.HURT;
+        endboss.hurt(10);
+        this.hit(20);
+      }
     }
   }
 
   checkCollisionsWithEnemy(enemies) {
     const now = Date.now();
-    if (now - this.lastHit < 2000) return;
+    if (now - this.lastHit < 500) return;
 
     enemies.forEach((enemy) => {
       if (enemy.isDead) return; // Überspringe tote Feinde
@@ -177,17 +199,18 @@ class Character extends MoveableObject {
   }
 
   isJumpingOnEnemy(enemy) {
-    const characterBottom = this.groundY + this.height;
+    const characterBottom = this.y + this.height;
     const enemyTop = enemy.y;
     const horizontalOverlap =
       this.x + this.width > enemy.x && this.x < enemy.x + enemy.width;
 
-    // Prüfen, ob der Charakter von oben kommt
-    return characterBottom >= enemyTop && horizontalOverlap && this.isAboveGround();
+    return (
+      characterBottom >= enemyTop && horizontalOverlap && this.isAboveGround()
+    );
   }
 
   bounceOffEnemy() {
-    this.speedY = -10; // Rückfederung nach oben
+    this.speedY = 15;
   }
 
   hit(damage) {
@@ -197,24 +220,15 @@ class Character extends MoveableObject {
       super.hit(damage);
       this.lastHit = now;
 
-      // "Aua"-Sound abspielen
-      if (this.world.soundManager) {
-        this.world.soundManager.play("hurtSound");
-      }
+      if (this.world.soundManager) this.world.soundManager.play("hurtSound");
 
       this.health = Math.max(0, this.health);
-      const percentage = (this.health / this.maxHealth) * 100;
-
-      if (this.world && this.world.healthBar) {
-        this.world.healthBar.setPercentage(percentage);
-      }
+      this.updateHealthBar();
 
       console.log(`Character getroffen! Gesundheit: ${this.health}`);
     }
 
-    if (this.health === 0) {
-      this.die();
-    }
+    if (this.health === 0) this.die();
   }
 
   die() {
@@ -225,12 +239,7 @@ class Character extends MoveableObject {
     console.log("Der Charakter ist gestorben!");
 
     if (this.world.soundManager) this.world.soundManager.stop("walkingSound");
-
-    if (this.world && this.world.gameManager) {
-      this.world.gameManager.gameOver();
-    } else {
-      console.error("Kein gameManager in world gefunden!");
-    }
+    if (this.world && this.world.gameManager) this.world.gameManager.gameOver();
   }
 
   // --- Bewegungs- und Statussteuerung ---
@@ -241,43 +250,28 @@ class Character extends MoveableObject {
 
   handleInput() {
     if (this.isDead || Date.now() < this.hurtUntil) return;
-
     this.isMoving = false;
 
-    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
-      this.moveRight();
-      this.isMoving = true;
-    }
-
-    if (this.world.keyboard.LEFT && this.x > 0) {
-      this.moveLeft();
-      this.isMoving = true;
-    }
-
-    if (this.world.keyboard.UP && !this.isAboveGround()) {
-      this.jump();
-      if (this.world.soundManager) this.world.soundManager.play("jumpSound");
-    }
+    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x)
+      this.handleRightInput();
+    if (this.world.keyboard.LEFT && this.x > 0) this.handleLeftInput();
+    if (this.world.keyboard.UP && !this.isAboveGround()) this.handleJumpInput();
   }
 
   handleState() {
     const now = Date.now();
 
-    if (this.isDead) return (this.currentState = this.STATES.DEAD);
+    if (this.isDead) return this.setState(this.STATES.DEAD);
+    if (now < this.hurtUntil) return this.setState(this.STATES.HURT);
+    if (this.isAboveGround()) return this.setJumpingState(now);
 
-    if (now < this.hurtUntil) return (this.currentState = this.STATES.HURT);
-
-    if (this.isAboveGround()) {
-      this.currentState = this.STATES.JUMPING;
-      this.lastMoveTime = now;
-    } else if (this.isMoving) {
-      this.currentState = this.STATES.WALKING;
-      this.lastMoveTime = now;
-    } else {
-      const idleDuration = now - (this.lastMoveTime || now);
-      this.currentState =
-        idleDuration > 100000 ? this.STATES.LONG_IDLE : this.STATES.IDLE;
+    if (this.isSnoring) {
+      this.world.soundManager.stop("snoringPepe");
+      this.isSnoring = false;
     }
+    if (this.isMoving) return this.setWalkingState(now);
+
+    return this.setIdleOrLongIdleState(now);
   }
 
   handleWalkingSound() {
@@ -314,22 +308,28 @@ class Character extends MoveableObject {
 
   // --- Aktionen ---
   throwBottle() {
-    console.log("Available bottles:", this.collectedBottles); // Debugging log
+    console.log("Available bottles:", this.collectedBottles);
+
     if (this.collectedBottles > 0) {
       this.collectedBottles--;
 
       const offsetX = this.otherDirection ? -10 : 60;
       const offsetY = 80;
+
       const bottle = new SalsaBottle(
         this.x + offsetX,
         this.y + offsetY,
         this.otherDirection,
-        this.world //WOrld referenz
+        this.world // World-Referenz
       );
 
       this.world.throwableObjects.push(bottle);
-      this.updateThrowBar();
+      this.world.updateThrowBar();
+
+      return true; // Flasche erfolgreich geworfen
     }
+
+    return false; // Keine Flaschen vorhanden → kein Wurf
   }
 
   // --- Kamera und Fortschrittsanzeige ---
@@ -339,12 +339,68 @@ class Character extends MoveableObject {
     }
   }
 
-  updateThrowBar() {
-    const totalBottles = this.world.level.bottles.length;
-    const collectedBottles = this.collectedBottles;
-    const percent = (collectedBottles / totalBottles) * 100;
-    console.log(
-      `Updating ThrowBar: ${percent}% (Collected: ${collectedBottles}, Total: ${totalBottles})`
-    );
+  //Hilfsmethoden
+  handleRightInput() {
+    this.moveRight();
+    this.isMoving = true;
+  }
+
+  handleLeftInput() {
+    this.moveLeft();
+    this.isMoving = true;
+  }
+
+  handleJumpInput() {
+    this.jump();
+    if (this.world.soundManager) {
+      this.world.soundManager.play("jumpSound");
+    }
+  }
+
+  setState(state) {
+    this.currentState = state;
+  }
+
+  setJumpingState(now) {
+    this.setState(this.STATES.JUMPING);
+    this.lastMoveTime = now;
+  }
+
+  setWalkingState(now) {
+    this.setState(this.STATES.WALKING);
+    this.lastMoveTime = now;
+
+    if (this.isSnoring) {
+      this.world.soundManager.stop("snoringPepe");
+      this.isSnoring = false;
+    }
+  }
+
+  setIdleOrLongIdleState(now) {
+    const idleDuration = now - (this.lastMoveTime || now);
+
+    if (idleDuration > 10000) {
+      this.setState(this.STATES.LONG_IDLE);
+
+      if (!this.isSnoring) {
+        this.world.soundManager.play("snoringPepe");
+        this.isSnoring = true;
+      }
+    } else {
+      this.setState(this.STATES.IDLE);
+
+      if (this.isSnoring) {
+        this.world.soundManager.stop("snoringPepe");
+        this.isSnoring = false;
+      }
+    }
+  }
+
+  updateHealthBar() {
+    const percentage = (this.health / this.maxHealth) * 100;
+
+    if (this.world && this.world.healthBar) {
+      this.world.healthBar.setPercentage(percentage);
+    }
   }
 }
