@@ -117,7 +117,7 @@ function initializeSoundManager() {
     soundManager.addSound(
       "walkingSound",
       "audio/character_walk_on_sand.mp3",
-      true,
+      false,
       1.0
     );
     soundManager.addSound(
