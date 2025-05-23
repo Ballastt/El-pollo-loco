@@ -6,7 +6,10 @@ class Endboss extends MoveableObject {
   isDead = false;
   hurtUntil = 0;
   currentState = "walking";
-  speed = 3;
+  speedWalk = 3;
+  speedAttack = 8;
+  jumpForce = 30;
+  chargeCooldown = 0;
   introSoundPlayed = false;
 
   IMAGES_WALKING = [
@@ -59,7 +62,8 @@ class Endboss extends MoveableObject {
   };
 
   constructor(character) {
-    super().loadImage("img/4_enemie_boss_chicken/1_walk/G1.png");
+    super();
+    this.loadImage("img/4_enemie_boss_chicken/1_walk/G1.png");
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_ALERT);
     this.loadImages(this.IMAGES_ATTACK);
@@ -70,6 +74,15 @@ class Endboss extends MoveableObject {
     this.character = character;
     this.soundManager = soundManager;
     this.animate();
+
+    console.log("Endboss initialisiert mit Leben:", this.health);
+
+    this.hitbox = {
+      offsetX: 10, // je nach Bild zuschneiden
+      offsetY: 100,
+      width: 300,
+      height: 300,
+    };
   }
 
   animate() {
@@ -77,10 +90,10 @@ class Endboss extends MoveableObject {
   }
 
   startAnimationLoop() {
-    setInterval(() => {
+    this.animationInterval = setInterval(() => {
       this.handleAnimations();
       this.updateState();
-      this.checkCharacterPositionAndMove();
+      this.moveDependingOnState();
     }, 100);
   }
 
@@ -104,31 +117,31 @@ class Endboss extends MoveableObject {
     }
   }
 
-  // Zustand aktualisieren basierend auf der Distanz zum Charakter
   updateState() {
     if (this.character) {
-      // Sicherstellen, dass der Charakter existiert
       const distanceToPlayer = this.calculateDistance(
         this.character.x,
         this.character.y
       );
+      console.log("📏 Abstand zum Spieler:", distanceToPlayer);
+
       if (this.isDead) {
         this.currentState = this.STATES.DEAD;
       } else if (distanceToPlayer < 200) {
         this.currentState = this.STATES.ATTACK;
       } else if (distanceToPlayer < 400) {
         this.currentState = this.STATES.ALERT;
-
-          //Hier IntroSound abspielen
-          if (!this.introSoundPlayed) {
-            this.soundManager.play("introEndboss");
-            this.soundManager.setVolume("introEndboss, 1.0");
-            this.introSoundPlayed = true;
-             console.log("Endboss-Intro-Sound abgespielt");
-          }
+        if (!this.introSoundPlayed) {
+          this.soundManager.play("introEndboss");
+          this.soundManager.setVolume("introEndboss", 1.0);
+          this.introSoundPlayed = true;
+          console.log("🎵 Intro abgespielt");
+        }
       } else {
         this.currentState = this.STATES.WALKING;
       }
+
+      console.log("🔁 Aktueller Boss-State:", this.currentState);
     }
   }
 
@@ -142,28 +155,93 @@ class Endboss extends MoveableObject {
   //Endboss bewegt sich nur, wenn Charakter am Ende des Spiels
   checkCharacterPositionAndMove() {
     if (this.character.x >= 6000) {
-        this.moveTowardsCharacter();
+      this.moveTowardsCharacter();
     }
   }
 
-  moveTowardsCharacter() {
-    if (this.character && this.currentState !== this.STATES.DEAD) {
-      const characterX = this.character.x;
-      if (this.x > characterX) {
-        this.x -= this.speed;
-      } else if (this.x < characterX) {
-        this.x += this.speed;
-      }
+  moveDependingOnState() {
+    if (this.isDead) return;
+
+    switch (this.currentState) {
+      case this.STATES.ATTACK:
+        this.chargePlayer();
+        break;
+
+      case this.STATES.ALERT:
+        this.moveTowardsCharacter(this.speedWalk);
+        break;
+
+      case this.STATES.WALKING:
+        break;
     }
+  }
+
+  moveTowardsCharacter(speed) {
+    if (!this.character) return;
+    const characterX = this.character.x;
+    if (this.x > characterX) this.x -= speed;
+    else if (this.x < characterX) this.x += speed;
   }
 
   hurt(damage = 10) {
+    const now = Date.now();
+    if (now < this.hurtUntil || this.isDead) return;
+
     this.health -= damage;
-    if (this.health < 0) {
+    this.hurtUntil = now + 1000;
+
+    console.log(
+      `Endboss nimmt ${damage} Schaden, verbleibend: ${this.health} HP`
+    );
+
+    if (this.health <= 0) {
       this.die();
     } else {
-      console.log("Endboss nimmt Schaden!");
       this.currentState = this.STATES.HURT;
+    }
+  }
+
+  die() {
+    this.isDead = true;
+    this.currentState = this.STATES.DEAD;
+    this.playAnimation(this.IMAGES_DEAD);
+    console.log("⚰️ Endboss ist tot.");
+
+    if (this.world && this.world.gameManager) this.world.gameManager.gameWon();
+  }
+
+  stop() {
+    if (this.animationInterval) {
+      clearInterval(this.animationInterval);
+      this.animationInterval = null;
+    }
+    console.log("⛔ Endboss gestoppt.");
+  }
+
+  chargePlayer() {
+    const now = Date.now();
+    if (now < this.chargeCooldown) return;
+    console.log("⏱️ Charge cooldown: ", now < this.chargeCooldown);
+
+    const dx = this.character.x - this.x;
+    const distance = Math.abs(dx);
+    const direction = dx > 0 ? 1 : -1;
+
+    // Sprinten
+    if (distance > 30) {
+      this.x += direction * this.speedAttack;
+    }
+
+    // 25 % Chance zu springen, wenn auf Boden
+    // Temporär ersetzen zum Testen
+    if (Math.random() < 0.25) {
+      this.speedY = this.jumpForce;
+      console.log("💥 Endboss springt!");
+    }
+
+    // Cooldown setzen
+    if (distance < 100) {
+      this.chargeCooldown = now + 2000; // 2 Sekunden warten
     }
   }
 }
