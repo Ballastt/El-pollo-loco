@@ -1,10 +1,42 @@
-let canvas;
-let world;
-let keyboard = new Keyboard();
-let level;
-let gameManager;
+let canvas, world, level, gameManager;
+const keyboard = new Keyboard();
+const buttons = {};
 
-// preload mit async/await
+document.addEventListener("DOMContentLoaded", () => {
+  cacheButtons();
+  initializeSoundManager();
+  setupStartButton();
+  initializeEventListeners();
+  console.log("Aktive Sounds:", soundManager?.sounds || "Keine Sounddaten");
+});
+
+function cacheButtons() {
+  buttons.start = document.getElementById("start-button");
+  buttons.pause = document.getElementById("pause-btn");
+  buttons.resume = document.getElementById("resume-btn");
+  buttons.restart = document.getElementById("restart-button");
+  buttons.learn = document.getElementById("learn-button");
+}
+
+function setupStartButton() {
+  if (!buttons.start) return;
+  buttons.start.addEventListener("click", async () => {
+    showLoading(true);
+    await preloadImages(layerSets.flat());
+    showLoading(false);
+    if (!level1) initLevel();
+    if (!gameManager) initializeGameManager();
+    const bgObjects = generateBackgroundObjects(layerSets);
+    world.setBackgroundObjects(bgObjects);
+    gameManager.startGame();
+  });
+}
+
+function showLoading(visible) {
+  const loadingScreen = document.getElementById("loading-screen");
+  if (loadingScreen) loadingScreen.style.display = visible ? "block" : "none";
+}
+
 async function preloadImages(paths) {
   await Promise.all(
     paths.map(
@@ -12,7 +44,7 @@ async function preloadImages(paths) {
         new Promise((resolve) => {
           const img = new Image();
           img.src = path;
-          img.onload = () => resolve();
+          img.onload = resolve;
           img.onerror = () => {
             console.warn("Fehler beim Laden:", path);
             resolve();
@@ -22,172 +54,100 @@ async function preloadImages(paths) {
   );
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const startButton = document.getElementById("start-button");
-
-  initializeSoundManager();
-
-  startButton.addEventListener("click", async () => {
-    const loadingScreen = document.getElementById("loading-screen");
-    if (loadingScreen) loadingScreen.style.display = "block";
-
-    // Alle Pfade aus layerSets extrahieren und preloaden
-    const preloadPaths = layerSets.flat();
-    await preloadImages(preloadPaths);
-
-    if (loadingScreen) loadingScreen.style.display = "none";
-
-    // Level & Manager initialisieren
-    if (!level1) initLevel();
-    if (!gameManager) initializeGameManager();
-
-    // Hintergrundobjekte generieren und übergeben
-    const bgObjects = generateBackgroundObjects(layerSets);
-    world.setBackgroundObjects(bgObjects);
-
-    // Spiel starten
-    gameManager.startGame();
-  });
-
-  initializeEventListeners();
-  console.log("Aktive Sounds:", soundManager.sounds);
-});
-
-// Initialisiere den GameManager
 function initializeGameManager() {
   canvas = document.getElementById("canvas");
-  if (!canvas) console.error("Canvas element not found!");
-  if (!level) level = level1;
-  if (!soundManager) soundManager = new SoundManager();
-
-  keyboard = new Keyboard(); // Initialisiere die Tastatur nur einmal
-  world = new World(canvas, keyboard, level1); // Erstelle eine World-Instanz
-  world.soundManager = soundManager; // Verknüpfe den SoundManager mit der Welt
-  gameManager = new GameManager(world); // Verknüpfe die World mit dem GameManager
-  world.gameManager = gameManager; // Verknüpfung in beide Richtungen sicherstellen
-
-  initializePauseToggleEvent();
+  if (!canvas) return console.error("Canvas nicht gefunden");
+  level = level1;
+  soundManager ??= new SoundManager();
+  world = new World(canvas, keyboard, level);
+  world.soundManager = soundManager;
+  gameManager = new GameManager(world);
+  world.gameManager = gameManager;
+  addPauseToggleWithSpace();
 }
 
-function initializePauseToggleEvent() {
+function addPauseToggleWithSpace() {
   window.addEventListener("keydown", (e) => {
-    if (e.code === "Space" && gameManager && gameManager.isGameRunning) {
+    if (e.code === "Space" && gameManager?.isGameRunning) {
       gameManager.togglePause();
     }
   });
 }
 
-/// Funktion zum Initialisieren der Pause-Events
-function initializePauseEvents() {
-  const pauseButton = document.getElementById("pause-btn");
-  if (pauseButton) {
-    pauseButton.addEventListener("click", () => {
-      if (gameManager) {
-        gameManager.pauseGame();
-        togglePauseResumeButtons(true);
-      } else {
-        console.error("GameManager is not initialized!");
-      }
-    });
-  }
-}
-
-// Funktion zum Initialisieren der Resume-Events
-function initializeResumeEvents() {
-  const resumeButton = document.getElementById("resume-btn");
-  if (resumeButton) {
-    resumeButton.addEventListener("click", () => {
-      if (gameManager) {
-        gameManager.resumeGame();
-        togglePauseResumeButtons(false);
-      }
-    });
-  }
-}
-// Hilfsfunktion, um Buttons zu toggeln
-function togglePauseResumeButtons(isPaused) {
-  const pauseButton = document.getElementById("pause-btn");
-  const resumeButton = document.getElementById("resume-btn");
-
-  if (pauseButton && resumeButton) {
-    if (isPaused) {
-      pauseButton.style.display = "none";
-      resumeButton.style.display = "inline-block"; // oder block, je nach Layout
-    } else {
-      pauseButton.style.display = "inline-block";
-      resumeButton.style.display = "none";
-    }
-  }
-}
-
-// Hauptfunktion zur Initialisierung aller Event Listener
 function initializeEventListeners() {
-  const restartButton = document.getElementById("restart-button");
-  if (restartButton) restartButton.addEventListener("click", restartGame);
+  if (buttons.pause) buttons.pause.addEventListener("click", handlePause);
+  if (buttons.resume) buttons.resume.addEventListener("click", handleResume);
+  if (buttons.restart) buttons.restart.addEventListener("click", restartGame);
+  if (buttons.learn) buttons.learn.addEventListener("click", showInstructions);
 
-  const learnButton = document.getElementById("learn-button");
-  if (learnButton) learnButton.addEventListener("click", showInstructions);
-
-  initializePauseEvents();
-  initializeResumeEvents();
   initializeImpressum();
-
-  // Globale Tastatureingaben initialisieren
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("load", checkOrientation);
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
 }
 
-// Funktion für Keydown-Event
+function handlePause() {
+  if (!gameManager) return;
+  gameManager.pauseGame();
+  togglePauseResumeButtons(true);
+}
+
+function handleResume() {
+  if (!gameManager) return;
+  gameManager.resumeGame();
+  togglePauseResumeButtons(false);
+}
+
+function togglePauseResumeButtons(isPaused) {
+  if (!buttons.pause || !buttons.resume) return;
+  buttons.pause.style.display = isPaused ? "none" : "inline-block";
+  buttons.resume.style.display = isPaused ? "inline-block" : "none";
+}
+
 function handleKeyDown(e) {
-  if (e.key === "ArrowRight") keyboard.RIGHT = true;
-  if (e.key === "ArrowLeft") keyboard.LEFT = true;
-  if (e.key === "ArrowUp") keyboard.UP = true;
-  if (e.key === "ArrowDown") keyboard.DOWN = true;
-  if (e.key === " ") keyboard.SPACE = true;
-  if (e.key === "d" || e.key === "D") keyboard.D = true;
+  const key = e.key.toLowerCase();
+  if (key === "arrowright") keyboard.RIGHT = true;
+  if (key === "arrowleft") keyboard.LEFT = true;
+  if (key === "arrowup") keyboard.UP = true;
+  if (key === "arrowdown") keyboard.DOWN = true;
+  if (key === " ") keyboard.SPACE = true;
+  if (key === "d") keyboard.D = true;
 }
 
 function handleKeyUp(e) {
-  if (e.key === "ArrowRight") keyboard.RIGHT = false;
-  if (e.key === "ArrowLeft") keyboard.LEFT = false;
-  if (e.key === "ArrowUp") keyboard.UP = false;
-  if (e.key === "ArrowDown") keyboard.DOWN = false;
-  if (e.key === " ") keyboard.SPACE = false;
-  if (e.key === "d" || e.key === "D") keyboard.D = false;
+  const key = e.key.toLowerCase();
+  if (key === "arrowright") keyboard.RIGHT = false;
+  if (key === "arrowleft") keyboard.LEFT = false;
+  if (key === "arrowup") keyboard.UP = false;
+  if (key === "arrowdown") keyboard.DOWN = false;
+  if (key === " ") keyboard.SPACE = false;
+  if (key === "d") keyboard.D = false;
 }
 
 function restartGame() {
-  console.log("Spiel wird neu gestartet...");
+  gameManager?.stopGame();
+  hideGameOverScreen();
+  if (canvas) canvas.style.opacity = 1;
+  initLevel();
+  world = new World(canvas, keyboard, level1);
+  world.soundManager = soundManager;
+  gameManager = new GameManager(world);
+  world.gameManager = gameManager;
+  gameManager.startGame();
+}
 
-  if (gameManager) {
-    // Stoppe altes Spiel
-    gameManager.stopGame();
-
-    // Entferne Game-Over-Screen (inkl. Sichtbarkeit & Reset von CSS)
-    const screen = document.getElementById("game-over-screen");
-    if (screen) {
-      screen.classList.remove("visible");
-      screen.classList.add("hidden");
-    }
-
-    // Setze Canvas wieder sichtbar
-    if (canvas) {
-      canvas.style.opacity = 1;
-    }
-
-    // Erstelle neuen Level (wenn du das möchtest – optional!)
-    initLevel();
-
-    // Erstelle neue World (bzw. World zurücksetzen)
-    world = new World(canvas, keyboard, level1);
-    world.soundManager = soundManager;
-
-    // Aktualisiere gameManager mit neuer World
-    gameManager = new GameManager(world);
-    world.gameManager = gameManager;
-
-    gameManager.startGame();
-  } else {
-    console.warn("Kein GameManager zum Neustarten vorhanden!");
+function hideGameOverScreen() {
+  const screen = document.getElementById("game-over-screen");
+  if (screen) {
+    screen.classList.remove("visible");
+    screen.classList.add("hidden");
   }
+}
+
+function checkOrientation() {
+  const overlay = document.getElementById("rotate-device-overlay");
+  if (!overlay) return;
+  overlay.style.display =
+    window.innerHeight > window.innerWidth ? "flex" : "none";
 }
