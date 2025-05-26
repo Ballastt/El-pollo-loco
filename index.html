@@ -4,31 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google" content="notranslate" />
-
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/x-icon" href="img/favicon/tabasco.png" />
     <title>El Pollo Loco</title>
   </head>
   <body>
     <div id="start-screen">
-      <img
-        src="img/9_intro_outro_screens/start/startscreen_1.png"
-        alt="Start Screen Image"
-        id="startScreen-img"
-      />
-      <div class="buttons">
-        <button id="learn-button" class="btn-grad">Über das Spiel</button>
-        <button id="start-button" class="btn-grad">Start game</button>
-        <button id="mute-button" class="btn-grad">
-          <img
-            src="img/9_intro_outro_screens/start/sound-off.png"
-            alt="Mute Button"
-            id="mute"
-          />
-        </button>
-        <button id="impressum-button" class="btn-grad">Impressum</button>
+      <div class="startscreen-wrapper">
+        <img
+          src="img/9_intro_outro_screens/start/startscreen_1.png"
+          alt="Start Screen"
+          id="startScreen-img"
+        />
+        <div class="buttons">
+          <button id="learn-button" class="btn-grad">Über das Spiel</button>
+          <button id="start-button" class="btn-grad">Start game</button>
+          <button id="impressum-button" class="btn-grad">Impressum</button>
+          <button id="mute-button" class="btn-grad">
+            <img
+              src="img/9_intro_outro_screens/start/sound-off.png"
+              alt="Mute"
+              id="mute"
+            />
+          </button>
+        </div>
       </div>
     </div>
+
     <div id="background-image">
       <h1>El Pollo Loco</h1>
 
@@ -57,6 +59,9 @@
       height="480px"
       style="display: none"
     ></canvas>
+    <div id="rotate-device-overlay" class="hidden">
+      <p>Bitte drehe dein Gerät ins Querformat (Landscape), um zu spielen.</p>
+    </div>
 
     <div id="game-over-screen" class="hidden">
       <div class="game-over-content">
