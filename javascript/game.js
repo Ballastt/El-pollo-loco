@@ -4,16 +4,48 @@ let keyboard = new Keyboard();
 let level;
 let gameManager;
 
+// preload mit async/await
+async function preloadImages(paths) {
+  await Promise.all(
+    paths.map(
+      (path) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.src = path;
+          img.onload = () => resolve();
+          img.onerror = () => {
+            console.warn("Fehler beim Laden:", path);
+            resolve();
+          };
+        })
+    )
+  );
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const startButton = document.getElementById("start-button");
 
   initializeSoundManager();
 
-  startButton.addEventListener("click", () => {
-    // Stelle sicher, dass level1 erst erstellt wird, wenn das Spiel startet
+  startButton.addEventListener("click", async () => {
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) loadingScreen.style.display = "block";
+
+    // Alle Pfade aus layerSets extrahieren und preloaden
+    const preloadPaths = layerSets.flat();
+    await preloadImages(preloadPaths);
+
+    if (loadingScreen) loadingScreen.style.display = "none";
+
+    // Level & Manager initialisieren
     if (!level1) initLevel();
     if (!gameManager) initializeGameManager();
 
+    // Hintergrundobjekte generieren und übergeben
+    const bgObjects = generateBackgroundObjects(layerSets);
+    world.setBackgroundObjects(bgObjects);
+
+    // Spiel starten
     gameManager.startGame();
   });
 
@@ -126,7 +158,36 @@ function handleKeyUp(e) {
 
 function restartGame() {
   console.log("Spiel wird neu gestartet...");
+
   if (gameManager) {
-    gameManager.startGame(); // Neustart über den GameManager
+    // Stoppe altes Spiel
+    gameManager.stopGame();
+
+    // Entferne Game-Over-Screen (inkl. Sichtbarkeit & Reset von CSS)
+    const screen = document.getElementById("game-over-screen");
+    if (screen) {
+      screen.classList.remove("visible");
+      screen.classList.add("hidden");
+    }
+
+    // Setze Canvas wieder sichtbar
+    if (canvas) {
+      canvas.style.opacity = 1;
+    }
+
+    // Erstelle neuen Level (wenn du das möchtest – optional!)
+    initLevel();
+
+    // Erstelle neue World (bzw. World zurücksetzen)
+    world = new World(canvas, keyboard, level1);
+    world.soundManager = soundManager;
+
+    // Aktualisiere gameManager mit neuer World
+    gameManager = new GameManager(world);
+    world.gameManager = gameManager;
+
+    gameManager.startGame();
+  } else {
+    console.warn("Kein GameManager zum Neustarten vorhanden!");
   }
 }
