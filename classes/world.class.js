@@ -16,6 +16,7 @@ class World {
   throwBar;
   coinBar;
 
+  backgroundObjects = [];
   throwableObjects = [];
 
   gameManager;
@@ -85,7 +86,7 @@ class World {
     this.ctx.translate(this.camera_x, 0); // Kameradrehung initial
 
     // Bewegliche Objekte zeichnen
-    this.addObjectToMap(this.level.backgroundObjects);
+    this.addObjectToMap(this.backgroundObjects);
     this.addObjectToMap(this.level.coins);
     this.addObjectToMap(this.level.bottles);
     this.addObjectToMap(this.level.clouds);
@@ -230,9 +231,11 @@ class World {
       console.log("🌍 Game-Loop gestoppt");
     }
 
-    if (this.character && typeof this.character.stop === "function") this.character.stop();
-    if (this.endboss && typeof this.endboss.stop === "function") this.endboss.stop();
-    
+    if (this.character && typeof this.character.stop === "function")
+      this.character.stop();
+    if (this.endboss && typeof this.endboss.stop === "function")
+      this.endboss.stop();
+
     for (let enemy of this.enemies || []) {
       if (typeof enemy.stop === "function") {
         enemy.stop();
@@ -278,6 +281,11 @@ class World {
   flipImageBack(mo) {
     mo.x = mo.x * -1;
     this.ctx.restore();
+  }
+
+  setBackgroundObjects(backgroundObjects) {
+    this.backgroundObjects = backgroundObjects;
+    this.level.backgroundObjects = backgroundObjects; // Falls du weiterhin `level.backgroundObjects` verwendest
   }
 
   updateSoundVolume() {
