@@ -227,7 +227,7 @@ h1 {
 }
 
 #game-over-screen {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -239,9 +239,13 @@ h1 {
   z-index: 0;
 }
 
-#game-over-screen img {
-  height: 480px;
-  width: 720px;
+.game-over-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 350px;
+  width: 400px;
+  gap: 3rem;
 }
 
 .hidden {
@@ -389,6 +393,33 @@ h1 {
   font-size: 16px;
   border: none;
   cursor: pointer;
+}
+
+#game-over-background {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
+  width: 720px;
+  height: 480px;
+}
+
+#game-over-image {
+  z-index: 1001;
+  width: 300px;
+  height: auto;
+}
+
+#restart-btn {
+  position: unset;
+  width: 200px;
+  height: 50px;
+  font-family: "Mountains of Christmas", cursive;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 1001;
+  
 }
 
 @media only screen and (max-width: 720px) {
