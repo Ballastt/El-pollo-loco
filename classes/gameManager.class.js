@@ -10,7 +10,7 @@ class GameManager {
   }
 
   startGame() {
-    if (!level1) initLevel();
+    initLevel();
 
     this.isGameRunning = true; // Spielzustand auf "gestartet" setzen
     this.isPaused = false;
@@ -39,6 +39,11 @@ class GameManager {
     screen.classList.remove("hidden");
     screen.style.zIndex = "1000";
     this.canvas.style.opacity = 0.2;
+
+    // Verzögertes Einblenden (z. B. 800ms nach Game-Ende)
+    setTimeout(() => {
+      screen.classList.add("visible");
+    }, 800);
   }
 
   togglePause() {
@@ -59,7 +64,7 @@ class GameManager {
   resumeGame() {
     console.log("Spiel wird fortgesetzt...");
     this.isPaused = false;
-    this.world.resumeObjects(); 
+    this.world.resumeObjects();
     if (this.soundManager) this.soundManager.play();
   }
 
@@ -72,7 +77,8 @@ class GameManager {
     this.isGameRunning = false;
 
     if (this.soundManager) this.soundManager.stopAll();
-    if (this.world && typeof this.world.stopObjects === "function") this.world.stopObjects();
+    if (this.world && typeof this.world.stopObjects === "function")
+      this.world.stopObjects();
   }
 
   gameOver() {
