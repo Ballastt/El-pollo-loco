@@ -94,7 +94,7 @@ class Chicken extends MoveableObject {
 
         setTimeout(() => {
           this.removeEnemy();
-        }, 1000); // 1 Sekunde Verzögerung
+        }, 500); // 1 Sekunde Verzögerung
       }
     }, 200); // Verlängertes Intervall für bessere Sichtbarkeit
   }
@@ -111,9 +111,7 @@ class Chicken extends MoveableObject {
     clearInterval(this.animationInterval);
 
     this.soundManager.play(this.deathSoundKey);
-
     this.isRunning = false;
-
     this.deathAnimationChicken();
   }
 }
