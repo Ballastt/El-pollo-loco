@@ -26,17 +26,18 @@ class GameManager {
 
   showEndScreen(won = false) {
     const screen = this.gameOverScreen;
-    const img = document.getElementById("game-over-image");
+    const textImg = document.getElementById("game-over-image");
 
-    if (!screen || !img) {
+    if (!screen || !textImg) {
       console.error("Endbildschirm-Elemente fehlen!");
       return;
     }
 
-    img.src = won
+    textImg.src = won
       ? "img/You won, you lost/You Win A.png"
       : "img/You won, you lost/Game over A.png";
     screen.classList.remove("hidden");
+    screen.style.zIndex = "1000";
     this.canvas.style.opacity = 0.2;
   }
 
@@ -58,7 +59,7 @@ class GameManager {
   resumeGame() {
     console.log("Spiel wird fortgesetzt...");
     this.isPaused = false;
-    this.world.resumeObjects(); // Alle Objekte fortsetzen
+    this.world.resumeObjects(); 
     if (this.soundManager) this.soundManager.play();
   }
 
@@ -70,10 +71,7 @@ class GameManager {
     clearInterval(this.world.characterAnimationInterval);
     this.isGameRunning = false;
 
-    // Alle Soundquellen stoppen
     if (this.soundManager) this.soundManager.stopAll();
-
-    // ❗ Alle Spielobjekte stoppen
     if (this.world && typeof this.world.stopObjects === "function") this.world.stopObjects();
   }
 
