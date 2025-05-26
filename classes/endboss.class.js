@@ -123,7 +123,6 @@ class Endboss extends MoveableObject {
         this.character.x,
         this.character.y
       );
-      console.log("📏 Abstand zum Spieler:", distanceToPlayer);
 
       if (this.isDead) {
         this.currentState = this.STATES.DEAD;
@@ -140,8 +139,6 @@ class Endboss extends MoveableObject {
       } else {
         this.currentState = this.STATES.WALKING;
       }
-
-      console.log("🔁 Aktueller Boss-State:", this.currentState);
     }
   }
 
