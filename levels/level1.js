@@ -1,4 +1,3 @@
-const backgroundObjects = [];
 const layerSets = [
   [
     "img/5_background/layers/air.png",
@@ -14,26 +13,29 @@ const layerSets = [
   ],
 ];
 
-//Calculate layers needed to fill level width
-const numberOfBackgrounds = Math.ceil(6500 / 720);
-for (let i = -1; i < numberOfBackgrounds; i++) {
-  const position = i * 719; //repeating the layer
-  const layerSet = layerSets[i % 2 === 0 ? 1 : 0]; // Alternate between sets
-  layerSet.forEach((layer) => {
-    backgroundObjects.push(new BackgroundObject(layer, position));
-  });
+function generateBackgroundObjects(layerSets) {
+  const backgroundObjects = [];
+  const numberOfBackgrounds = Math.ceil(6500 / 720);
+
+  for (let i = -1; i < numberOfBackgrounds; i++) {
+    const position = i * 719;
+    const layerSet = layerSets[i % 2 === 0 ? 1 : 0];
+    layerSet.forEach((layer) => {
+      backgroundObjects.push(new BackgroundObject(layer, position));
+    });
+  }
+
+  return backgroundObjects;
 }
 
 function generateEnemies() {
   const enemies = [];
   const amount = 30;
-  const level_end_x = 6000;
-  const startX = 600;
-  const spacing = (level_end_x - startX) / amount;
+  const level_end_x = 6200;
+  const spacing = level_end_x / amount;
 
   for (let i = 0; i < amount; i++) {
-    const baseX = startX + i * spacing;
-    const x = baseX + (Math.random() - 0.5) * spacing * 0.3;
+    const x = (Math.random() - 0.5) * spacing * 0.3;
 
     // Hier wird das enemies-Array korrekt übergeben
     const enemy =
@@ -103,10 +105,8 @@ function initLevel() {
   level1 = new Level(
     generateEnemies(),
     generateClouds(),
-    backgroundObjects,
+    generateBackgroundObjects(layerSets),
     generateCoins(40),
     generateBottles(30)
   );
-  console.log("Level 1 initialisiert:", level1);
 }
-
