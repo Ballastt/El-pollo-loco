@@ -167,6 +167,8 @@ class Character extends MoveableObject {
       if (Date.now() > (this.lastCollision || 0) + 1000) {
         this.lastCollision = Date.now();
         this.currentState = this.STATES.HURT;
+        this.hurtUntil = Date.now() + 500;
+
         endboss.hurt(10);
         this.hit(20);
       }
@@ -174,28 +176,40 @@ class Character extends MoveableObject {
   }
 
   checkCollisionsWithEnemy(enemies) {
+    if (!this.canBeHit()) return;
+
+    enemies.forEach((enemy) => this.handleEnemyCollision(enemy));
+  }
+
+  canBeHit() {
+    return Date.now() - this.lastHit >= 500;
+  }
+
+  handleEnemyCollision(enemy) {
+    if (enemy.isDead || !this.isColliding(enemy)) return;
+
+    if (this.isJumpingOnEnemy(enemy)) {
+      this.defeatEnemy(enemy);
+    } else {
+      this.receiveHitFrom(enemy);
+    }
+  }
+
+  defeatEnemy(enemy) {
+    console.log(`Enemy defeated by jumping: ${enemy.constructor.name}`);
+    enemy.die();
+    this.bounceOffEnemy();
+  }
+
+  receiveHitFrom(enemy) {
     const now = Date.now();
-    if (now - this.lastHit < 500) return;
-
-    enemies.forEach((enemy) => {
-      if (enemy.isDead) return; // Überspringe tote Feinde
-
-      if (this.isColliding(enemy)) {
-        if (this.isJumpingOnEnemy(enemy)) {
-          console.log(`Enemy defeated by jumping: ${enemy.constructor.name}`);
-          enemy.die(); // Feind eliminieren
-          this.bounceOffEnemy(); // Charakter zurückspringen lassen
-        } else {
-          this.currentState = this.STATES.HURT;
-          this.hit(10);
-          console.log(
-            `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
-          );
-          this.lastHit = now;
-          this.hurtUntil = now + 500;
-        }
-      }
-    });
+    this.currentState = this.STATES.HURT;
+    this.hit(10);
+    console.log(
+      `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
+    );
+    this.lastHit = now;
+    this.hurtUntil = now + 500;
   }
 
   isJumpingOnEnemy(enemy) {
@@ -398,7 +412,6 @@ class Character extends MoveableObject {
 
   updateHealthBar() {
     const percentage = (this.health / this.maxHealth) * 100;
-
     if (this.world && this.world.healthBar) {
       this.world.healthBar.setPercentage(percentage);
     }
