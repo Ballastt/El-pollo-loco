@@ -24,6 +24,7 @@ class World {
   // Add properties to control collection delay
   startTime;
   allowCollection = false;
+  canThrow = true;
 
   // --- Konstruktor ---
   constructor(canvas) {
@@ -115,25 +116,45 @@ class World {
   }
 
   bottleEnemyCollision() {
+    this.handleBottleHitsForEnemies();
+    this.handleBottleHitForEndboss();
+  }
+
+  handleBottleHitsForEnemies() {
     this.throwableObjects.forEach((bottle, bottleIndex) => {
       this.level.enemies.forEach((enemy) => {
-        // Prüfen, ob die Flasche mit einem lebenden Feind kollidiert
         if (bottle.isColliding(enemy) && !enemy.isDead) {
           console.log("Flasche trifft Feind", enemy);
-
-          enemy.die(); // Nur lebende Feinde sterben lassen
-          this.throwableObjects.splice(bottleIndex, 1); // Flasche entfernen
+          enemy.die();
+          this.throwableObjects.splice(bottleIndex, 1);
         }
       });
     });
   }
 
+  handleBottleHitForEndboss() {
+    this.throwableObjects.forEach((bottle, bottleIndex) => {
+      if (
+        this.endboss &&
+        bottle.isColliding(this.endboss) &&
+        !this.endboss.isDead
+      ) {
+        console.log("Flasche trifft Endboss");
+        this.endboss.hurt(20);
+        this.throwableObjects.splice(bottleIndex, 1);
+      }
+    });
+  }
+
   checkThrowObjects() {
     if (this.keyboard.D) {
-      const didThrow = this.character.throwBottle(); // Rückgabewert prüfen
-      if (didThrow) {
-        this.updateThrowBar(); // Flasche wurde geworfen → Bar aktualisieren
+      if (this.canThrow) {
+        const didThrow = this.character.throwBottle();
+        if (didThrow) this.updateThrowBar();
+        this.canThrow = false; // Jetzt nicht mehr werfen, bis Taste losgelassen
       }
+    } else {
+      this.canThrow = true; // Taste losgelassen, wieder bereit für neuen Wurf
     }
     this.bottleEnemyCollision();
   }
@@ -241,7 +262,6 @@ class World {
         enemy.stop();
       }
     }
-    // weitere Objekte wie z. B. `coins`, `clouds`, `backgroundObjects`, wenn nötig
   }
 
   get isDead() {
@@ -285,7 +305,7 @@ class World {
 
   setBackgroundObjects(backgroundObjects) {
     this.backgroundObjects = backgroundObjects;
-    this.level.backgroundObjects = backgroundObjects; // Falls du weiterhin `level.backgroundObjects` verwendest
+    this.level.backgroundObjects = backgroundObjects;
   }
 
   updateSoundVolume() {
