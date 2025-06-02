@@ -1,7 +1,7 @@
 /**
  * @constant {string[][]} layerSets
  * Two sets of background layer image paths for parallax effect.
- */ 
+ */
 const layerSets = [
   [
     "img/5_background/layers/air.png",
@@ -16,7 +16,6 @@ const layerSets = [
     "img/5_background/layers/1_first_layer/1.png",
   ],
 ];
-
 
 /**
  * Generates background objects based on the provided layer sets.
@@ -40,18 +39,35 @@ function generateBackgroundObjects(layerSets) {
 
 
 /**
- * Generates an array of enemies (SmallChicken or NormalChicken).
+ * Creates a single enemy instance (either SmallChicken or NormalChicken).
+ * Assigns the shared enemies array reference to the instance.
+ *
+ * @param {number} x - The horizontal position to place the enemy.
+ * @param {(SmallChicken|NormalChicken)[]} enemies - The shared array of enemy instances.
+ * @returns {SmallChicken|NormalChicken} The newly created enemy instance.
+ */
+function createEnemy(x, enemies) {
+  const EnemyClass = Math.random() < 0.5 ? SmallChicken : NormalChicken;
+  const enemy = new EnemyClass(x, enemies);
+  enemy.enemies = enemies;
+  return enemy;
+}
+
+
+/**
+ * Generates an array of enemy instances distributed across the level.
+ * Each enemy is either a SmallChicken or NormalChicken placed with slight randomness.
+ *
  * @returns {(SmallChicken|NormalChicken)[]} Array of enemy instances.
  */
 function generateEnemies() {
+  const enemies = [];
   const amount = 40;
   const spacing = 6200 / amount;
-  const enemies = [];
 
   for (let i = 0; i < amount; i++) {
     const x = (Math.random() - 0.5) * spacing * 0.3;
-    const Enemy = Math.random() < 0.5 ? SmallChicken : NormalChicken;
-    enemies.push(new Enemy(x, enemies));
+    enemies.push(createEnemy(x, enemies));
   }
 
   return enemies;
@@ -117,11 +133,13 @@ function generateBottles(maxBottles = 30) {
   return bottles;
 }
 
+
 /**
  * Global variable representing the first game level.
  * @type {Level}
  */
 let level1;
+
 
 /**
  * Initializes the first level with generated game objects.
