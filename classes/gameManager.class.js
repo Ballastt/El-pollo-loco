@@ -28,11 +28,8 @@ class GameManager {
     const screen = this.gameOverScreen;
     const textImg = document.getElementById("game-over-image");
 
-    if (!screen || !textImg) {
-      console.error("Endbildschirm-Elemente fehlen!");
-      return;
-    }
-
+    if (!screen || !textImg) return console.error("Endbildschirm-Elemente fehlen!");
+      
     textImg.src = won
       ? "img/You won, you lost/You Win A.png"
       : "img/You won, you lost/Game over A.png";
@@ -57,7 +54,7 @@ class GameManager {
   pauseGame() {
     console.log("Spiel wird pausiert...");
     this.isPaused = true;
-    this.world.pauseObjects(); // Alle Objekte pausieren
+    this.world.pauseObjects(); 
     if (this.soundManager) this.soundManager.pauseAll();
   }
 
@@ -83,15 +80,15 @@ class GameManager {
 
   gameOver() {
     console.log("Spiel ist vorbei");
-    this.isGameRunning = false; // Spielstatus setzen
-    this.showEndScreen(false); //Niederlage anzeigen
+    this.isGameRunning = false; 
+    this.showEndScreen(false); 
     this.stopGame();
   }
 
   gameWon() {
     console.log("Spiel gewonnen!");
     this.isGameRunning = false;
-    this.showEndScreen(true); // Sieg anzeigen
+    this.showEndScreen(true); 
     this.stopGame();
   }
 }
