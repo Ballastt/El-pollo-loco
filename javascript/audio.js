@@ -134,6 +134,9 @@ function initializeSoundManager() {
       false,
       1.0
     );
+    soundManager.addSound("endbossClucking", "audio/endboss_clucking.mp3", false, 0.6);
+    soundManager.addSound("endbossAngry", "audio/endboss_angry.mp3", false, 0.6);
+    soundManager.addSound("bottleSplash", "audio/bottle_splash.mp3", false, 0.6);
     soundManager.setVolume(0.8);
     console.log("SoundManager erfolgreich initialisiert");
     setupEventListeners();
