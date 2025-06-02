@@ -22,11 +22,11 @@ class Chicken extends MoveableObject {
     this.IMAGES_DEAD = imageDeadArray;
 
     this.enemies = enemies;
-    this.isDead = false; // Zustand, ob das Huhn tot ist
-    this.isRemoved = false; // Zustand, ob das Huhn bereits entfernt wurde
-    this.gameManager = gameManager; // Reference to GameManager
+    this.isDead = false; 
+    this.isRemoved = false; 
+    this.gameManager = gameManager; 
     this.soundManager = soundManager;
-    this.world = world; //Verknüpfung zzur Welt für den Soundmanager
+    this.world = world; 
 
     this.walkSoundKey = walkSoundKey;
     this.deathSoundKey = deathSoundKey;
@@ -37,15 +37,12 @@ class Chicken extends MoveableObject {
     this.loadImages(this.IMAGES_DEAD);
 
     this.isRunning = false;
-
-    // Start animation
     this.animate();
   }
 
   moveLeft() {
     super.moveLeft();
     if (!this.isRunning) {
-      console.log("Playing walking sound:", this.walkSoundKey);
       this.soundManager.play(this.walkSoundKey);
       this.isRunning = true;
     }
