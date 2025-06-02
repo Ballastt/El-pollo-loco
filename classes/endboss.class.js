@@ -6,11 +6,13 @@ class Endboss extends MoveableObject {
   isDead = false;
   hurtUntil = 0;
   currentState = "walking";
-  speedWalk = 3;
-  speedAttack = 8;
+  speedWalk = 15;
+  speedAttack = 45;
   jumpForce = 30;
   chargeCooldown = 0;
   introSoundPlayed = false;
+  isPaused = false;
+  ATTACK_DISTANCE = 300;
 
   IMAGES_WALKING = [
     "img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -71,9 +73,15 @@ class Endboss extends MoveableObject {
     this.loadImages(this.IMAGES_DEAD);
     this.x = 6300;
     this.y = 50;
+    this.groundY = 50;
     this.character = character;
     this.soundManager = soundManager;
     this.animate();
+    this.applyGravity();
+
+    console.log(
+      `Y: ${this.y}, speedY: ${this.speedY}, groundY: ${this.groundY}`
+    );
 
     console.log("Endboss initialisiert mit Leben:", this.health);
 
@@ -91,6 +99,7 @@ class Endboss extends MoveableObject {
 
   startAnimationLoop() {
     this.animationInterval = setInterval(() => {
+      if (this.isPaused) return;
       this.handleAnimations();
       this.updateState();
       this.moveDependingOnState();
@@ -117,29 +126,82 @@ class Endboss extends MoveableObject {
     }
   }
 
-  updateState() {
-    if (this.character) {
-      const distanceToPlayer = this.calculateDistance(
-        this.character.x,
-        this.character.y
-      );
+  pause() {
+    this.isPaused = true;
+    console.log("Endboss pausiert.");
+  }
 
-      if (this.isDead) {
-        this.currentState = this.STATES.DEAD;
-      } else if (distanceToPlayer < 200) {
-        this.currentState = this.STATES.ATTACK;
-      } else if (distanceToPlayer < 400) {
-        this.currentState = this.STATES.ALERT;
-        if (!this.introSoundPlayed) {
-          this.soundManager.play("introEndboss");
-          this.soundManager.setVolume("introEndboss", 1.0);
-          this.introSoundPlayed = true;
-          console.log("🎵 Intro abgespielt");
-        }
-      } else {
-        this.currentState = this.STATES.WALKING;
-      }
+  resume() {
+    this.isPaused = false;
+    console.log("Endboss läuft weiter.");
+  }
+
+  updateState() {
+    if (this.isDead) return this.setDeadState();
+    if (this.health <= 0) return this.die();
+    if (Date.now() < this.hurtUntil) return this.setHurtState();
+
+    const distanceToPlayer = this.calculateDistance(
+      this.character.x,
+      this.character.y
+    );
+
+    if (distanceToPlayer < this.ATTACK_DISTANCE) return this.setAttackState();
+    if (distanceToPlayer < 400) return this.setAlertState();
+    return this.setWalkingState();
+  }
+
+  setDeadState() {
+    this.currentState = this.STATES.DEAD;
+    console.log("State: DEAD - stoppe alle Sounds");
+    this.soundManager.stop("endbossClucking");
+    this.soundManager.stop("endbossAngry");
+  }
+
+  setHurtState() {
+    this.currentState = this.STATES.HURT;
+    console.log("State: HURT - stoppe alle Sounds");
+    this.soundManager.stop("endbossClucking");
+    this.soundManager.stop("endbossAngry");
+  }
+
+  setAttackState() {
+    if (this.currentState !== this.STATES.ATTACK) {
+      console.log(
+        "State: ATTACK - spiele 'endbossAngry', stoppe 'endbossClucking'"
+      );
+      this.soundManager.stop("endbossClucking");
+      this.soundManager.play("endbossAngry");
     }
+    this.currentState = this.STATES.ATTACK;
+  }
+
+  setAlertState() {
+    if (this.currentState !== this.STATES.ALERT) {
+      console.log(
+        "State: ALERT - spiele 'endbossClucking', stoppe 'endbossAngry'"
+      );
+      this.soundManager.play("endbossClucking");
+      this.soundManager.stop("endbossAngry");
+    }
+    this.currentState = this.STATES.ALERT;
+
+    if (!this.introSoundPlayed) {
+      this.soundManager.play("introEndboss");
+      this.introSoundPlayed = true;
+      console.log("🎵 Intro abgespielt");
+    }
+  }
+
+  setWalkingState() {
+    if (this.currentState !== this.STATES.WALKING) {
+      console.log(
+        "State: WALKING - spiele 'endbossClucking', stoppe 'endbossAngry'"
+      );
+      this.soundManager.stop("endbossAngry");
+      this.soundManager.play("endbossClucking");
+    }
+    this.currentState = this.STATES.WALKING;
   }
 
   // Berechnung der Distanz zwischen Endboss und Charakter
@@ -153,6 +215,16 @@ class Endboss extends MoveableObject {
   checkCharacterPositionAndMove() {
     if (this.character.x >= 6000) {
       this.moveTowardsCharacter();
+    }
+  }
+
+  ensureClucking() {
+    if (
+      !this.isDead &&
+      Date.now() >= this.hurtUntil &&
+      !this.soundManager.play("endbossClucking")
+    ) {
+      this.soundManager.play("endbossClucking");
     }
   }
 
@@ -173,7 +245,7 @@ class Endboss extends MoveableObject {
     }
   }
 
-  moveTowardsCharacter(speed) {
+  moveTowardsCharacter(speed = this.speedWalk) {
     if (!this.character) return;
     const characterX = this.character.x;
     if (this.x > characterX) this.x -= speed;
@@ -193,7 +265,9 @@ class Endboss extends MoveableObject {
 
     if (this.health <= 0) {
       this.die();
+      this.soundManager.stop("endbossClucking");
     } else {
+      this.soundManager.stop("endbossClucking");
       this.currentState = this.STATES.HURT;
     }
   }
@@ -225,20 +299,15 @@ class Endboss extends MoveableObject {
     const direction = dx > 0 ? 1 : -1;
 
     // Sprinten
-    if (distance > 30) {
-      this.x += direction * this.speedAttack;
-    }
+    if (distance > 30) this.x += direction * this.speedAttack;
 
     // 25 % Chance zu springen, wenn auf Boden
-    // Temporär ersetzen zum Testen
-    if (Math.random() < 0.25) {
+    if (!this.isAboveGround() && Math.random() < 0.75) {
       this.speedY = this.jumpForce;
       console.log("💥 Endboss springt!");
     }
 
     // Cooldown setzen
-    if (distance < 100) {
-      this.chargeCooldown = now + 2000; // 2 Sekunden warten
-    }
+    if (distance < 100) this.chargeCooldown = now + 2000; // 2 Sekunden warten
   }
 }
