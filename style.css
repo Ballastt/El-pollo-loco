@@ -41,8 +41,8 @@ canvas {
 
 h1 {
   font-family: "Mountains of Christmas", cursive;
-  font-size: 6rem;
-  padding: 85px 0px;
+  font-size: 5rem;
+  padding: 0px;
   font-weight: bold;
   text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
 }
@@ -129,7 +129,7 @@ h1 {
 
 .buttons {
   position: absolute;
-  top: 0%; /* relativ zum Bild! */
+  top: 5%; 
   left: 50%;
   transform: translateX(-50%);
   display: flex;
