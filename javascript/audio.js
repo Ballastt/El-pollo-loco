@@ -1,6 +1,7 @@
-// JavaScript for Start Screen and Game Logic
-
-// Elements
+/**
+ * References to DOM elements related to the start screen and sound controls.
+ * @type {HTMLElement|null}
+ */
 const startScreen = document.getElementById("start-screen");
 const startButton = document.getElementById("start-button");
 const learnButton = document.getElementById("learn-button");
@@ -9,10 +10,24 @@ const muteIcon = document.getElementById("mute");
 const muteButtonInGame = document.getElementById("mute-btn");
 const soundButtonInGame = document.getElementById("sound-btn");
 
+/** 
+ * Flag to indicate whether the sound is muted.
+ * @type {boolean}
+ */
 let isMuted = false;
+
+/** 
+ * Flag to indicate if the user has interacted to enable audio playback.
+ * @type {boolean}
+ */
 let userInteracted = false;
 
-
+/**
+ * Toggles the mute state:
+ * - Mutes or unmutes the sound via soundManager.
+ * - Updates the mute icon image.
+ * - Shows or hides in-game mute and sound buttons accordingly.
+ */
 function toggleMute() {
   isMuted = !isMuted;
 
@@ -28,15 +43,21 @@ function toggleMute() {
   }
 }
 
-
+/**
+ * Enables audio playback by dispatching a custom event,
+ * ensuring audio starts only after user interaction.
+ */
 function enableAudioPlayback() {
   if (!userInteracted) {
     userInteracted = true;
-
     document.dispatchEvent(new Event("audio-enabled"));
   }
 }
 
+/**
+ * Attaches click event listeners to all mute buttons
+ * to toggle mute on user interaction.
+ */
 function setupMuteButtons() {
   const muteButtons = [muteButton, muteButtonInGame, soundButtonInGame];
   muteButtons.forEach((button) => {
@@ -49,11 +70,15 @@ function setupMuteButtons() {
   });
 }
 
+/**
+ * Sets up the start button to:
+ * - Enable audio playback on first click.
+ * - Play background music if not muted.
+ */
 function setupStartButton() {
   if (startButton) {
     startButton.addEventListener("click", () => {
       enableAudioPlayback();
-
       if (!isMuted) {
         soundManager.play("backgroundMusic");
       }
@@ -61,12 +86,20 @@ function setupStartButton() {
   }
 }
 
+/**
+ * Sets up all relevant event listeners for sound controls and start button.
+ */
 function setupEventListeners() {
   setupMuteButtons();
   setupStartButton();
 }
 
-// Set default sound state on load
+/**
+ * Sets default sound state on window load:
+ * - Unmutes sound.
+ * - Updates mute icon.
+ * - Adjusts visibility of in-game mute and sound buttons.
+ */
 window.addEventListener("load", () => {
   isMuted = false;
   soundManager.unmute();
@@ -78,15 +111,22 @@ window.addEventListener("load", () => {
   }
 });
 
+/**
+ * Initializes the global soundManager instance if not already defined,
+ * adds all game sounds with their respective properties,
+ * sets initial volume,
+ * and sets up necessary event listeners.
+ */
 function initializeSoundManager() {
   if (!window.soundManager) {
-    window.soundManager = new SoundManager(); // global verfügbar
+    window.soundManager = new SoundManager(); // globally available
+
     soundManager.addSound(
       "backgroundMusic",
       "audio/audio_start_screen.mp3",
       true,
       0.2
-    ); // loop=true
+    ); // loop = true
 
     soundManager.addSound(
       "normalChickenWalking",
@@ -137,8 +177,10 @@ function initializeSoundManager() {
     soundManager.addSound("endbossClucking", "audio/endboss_clucking.mp3", false, 0.6);
     soundManager.addSound("endbossAngry", "audio/endboss_angry.mp3", false, 0.6);
     soundManager.addSound("bottleSplash", "audio/bottle_splash.mp3", false, 0.6);
+
     soundManager.setVolume(0.8);
-    console.log("SoundManager erfolgreich initialisiert");
+    console.log("SoundManager initialized successfully");
+
     setupEventListeners();
   }
 }
