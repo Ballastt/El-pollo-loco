@@ -29,24 +29,14 @@ function generateBackgroundObjects(layerSets) {
 }
 
 function generateEnemies() {
+  const amount = 40;
+  const spacing = 6200 / amount;
   const enemies = [];
-  const amount = 30;
-  const level_end_x = 6200;
-  const spacing = level_end_x / amount;
 
   for (let i = 0; i < amount; i++) {
     const x = (Math.random() - 0.5) * spacing * 0.3;
-
-    // Hier wird das enemies-Array korrekt übergeben
-    const enemy =
-      Math.random() < 0.5
-        ? new SmallChicken(x, enemies)
-        : new NormalChicken(x, enemies);
-
-    // Jetzt das enemies-Array korrekt setzen
-    enemy.enemies = enemies;
-
-    enemies.push(enemy);
+    const Enemy = Math.random() < 0.5 ? SmallChicken : NormalChicken;
+    enemies.push(new Enemy(x, enemies));
   }
 
   return enemies;
@@ -59,8 +49,8 @@ function generateClouds() {
 
   for (let i = 0; i <= numberOfClouds; i++) {
     const cloud = new Cloud();
-    cloud.x = i * cloudDistance + Math.random() * 20; // only small random
-    cloud.y = 0 + Math.random() * 30; // between 30 and 70px (higher sky)
+    cloud.x = i * cloudDistance + Math.random() * 20; 
+    cloud.y = 0 + Math.random() * 30; 
     cloud.speed = 1.1 + Math.random() * 0.35;
     clouds.push(cloud);
   }
@@ -74,33 +64,29 @@ function generateCoins(maxCoins = 40) {
   const startX = 300;
 
   for (let i = 0; i < maxCoins; i++) {
-    const x = startX + i * coinDistance + Math.random() * 100; // Zufällige Position im Bereich
+    const x = startX + i * coinDistance + Math.random() * 100; 
     const y = 30 + Math.random() * 300;
-
     const coin = new Coin(x, y);
     coins.push(coin);
   }
-
   return coins;
 }
 
 function generateBottles(maxBottles = 30) {
   const bottles = [];
   const bottleDistance = 5700 / maxBottles;
-  const startX = 300; // Startposition der Flaschen (nach der Statusbar)
+  const startX = 300; 
 
   for (let i = 0; i < maxBottles; i++) {
-    const x = startX + i * bottleDistance + Math.random() * 100; // Zufällige Position im Bereich
-    const y = 30 + Math.random() * 300; // Zufällige Höhe zwischen 100px und 300px
+    const x = startX + i * bottleDistance + Math.random() * 100; 
+    const y = 30 + Math.random() * 300; 
     bottles.push(new CollectableBottle(x, y));
   }
-
   return bottles;
 }
 
 let level1;
 
-// Initialisiere `level1`, sobald das Skript geladen wird
 function initLevel() {
   level1 = new Level(
     generateEnemies(),
