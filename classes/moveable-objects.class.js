@@ -1,7 +1,11 @@
+/**
+ * Class representing a moveable object that extends DrawableObject.
+ * Handles position, movement, gravity, animation, collision detection, and health.
+ */
 class MoveableObject extends DrawableObject {
   currentImage = 0;
   speed = 0.55;
-  otherDirection = false; //standardmäßg mal falsch
+  otherDirection = false; 
   speedY = 0;
   acceleration = 2.5;
   health = 100;
@@ -10,21 +14,30 @@ class MoveableObject extends DrawableObject {
   groundY;
   paused = false;
 
+
+   /**
+   * Applies gravity to the object, updating its vertical position over time.
+   * Stops movement when object reaches the ground.
+   */
   applyGravity() {
-    const tolerance = 2; // Kleine Toleranz
+    const tolerance = 2; 
     this.gravityInterval = setInterval(() => {
       if (!this.paused) {
         if (this.isAboveGround() || this.speedY > 0) {
           this.y -= this.speedY;
           this.speedY -= this.acceleration;
         } else if (this.y >= this.groundY - tolerance) {
-          this.y = this.groundY; // Charakter landet auf dem Boden
-          this.speedY = 0; // Geschwindigkeit wird gestoppt
+          this.y = this.groundY; 
+          this.speedY = 0; 
         }
       }
     }, 1000 / 25);
   }
 
+   /**
+   * Checks if the object is above the ground.
+   * @returns {boolean} True if above ground, false otherwise.
+   */
   isAboveGround() {
     const tolerance = 5;
     if (this instanceof ThrowableObject) {
@@ -34,6 +47,10 @@ class MoveableObject extends DrawableObject {
     }
   }
 
+  /**
+   * Plays animation by cycling through provided image paths.
+   * @param {string[]} images - Array of image paths for animation frames.
+   */
   playAnimation(images) {
     if (!this.paused) {
       // Prüfen, ob pausiert
@@ -44,7 +61,9 @@ class MoveableObject extends DrawableObject {
     }
   }
 
-  //Schablone (wie ein JSON)
+  /**
+   * Moves the object to the right by its speed.
+   */
   moveRight() {
     if (!this.paused) {
       this.x += this.speed;
@@ -52,6 +71,9 @@ class MoveableObject extends DrawableObject {
     }
   }
 
+   /**
+   * Moves the object to the left by its speed.
+   */
   moveLeft() {
     if (!this.paused) {
       this.x -= this.speed;
@@ -59,17 +81,28 @@ class MoveableObject extends DrawableObject {
     }
   }
 
+   /**
+   * Pauses all movements and animations of this object.
+   */
   pause() {
     this.paused = true;
     console.log(`${this.constructor.name} paused`);
   }
 
+   /**
+   * Resumes movements and animations if paused.
+   */
   resume() {
     this.paused = false;
     console.log(`${this.constructor.name} resumed`);
   }
 
-  //character isColliding(Chicken)
+  /**
+   * Checks if this object is colliding with another movable object.
+   * Takes into account hitboxes if defined.
+   * @param {MoveableObject} mo - The other object to check collision with.
+   * @returns {boolean} True if colliding, false otherwise.
+   */
   isColliding(mo) {
     const thisHitbox = this.hitbox
       ? {
@@ -97,29 +130,35 @@ class MoveableObject extends DrawableObject {
     );
   }
 
+    /**
+   * Makes the object jump by setting vertical speed.
+   */
   jump() {
     if (!this.paused) {
       this.speedY = 34;
     }
   }
 
-  // Allgemeine Trefferlogik
+  /**
+   * Decreases health by damage amount and triggers death if health falls below zero.
+   * @param {number} damage - Amount of damage to apply.
+   */
   hit(damage) {
     this.health -= damage;
-
-    // Überprüfen, ob das Objekt sterben soll
     if (this.health < 0) {
-      this.health = 0; // Gesundheit darf nicht negativ sein
+      this.health = 0; 
       this.die();
     }
   }
 
-  // Allgemeine Logik für den Tod
+  /**
+   * Handles object's death, clears gravity interval and marks as dead.
+   */
   die() {
     if (!this.isDead) {
       this.isDead = true;
 
-      clearInterval(this.gravityInterval); // Schwerkraft beenden
+      clearInterval(this.gravityInterval); 
       console.log(`${this.constructor.name} ist gestorben!`);
     }
   }
