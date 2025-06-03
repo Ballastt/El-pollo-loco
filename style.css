@@ -87,7 +87,6 @@ h1 {
 
 .startscreen-wrapper {
   position: relative;
-  width: 90%;
   max-width: 100%;
   aspect-ratio: 16/9;
   background-color: black;
@@ -129,13 +128,14 @@ h1 {
 
 .buttons {
   position: absolute;
-  top: 5%; 
+  top: 10%; 
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 1rem;
-  /*flex-wrap: wrap;*/
+  gap: 3rem;
+  flex-wrap: wrap;
   justify-content: space-around;
+  align-items: center;
   width: 90%;
   max-width: 800px;
   z-index: 2;
