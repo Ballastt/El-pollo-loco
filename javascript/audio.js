@@ -10,13 +10,13 @@ const muteIcon = document.getElementById("mute");
 const muteButtonInGame = document.getElementById("mute-btn");
 const soundButtonInGame = document.getElementById("sound-btn");
 
-/** 
+/**
  * Flag to indicate whether the sound is muted.
  * @type {boolean}
  */
 let isMuted = false;
 
-/** 
+/**
  * Flag to indicate if the user has interacted to enable audio playback.
  * @type {boolean}
  */
@@ -79,9 +79,14 @@ function setupStartButton() {
   if (startButton) {
     startButton.addEventListener("click", () => {
       enableAudioPlayback();
-      if (!isMuted) {
-        soundManager.play("backgroundMusic");
-      }
+      // Wait a tick to ensure all sounds are initialized
+      setTimeout(() => {
+        console.log("User interaction status:", userInteracted);
+
+        if (!isMuted) {
+          soundManager.play("backgroundMusic");
+        }
+      }, 100); // short delay ensures everything is settled
     });
   }
 }
@@ -101,7 +106,7 @@ function setupEventListeners() {
  * - Adjusts visibility of in-game mute and sound buttons.
  */
 window.addEventListener("load", () => {
-  isMuted = false;
+  isMuted = JSON.parse(localStorage.getItem("isMuted")) ?? false;
   soundManager.unmute();
   muteIcon.src = "img/9_intro_outro_screens/start/sound-on.png";
 
@@ -124,7 +129,7 @@ function initializeSoundManager() {
     soundManager.addSound(
       "backgroundMusic",
       "audio/audio_start_screen.mp3",
-      true,
+      false,
       0.2
     ); // loop = true
 
@@ -168,15 +173,33 @@ function initializeSoundManager() {
     );
     soundManager.addSound("hurtSound", "audio/pepe_hurting.mp3", false, 0.8);
     soundManager.addSound("snoringPepe", "audio/pepe_snoring.mp3", false, 0.4);
+    soundManager.addSound("PepeDying", "audio/pepe_dying.mp3", false, 0.6);
     soundManager.addSound(
       "introEndboss",
       "audio/endboss_intro_sound.mp3",
       false,
       1.0
     );
-    soundManager.addSound("endbossClucking", "audio/endboss_clucking.mp3", false, 0.6);
-    soundManager.addSound("endbossAngry", "audio/endboss_angry.mp3", false, 0.6);
-    soundManager.addSound("bottleSplash", "audio/bottle_splash.mp3", false, 0.6);
+    soundManager.addSound(
+      "endbossClucking",
+      "audio/endboss_clucking.mp3",
+      false,
+      0.6
+    );
+    soundManager.addSound(
+      "endbossAngry",
+      "audio/endboss_angry.mp3",
+      false,
+      0.8
+    );
+    soundManager.addSound("endbossHurt", "audio/endboss_hurting.mp3", false, 0.7);
+    soundManager.addSound(
+      "bottleSplash",
+      "audio/bottle_splash.mp3",
+      false,
+      0.4
+    );
+    soundManager.addSound("gameWon", "audio/game_won.mp3", false, 0.8);
 
     soundManager.setVolume(0.8);
     console.log("SoundManager initialized successfully");
