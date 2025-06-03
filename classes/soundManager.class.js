@@ -1,7 +1,7 @@
 class SoundManager {
   constructor() {
     this.sounds = {};
-    this.isMuted = JSON.parse(localStorage.getItem('isMuted')) || false;
+    this.isMuted = JSON.parse(localStorage.getItem("isMuted")) || false;
   }
 
   addSound(key, filePath, loop = false, volume = 1.0) {
@@ -13,7 +13,12 @@ class SoundManager {
 
   play(key) {
     const sound = this.sounds[key];
-    if (sound && !this.isMuted) {
+    if (!sound) {
+      console.warn(`No sound found for key: ${key}`);
+      return;
+    }
+
+    if (!this.isMuted) {
       sound.play();
     }
   }
@@ -54,17 +59,23 @@ class SoundManager {
 
   mute() {
     this.isMuted = true;
-    localStorage.setItem('isMuted', JSON.stringify(true));
+    localStorage.setItem("isMuted", JSON.stringify(true));
     this.pauseAll();
   }
 
   unmute() {
     this.isMuted = false;
-    localStorage.setItem('isMuted', JSON.stringify(false));
-    for (const key in this.sounds) {
-      const sound = this.sounds[key];
-      if (sound.loop) {
-        sound.play();
+    localStorage.setItem("isMuted", JSON.stringify(false));
+
+    // Only play looped sounds *after* user interaction
+    if (userInteracted) {
+      for (const key in this.sounds) {
+        const sound = this.sounds[key];
+        if (sound.loop) {
+          sound
+            .play()
+            .catch((err) => console.warn(`Playback blocked: ${err.message}`));
+        }
       }
     }
   }
