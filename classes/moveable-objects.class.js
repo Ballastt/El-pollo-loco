@@ -86,7 +86,6 @@ class MoveableObject extends DrawableObject {
    */
   pause() {
     this.paused = true;
-    console.log(`${this.constructor.name} paused`);
   }
 
    /**
@@ -94,7 +93,6 @@ class MoveableObject extends DrawableObject {
    */
   resume() {
     this.paused = false;
-    console.log(`${this.constructor.name} resumed`);
   }
 
   /**
