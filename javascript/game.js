@@ -105,10 +105,12 @@ function initializeGameManager() {
   if (!canvas) return console.error("Canvas not found");
   level = level1;
   soundManager ??= new SoundManager();
-  world = new World(canvas, keyboard, level);
+  gameManager = new GameManager(null);
+
+  world = new World(canvas, keyboard, level, gameManager);
   world.soundManager = soundManager;
-  gameManager = new GameManager(world);
-  world.gameManager = gameManager;
+  gameManager.world = world;
+
   addPauseToggleWithSpace();
 }
 
