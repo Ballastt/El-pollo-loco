@@ -129,9 +129,20 @@ function addPauseToggleWithSpace() {
  * Initializes all relevant event listeners for buttons and window events.
  */
 function initializeEventListeners() {
+  buttons.restart = document.getElementById("restart-btn");
   if (buttons.pause) buttons.pause.addEventListener("click", handlePause);
   if (buttons.resume) buttons.resume.addEventListener("click", handleResume);
-  if (buttons.restart) buttons.restart.addEventListener("click", restartGame);
+  console.log("Restart-Button:", buttons.restart);
+
+  if (buttons.restart) {
+    buttons.restart.addEventListener("click", () => {
+      if (gameManager) {
+        gameManager.restartGame();
+      } else {
+        console.warn("GameManager not initialized yet");
+      }
+    });
+  }
   if (buttons.learn) buttons.learn.addEventListener("click", showInstructions);
 
   initializeImpressum();
@@ -195,23 +206,6 @@ function handleKeyUp(e) {
   if (key === "arrowdown") keyboard.DOWN = false;
   if (key === " ") keyboard.SPACE = false;
   if (key === "d") keyboard.D = false;
-}
-
-/**
- * Restarts the game by stopping the current game,
- * hiding the game over screen, resetting level and world,
- * and starting a new game session.
- */
-function restartGame() {
-  gameManager?.stopGame();
-  hideGameOverScreen();
-  if (canvas) canvas.style.opacity = 1;
-  initLevel();
-  world = new World(canvas, keyboard, level1);
-  world.soundManager = soundManager;
-  gameManager = new GameManager(world);
-  world.gameManager = gameManager;
-  gameManager.startGame();
 }
 
 /**
