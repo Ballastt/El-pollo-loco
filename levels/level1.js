@@ -37,7 +37,6 @@ function generateBackgroundObjects(layerSets) {
   return backgroundObjects;
 }
 
-
 /**
  * Creates a single enemy instance (either SmallChicken or NormalChicken).
  * Assigns the shared enemies array reference to the instance.
@@ -53,7 +52,6 @@ function createEnemy(x, enemies) {
   return enemy;
 }
 
-
 /**
  * Generates an array of enemy instances distributed across the level.
  * Each enemy is either a SmallChicken or NormalChicken placed with slight randomness.
@@ -66,13 +64,15 @@ function generateEnemies() {
   const spacing = 6200 / amount;
 
   for (let i = 0; i < amount; i++) {
-    const x = (Math.random() - 0.5) * spacing * 0.3;
+    const baseX = i * spacing;
+    const randomOffset = (Math.random() - 0.5) * spacing * 0.3;
+    const x = baseX + randomOffset;
+
     enemies.push(createEnemy(x, enemies));
   }
 
   return enemies;
 }
-
 
 /**
  * Generates clouds with randomized positions and speeds.
@@ -94,7 +94,6 @@ function generateClouds() {
   return clouds;
 }
 
-
 /**
  * Generates coins randomly positioned in a horizontal range.
  * @param {number} [maxCoins=40] Maximum number of coins to generate.
@@ -114,7 +113,6 @@ function generateCoins(maxCoins = 40) {
   return coins;
 }
 
-
 /**
  * Generates collectible bottles randomly positioned in a horizontal range.
  * @param {number} [maxBottles=30] Maximum number of bottles to generate.
@@ -133,13 +131,11 @@ function generateBottles(maxBottles = 30) {
   return bottles;
 }
 
-
 /**
  * Global variable representing the first game level.
  * @type {Level}
  */
 let level1;
-
 
 /**
  * Initializes the first level with generated game objects.
