@@ -63,7 +63,7 @@ class Endboss extends MoveableObject {
     DEAD: "dead",
   };
 
-  constructor(character) {
+  constructor(character, world) {
     super();
     this.loadImage("img/4_enemie_boss_chicken/1_walk/G1.png");
     this.loadImages(this.IMAGES_WALKING);
@@ -75,6 +75,8 @@ class Endboss extends MoveableObject {
     this.y = 50;
     this.groundY = 50;
     this.character = character;
+    this.world = world;
+    this.gameManager = world?.gameManager;
     this.soundManager = soundManager;
     this.animate();
     this.applyGravity();
@@ -86,7 +88,7 @@ class Endboss extends MoveableObject {
     console.log("Endboss initialisiert mit Leben:", this.health);
 
     this.hitbox = {
-      offsetX: 10, // je nach Bild zuschneiden
+      offsetX: 10,
       offsetY: 100,
       width: 300,
       height: 300,
@@ -137,8 +139,8 @@ class Endboss extends MoveableObject {
   }
 
   updateState() {
-    if (this.isDead) return this.setDeadState();
-    if (this.health <= 0) return this.die();
+    if (this.isDead) return; // 🧹 Wenn tot, dann nichts mehr tun
+    if (this.health <= 0) return this.die(); // stirbt nur 1×
     if (Date.now() < this.hurtUntil) return this.setHurtState();
 
     const distanceToPlayer = this.calculateDistance(
@@ -149,13 +151,6 @@ class Endboss extends MoveableObject {
     if (distanceToPlayer < this.ATTACK_DISTANCE) return this.setAttackState();
     if (distanceToPlayer < 400) return this.setAlertState();
     return this.setWalkingState();
-  }
-
-  setDeadState() {
-    this.currentState = this.STATES.DEAD;
-    console.log("State: DEAD - stoppe alle Sounds");
-    this.soundManager.stop("endbossClucking");
-    this.soundManager.stop("endbossAngry");
   }
 
   setHurtState() {
@@ -256,6 +251,8 @@ class Endboss extends MoveableObject {
     const now = Date.now();
     if (now < this.hurtUntil || this.isDead) return;
 
+    this.soundManager.play("endbossHurt");
+
     this.health -= damage;
     this.hurtUntil = now + 1000;
 
@@ -265,7 +262,6 @@ class Endboss extends MoveableObject {
 
     if (this.health <= 0) {
       this.die();
-      this.soundManager.stop("endbossClucking");
     } else {
       this.soundManager.stop("endbossClucking");
       this.currentState = this.STATES.HURT;
@@ -273,12 +269,24 @@ class Endboss extends MoveableObject {
   }
 
   die() {
+    if (this.isDead) return;
     this.isDead = true;
     this.currentState = this.STATES.DEAD;
     this.playAnimation(this.IMAGES_DEAD);
     console.log("⚰️ Endboss ist tot.");
 
-    if (this.world && this.world.gameManager) this.world.gameManager.gameWon();
+    // Sounds nur EINMAL stoppen
+    this.soundManager.stop("endbossClucking");
+    this.soundManager.stop("endbossAngry");
+
+    console.log("📦 this.world =", this.world);
+    console.log("🎮 this.world.gameManager =", this.world?.gameManager);
+
+    setTimeout(() => {
+      console.log("Death-Animation abgeschlossen");
+      this.soundManager.play("gameWon");
+      this.gameManager.gameWon?.();
+    }, 2050);
   }
 
   stop() {
