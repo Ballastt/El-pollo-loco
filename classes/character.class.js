@@ -18,6 +18,10 @@ class Character extends MoveableObject {
     this.collectedCoins = 0;
     this.collectedBottles = 0;
 
+    // assuming this is loaded before character.js in HTML:
+    this.STATES = CharacterStates;
+    this.IMAGES = CharacterAssets;
+
     this.healthBar;
 
     this.x = 20;
@@ -37,12 +41,12 @@ class Character extends MoveableObject {
       height: 146,
     };
 
-    this.loadImages(this.IMAGES_WALKING);
-    this.loadImages(this.IMAGES_JUMPING);
-    this.loadImages(this.IMAGES_IDLE);
-    this.loadImages(this.IMAGES_LONG_IDLE);
-    this.loadImages(this.IMAGES_HURT);
-    this.loadImages(this.IMAGES_DEAD);
+    this.loadImages(this.IMAGES.WALKING);
+    this.loadImages(this.IMAGES.JUMPING);
+    this.loadImages(this.IMAGES.IDLE);
+    this.loadImages(this.IMAGES.LONG_IDLE);
+    this.loadImages(this.IMAGES.HURT);
+    this.loadImages(this.IMAGES.DEAD);
 
     this.soundManager = soundManager;
 
@@ -105,7 +109,16 @@ class Character extends MoveableObject {
   checkCollisionsWithEnemy(enemies) {
     if (!this.canBeHit()) return;
 
-    enemies.forEach((enemy) => this.handleEnemyCollision(enemy));
+    for (let enemy of enemies) {
+      if (enemy.isDead || !this.isColliding(enemy)) continue;
+
+      if (this.isJumpingOnEnemy(enemy)) {
+        this.defeatEnemy(enemy);
+      } else {
+        this.receiveHitFrom(enemy);
+        break; // 👉 Nach einem Treffer abbrechen!
+      }
+    }
   }
 
   canBeHit() {
@@ -163,7 +176,7 @@ class Character extends MoveableObject {
 
       if (this.world.soundManager) this.world.soundManager.play("hurtSound");
 
-      this.health = Math.max(0, this.health);
+      this.health = Math.max(0, this.health - damage);
       this.updateHealthBar();
 
       console.log(`Character getroffen! Gesundheit: ${this.health}`);
@@ -174,7 +187,7 @@ class Character extends MoveableObject {
 
   die() {
     super.die();
-    this.playAnimation(this.IMAGES_DEAD);
+    this.playAnimation(this.IMAGES.DEAD);
     this.isDead = true;
 
     console.log("Der Charakter ist gestorben!");
@@ -227,22 +240,22 @@ class Character extends MoveableObject {
   handleAnimations() {
     switch (this.currentState) {
       case this.STATES.JUMPING:
-        this.playAnimation(this.IMAGES_JUMPING);
+        this.playAnimation(this.IMAGES.JUMPING);
         break;
       case this.STATES.WALKING:
-        this.playAnimation(this.IMAGES_WALKING);
+        this.playAnimation(this.IMAGES.WALKING);
         break;
       case this.STATES.LONG_IDLE:
-        this.playAnimation(this.IMAGES_LONG_IDLE);
+        this.playAnimation(this.IMAGES.LONG_IDLE);
         break;
       case this.STATES.IDLE:
-        this.playAnimation(this.IMAGES_IDLE);
+        this.playAnimation(this.IMAGES.IDLE);
         break;
       case this.STATES.HURT:
-        this.playAnimation(this.IMAGES_HURT);
+        this.playAnimation(this.IMAGES.HURT);
         break;
       case this.STATES.DEAD:
-        this.playAnimation(this.IMAGES_DEAD);
+        this.playAnimation(this.IMAGES.DEAD);
         break;
     }
   }
