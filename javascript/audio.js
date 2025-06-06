@@ -130,13 +130,7 @@ function initializeSoundManager() {
       "smallChickenWalking",
       "audio/small_chicken_walking.mp3",
       true,
-      0.4
-    );
-    soundManager.addSound(
-      "chickenHit",
-      "audio/hitting_a_chicken.mp3",
-      false,
-      0.6
+      0.5
     );
     soundManager.addSound("coinCollect", "audio/get_coin.mp3", false, 0.5);
     soundManager.addSound("bottleCollect", "audio/get_bottle.mp3", false, 0.5);
