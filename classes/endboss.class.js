@@ -181,6 +181,7 @@ class Endboss extends MoveableObject {
     }
     this.currentState = this.STATES.ALERT;
 
+    console.log(this.introSoundPlayed)
     if (!this.introSoundPlayed) {
       this.soundManager.play("introEndboss");
       this.introSoundPlayed = true;
