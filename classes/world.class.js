@@ -25,16 +25,18 @@ class World {
   startTime;
   allowCollection = false;
   canThrow = true;
+  animationFrameId = null;
 
   // --- Konstruktor ---
-  constructor(canvas) {
+  constructor(canvas, keyboard, level, gameManager) {
     this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.keyboard = keyboard;
+    this.level = level;
+    this.gameManager = gameManager;
 
     this.character = new Character(this);
-    this.endboss = new Endboss(this.character);
-    this.gameManager = new GameManager(this);
+    this.endboss = new Endboss(this.character, this);
 
     // Statusbars mit den jeweiligen Bildern initialisieren
     this.healthBar = new StatusBar("health", 0, 0, 250, 60);
@@ -110,9 +112,12 @@ class World {
 
   // --- Kollisionen ---
   checkCollisions() {
+    if (!this.gameManager?.isGameRunning) return;
+
     this.character.checkCollisionsWithEnemy(this.level.enemies);
     this.character.checkCollisionsWithEndboss(this.endboss);
-    this.healthBar.setPercentage(this.character.health);
+    
+    this.character.updateHealthBar();
   }
 
   bottleEnemyCollision() {
@@ -269,9 +274,13 @@ class World {
   }
 
   checkGameOver() {
-    if (!this.gameManager.isGameRunning || this.character.isDead) {
-      console.log("Game Over detected in World");
-      this.gameManager.gameOver();
+    if (!this.gameManager.isGameRunning) return;
+
+    if (this.character.isDead) {
+      console.log("☠️ Game Over detected in World");
+      this.gameManager.isGameRunning = false;
+      this.stopObjects(); // Stoppt draw() und gameLoopInterval
+      this.gameManager.gameOver(); // Zeigt ggf. Menü, etc.
     }
   }
 
