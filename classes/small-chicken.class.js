@@ -17,7 +17,7 @@ class SmallChicken extends Chicken {
       ["img/3_enemies_chicken/chicken_small/2_dead/dead.png"],
       35,          // width
       35,          // height
-      [0.25, 0.55],// hitbox offset scale or similar parameters
+      [0.25, 0.65],// hitbox offset scale or similar parameters
       "smallChickenWalking", // animation state name for walking
       "chickenDeath"         // animation state name for death
     );
