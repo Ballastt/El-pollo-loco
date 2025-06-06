@@ -22,11 +22,11 @@ class Chicken extends MoveableObject {
     this.IMAGES_DEAD = imageDeadArray;
 
     this.enemies = enemies;
-    this.isDead = false; 
-    this.isRemoved = false; 
-    this.gameManager = gameManager; 
+    this.isDead = false;
+    this.isRemoved = false;
+    this.gameManager = gameManager;
     this.soundManager = soundManager;
-    this.world = world; 
+    this.world = world;
 
     this.walkSoundKey = walkSoundKey;
     this.deathSoundKey = deathSoundKey;
@@ -41,6 +41,8 @@ class Chicken extends MoveableObject {
   }
 
   moveLeft() {
+    if (this.isDead) return;
+
     super.moveLeft();
     if (!this.isRunning) {
       this.soundManager.play(this.walkSoundKey);
@@ -60,10 +62,7 @@ class Chicken extends MoveableObject {
   }
 
   removeEnemy() {
-    if (this.isRemoved) {
-      console.warn("Enemy already removed:", this);
-      return;
-    }
+    if (this.isRemoved) return console.warn("Enemy already removed:", this);
 
     console.log("removeEnemy wurde aufgerufen:", this);
     const index = this.enemies.indexOf(this);
@@ -94,20 +93,28 @@ class Chicken extends MoveableObject {
         }, 500); // 1 Sekunde Verzögerung
       }
     }, 200); // Verlängertes Intervall für bessere Sichtbarkeit
+
+    
   }
 
   die() {
+    console.log("die() aufgerufen für", this, "isDead:", this.isDead);
+
     if (this.isDead) {
-      console.warn("Chicken is already dead:", this);
-      return;
+
+      return console.warn("Chicken is already dead:", this);
     }
 
+    this.isRemoving = true;
+    this.isDead = true; // direkt synchron setzen
+
     console.log("Chicken is dying...");
-    this.isDead = true;
     clearInterval(this.walkingInterval);
     clearInterval(this.animationInterval);
 
+    console.log("Sound played for death:", this.deathSoundKey);
     this.soundManager.play(this.deathSoundKey);
+  
     this.isRunning = false;
     this.deathAnimationChicken();
   }
