@@ -20,18 +20,9 @@ class CollectableObject extends MoveableObject {
     this.y = y;
     this.width = width;
     this.height = height;
-    this.speed = 0; // No movement
+    this.speed = 0; 
 
-    /**
-     * Hitbox for collision detection, can be overridden in subclasses.
-     * @type {{offsetX: number, offsetY: number, width: number, height: number}}
-     */
-    this.hitbox = {
-      offsetX: 0,
-      offsetY: 0,
-      width: width,
-      height: height,
-    };
+    this.initHitbox(); // Initialize hitbox
   }
 
   /**
@@ -42,5 +33,18 @@ class CollectableObject extends MoveableObject {
    */
   loadCollectableImages(imagePaths) {
     this.loadImages(imagePaths);
+  }
+
+  /**
+     * Hitbox for collision detection, can be overridden in subclasses.
+     * @type {{offsetX: number, offsetY: number, width: number, height: number}}
+     */
+  initHitbox() {
+    this.hitbox = {
+      offsetX: 0,
+      offsetY: 0,
+      width: this.width,
+      height: this.height,
+    };
   }
 }

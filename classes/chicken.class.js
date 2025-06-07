@@ -13,31 +13,43 @@ class Chicken extends MoveableObject {
   ) {
     super();
 
-    this.x = 200 + Math.random() * 6200;
-    this.y = 370;
-    this.speed = speedRange[0] + Math.random() * speedRange[1];
-    this.height = height;
-    this.width = width;
-    this.IMAGES_WALKING = imageArray;
-    this.IMAGES_DEAD = imageDeadArray;
-
+    this.world = world;
     this.enemies = enemies;
-    this.isDead = false;
-    this.isRemoved = false;
     this.gameManager = gameManager;
     this.soundManager = soundManager;
-    this.world = world;
 
     this.walkSoundKey = walkSoundKey;
     this.deathSoundKey = deathSoundKey;
 
+    this.initDimensions(width, height, speedRange);
+    this.initFlags();
+    this.initImages(imagePath, imageArray, imageDeadArray);
+
+    this.animate();
+  }
+
+  initDimensions(width, height, speedRange) {
+    this.width = width;
+    this.height = height;
+    this.x = 200 + Math.random() * 6200;
+    this.y = 370;
+    this.speed = speedRange[0] + Math.random() * speedRange[1];
+  }
+
+  initFlags() {
+    this.isDead = false;
+    this.isRemoved = false;
+    this.isRunning = false;
+  }
+
+  initImages(imagePath, imageArray, imageDeadArray) {
+    this.IMAGES_WALKING = imageArray;
+    this.IMAGES_DEAD = imageDeadArray;
     this.imageCache = {};
+
     this.loadImage(imagePath);
     this.loadImages(this.IMAGES_WALKING);
     this.loadImages(this.IMAGES_DEAD);
-
-    this.isRunning = false;
-    this.animate();
   }
 
   moveLeft() {
@@ -86,7 +98,6 @@ class Chicken extends MoveableObject {
         frameIndex++;
       } else {
         clearInterval(deathInterval);
-        console.log("Chicken animation completed. Ready to remove.");
 
         setTimeout(() => {
           this.removeEnemy();
@@ -98,21 +109,14 @@ class Chicken extends MoveableObject {
   }
 
   die() {
-    console.log("die() aufgerufen für", this, "isDead:", this.isDead);
-
-    if (this.isDead) {
-
-      return console.warn("Chicken is already dead:", this);
-    }
-
+    if (this.isDead) return console.warn("Chicken is already dead:", this);
+    
     this.isRemoving = true;
     this.isDead = true; // direkt synchron setzen
 
-    console.log("Chicken is dying...");
     clearInterval(this.walkingInterval);
     clearInterval(this.animationInterval);
 
-    console.log("Sound played for death:", this.deathSoundKey);
     this.soundManager.play(this.deathSoundKey);
   
     this.isRunning = false;
