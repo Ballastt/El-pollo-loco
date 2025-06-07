@@ -60,17 +60,20 @@ function createEnemy(x, enemies) {
  */
 function generateEnemies() {
   const enemies = [];
-  const amount = 40;
-  const spacing = 6200 / amount;
+  const amount = 30;
+  const levelLength = 6200;
+  const availableSpace = levelLength - 600; // Platz ab x=600 bis zum Ende
+  const spacing = availableSpace / amount;
 
   for (let i = 0; i < amount; i++) {
-    const baseX = i * spacing;
-    const randomOffset = (Math.random() - 0.5) * spacing * 0.3;
-    const x = baseX + randomOffset;
-
+    const x = 600 + i * spacing;
     enemies.push(createEnemy(x, enemies));
   }
 
+  console.log(
+    "🐤 Neue Gegner generiert:",
+    enemies.map((e) => Math.round(e.x))
+  );
   return enemies;
 }
 
@@ -118,7 +121,7 @@ function generateCoins(maxCoins = 40) {
  * @param {number} [maxBottles=30] Maximum number of bottles to generate.
  * @returns {CollectableBottle[]} Array of CollectableBottle instances.
  */
-function generateBottles(maxBottles = 30) {
+function generateBottles(maxBottles = 20) {
   const bottles = [];
   const bottleDistance = 5700 / maxBottles;
   const startX = 300;
@@ -146,6 +149,6 @@ function initLevel() {
     generateClouds(),
     generateBackgroundObjects(layerSets),
     generateCoins(40),
-    generateBottles(30)
+    generateBottles(20)
   );
 }
