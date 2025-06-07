@@ -5,7 +5,7 @@
 class MoveableObject extends DrawableObject {
   currentImage = 0;
   speed = 0.55;
-  otherDirection = false; 
+  otherDirection = false;
   speedY = 0;
   acceleration = 2.5;
   health = 100;
@@ -14,27 +14,26 @@ class MoveableObject extends DrawableObject {
   groundY;
   paused = false;
 
-
-   /**
+  /**
    * Applies gravity to the object, updating its vertical position over time.
    * Stops movement when object reaches the ground.
    */
   applyGravity() {
-    const tolerance = 2; 
+    const tolerance = 2;
     this.gravityInterval = setInterval(() => {
       if (!this.paused) {
         if (this.isAboveGround() || this.speedY > 0) {
           this.y -= this.speedY;
           this.speedY -= this.acceleration;
         } else if (this.y >= this.groundY - tolerance) {
-          this.y = this.groundY; 
-          this.speedY = 0; 
+          this.y = this.groundY;
+          this.speedY = 0;
         }
       }
     }, 1000 / 25);
   }
 
-   /**
+  /**
    * Checks if the object is above the ground.
    * @returns {boolean} True if above ground, false otherwise.
    */
@@ -71,7 +70,7 @@ class MoveableObject extends DrawableObject {
     }
   }
 
-   /**
+  /**
    * Moves the object to the left by its speed.
    */
   moveLeft() {
@@ -81,14 +80,14 @@ class MoveableObject extends DrawableObject {
     }
   }
 
-   /**
+  /**
    * Pauses all movements and animations of this object.
    */
   pause() {
     this.paused = true;
   }
 
-   /**
+  /**
    * Resumes movements and animations if paused.
    */
   resume() {
@@ -128,7 +127,7 @@ class MoveableObject extends DrawableObject {
     );
   }
 
-    /**
+  /**
    * Makes the object jump by setting vertical speed.
    */
   jump() {
@@ -144,9 +143,22 @@ class MoveableObject extends DrawableObject {
   hit(damage) {
     this.health -= damage;
     if (this.health < 0) {
-      this.health = 0; 
+      this.health = 0;
       this.die();
     }
+  }
+
+  reset() {
+    this.health = 100;
+    this.speedY = 0;
+    this.paused = false;
+    this.isDead = false;
+    this.currentImage = 0;
+  }
+
+  stop() {
+    clearInterval(this.gravityInterval);
+    this.paused = true;
   }
 
   /**
@@ -156,7 +168,7 @@ class MoveableObject extends DrawableObject {
     if (!this.isDead) {
       this.isDead = true;
 
-      clearInterval(this.gravityInterval); 
+      clearInterval(this.gravityInterval);
       console.log(`${this.constructor.name} ist gestorben!`);
     }
   }
