@@ -28,4 +28,12 @@ class Keyboard {
     /** @type {boolean} Whether the "D" key is pressed */
     this.D = false;
   }
+
+  reset() {
+    keyboard.SPACE = false;
+    keyboard.LEFT = false;
+    keyboard.RIGHT = false;
+    keyboard.UP = false;
+    keyboard.D = false;
+  }
 }
