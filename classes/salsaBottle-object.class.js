@@ -116,11 +116,8 @@ class SalsaBottle extends ThrowableObject {
    */
   splash() {
     this.isFlying = false;
-
-    if (this.world?.soundManager) {
-      this.world.soundManager.play("bottleSplash");
-    }
-
+    if (this.world?.soundManager) this.world.soundManager.play("bottleSplash");
+    
     let index = 0;
     const interval = setInterval(() => {
       if (index >= this.IMAGES_SPLASH.length) {
@@ -129,7 +126,6 @@ class SalsaBottle extends ThrowableObject {
         this.removeBottleFromWorld();
         return;
       }
-      console.log(`Splash frame ${index} for bottle:`, this);
       this.img = this.imageCache[this.IMAGES_SPLASH[index]];
       index++;
     }, 100);
@@ -156,8 +152,6 @@ class SalsaBottle extends ThrowableObject {
    * Removes the bottle from the world's throwableObjects and enemies arrays.
    */
   removeBottleFromWorld() {
-    console.log("Removing bottle from world:", this);
-
     this.removeFromArray(this.world?.throwableObjects, "throwableObjects");
     this.removeFromArray(this.world?.level?.enemies, "enemies");
   }
