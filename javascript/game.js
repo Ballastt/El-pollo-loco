@@ -16,6 +16,8 @@ const keyboard = new Keyboard();
  */
 const buttons = {};
 
+let spaceListenerAdded = false;
+
 /**
  * Initializes the game when DOM content is fully loaded:
  * - Caches buttons.
@@ -29,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeSoundManager();
   setupStartButton();
   initializeEventListeners();
-  console.log("Active Sounds:", soundManager?.sounds || "No sound data");
+  setupEventListeners();
 });
 
 /**
@@ -58,7 +60,9 @@ function setupStartButton() {
     await preloadImages(layerSets.flat());
     showLoading(false);
     if (!level1) initLevel();
-    if (!gameManager) initializeGameManager();
+    initializeGameManager(); // <- Immer aufrufen
+    console.log("✅ GameManager initialisiert:", gameManager);
+
     const bgObjects = generateBackgroundObjects(layerSets);
     world.setBackgroundObjects(bgObjects);
     gameManager.startGame();
@@ -118,8 +122,13 @@ function initializeGameManager() {
  * Adds an event listener for the space bar key to toggle game pause/resume.
  */
 function addPauseToggleWithSpace() {
+  if (spaceListenerAdded) return;
+  spaceListenerAdded = true;
+
   window.addEventListener("keydown", (e) => {
-    if (e.code === "Space" && gameManager?.isGameRunning) {
+    if (e.code === "Space" && !e.repeat && gameManager?.isGameRunning) {
+      e.preventDefault(); // ✅ verhindert Scrollen bei Space
+      console.log("▶️ SPACE gedrückt");
       gameManager.togglePause();
     }
   });
@@ -132,7 +141,6 @@ function initializeEventListeners() {
   buttons.restart = document.getElementById("restart-btn");
   if (buttons.pause) buttons.pause.addEventListener("click", handlePause);
   if (buttons.resume) buttons.resume.addEventListener("click", handleResume);
-  console.log("Restart-Button:", buttons.restart);
 
   if (buttons.restart) {
     buttons.restart.addEventListener("click", () => {
@@ -146,10 +154,18 @@ function initializeEventListeners() {
   if (buttons.learn) buttons.learn.addEventListener("click", showInstructions);
 
   initializeImpressum();
-  window.addEventListener("resize", checkOrientation);
-  window.addEventListener("load", checkOrientation);
+}
+
+function setupEventListeners() {
+  window.removeEventListener("keydown", handleKeyDown);
+  window.removeEventListener("keyup", handleKeyUp);
+  window.removeEventListener("resize", checkOrientation);
+  window.removeEventListener("load", checkOrientation);
+
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
+  window.addEventListener("resize", checkOrientation);
+  window.addEventListener("load", checkOrientation);
 }
 
 /**
@@ -185,6 +201,9 @@ function togglePauseResumeButtons(isPaused) {
  * @param {KeyboardEvent} e - The keyboard event.
  */
 function handleKeyDown(e) {
+  console.log(gameManager, "* gameManager");
+  // Check if gameManager exists and the game is running
+  if (!gameManager || !gameManager.isGameRunning) return;
   const key = e.key.toLowerCase();
   if (key === "arrowright") keyboard.RIGHT = true;
   if (key === "arrowleft") keyboard.LEFT = true;
