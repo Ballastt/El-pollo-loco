@@ -12,7 +12,7 @@ class Endboss extends MoveableObject {
   chargeCooldown = 0;
   introSoundPlayed = false;
   isPaused = false;
-  ATTACK_DISTANCE = 300;
+  ATTACK_DISTANCE = 370;
 
   IMAGES_WALKING = [
     "img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -65,34 +65,19 @@ class Endboss extends MoveableObject {
 
   constructor(character, world) {
     super();
-    this.loadImage("img/4_enemie_boss_chicken/1_walk/G1.png");
-    this.loadImages(this.IMAGES_WALKING);
-    this.loadImages(this.IMAGES_ALERT);
-    this.loadImages(this.IMAGES_ATTACK);
-    this.loadImages(this.IMAGES_HURT);
-    this.loadImages(this.IMAGES_DEAD);
-    this.x = 6300;
-    this.y = 50;
-    this.groundY = 50;
     this.character = character;
     this.world = world;
     this.gameManager = world?.gameManager;
     this.soundManager = soundManager;
-    this.animate();
+
+    this.initImages();
+    this.initPosition();
+    this.initHitbox();
+
     this.applyGravity();
+    this.animate();
 
-    console.log(
-      `Y: ${this.y}, speedY: ${this.speedY}, groundY: ${this.groundY}`
-    );
-
-    console.log("Endboss initialisiert mit Leben:", this.health);
-
-    this.hitbox = {
-      offsetX: 10,
-      offsetY: 100,
-      width: 300,
-      height: 300,
-    };
+    console.log(`Endboss initialisiert mit Leben: ${this.health}`);
   }
 
   animate() {
@@ -106,6 +91,30 @@ class Endboss extends MoveableObject {
       this.updateState();
       this.moveDependingOnState();
     }, 100);
+  }
+
+  initPosition() {
+    this.x = 6300;
+    this.y = 50;
+    this.groundY = 50;
+  }
+
+  initImages() {
+    this.loadImage(this.IMAGES_WALKING[0]);
+    this.loadImages(this.IMAGES_WALKING);
+    this.loadImages(this.IMAGES_ALERT);
+    this.loadImages(this.IMAGES_ATTACK);
+    this.loadImages(this.IMAGES_HURT);
+    this.loadImages(this.IMAGES_DEAD);
+  }
+
+  initHitbox() {
+    this.hitbox = {
+      offsetX: 10,
+      offsetY: 100,
+      width: 300,
+      height: 300,
+    };
   }
 
   handleAnimations() {
@@ -181,7 +190,7 @@ class Endboss extends MoveableObject {
     }
     this.currentState = this.STATES.ALERT;
 
-    console.log(this.introSoundPlayed)
+    console.log(this.introSoundPlayed);
     if (!this.introSoundPlayed) {
       this.soundManager.play("introEndboss");
       this.introSoundPlayed = true;
@@ -231,11 +240,9 @@ class Endboss extends MoveableObject {
       case this.STATES.ATTACK:
         this.chargePlayer();
         break;
-
       case this.STATES.ALERT:
         this.moveTowardsCharacter(this.speedWalk);
         break;
-
       case this.STATES.WALKING:
         break;
     }
@@ -252,14 +259,9 @@ class Endboss extends MoveableObject {
     const now = Date.now();
     if (now < this.hurtUntil || this.isDead) return;
 
-    this.soundManager.play("endbossHurt");
-
     this.health -= damage;
     this.hurtUntil = now + 1000;
-
-    console.log(
-      `Endboss nimmt ${damage} Schaden, verbleibend: ${this.health} HP`
-    );
+    this.soundManager.play("endbossHurt");
 
     if (this.health <= 0) {
       this.die();
@@ -277,6 +279,7 @@ class Endboss extends MoveableObject {
     console.log("⚰️ Endboss ist tot.");
 
     // Sounds nur EINMAL stoppen
+    this.soundManager.play("endbossDying");
     this.soundManager.stop("endbossClucking");
     this.soundManager.stop("endbossAngry");
 
@@ -286,8 +289,8 @@ class Endboss extends MoveableObject {
     setTimeout(() => {
       console.log("Death-Animation abgeschlossen");
       this.soundManager.play("gameWon");
-      this.gameManager.gameWon?.();
-    }, 2050);
+      this.world.gameManager.gameWon?.();
+    }, 2000); // 2 Sekunden für die Animation
   }
 
   stop() {
@@ -301,22 +304,13 @@ class Endboss extends MoveableObject {
   chargePlayer() {
     const now = Date.now();
     if (now < this.chargeCooldown) return;
-    console.log("⏱️ Charge cooldown: ", now < this.chargeCooldown);
 
     const dx = this.character.x - this.x;
     const distance = Math.abs(dx);
     const direction = dx > 0 ? 1 : -1;
 
-    // Sprinten
     if (distance > 30) this.x += direction * this.speedAttack;
-
-    // 25 % Chance zu springen, wenn auf Boden
-    if (!this.isAboveGround() && Math.random() < 0.75) {
-      this.speedY = this.jumpForce;
-      console.log("💥 Endboss springt!");
-    }
-
-    // Cooldown setzen
-    if (distance < 100) this.chargeCooldown = now + 2000; // 2 Sekunden warten
+    if (!this.isAboveGround() && Math.random() < 0.75) this.speedY = this.jumpForce;
+    if (distance < 100) this.chargeCooldown = now + 2000;
   }
 }
