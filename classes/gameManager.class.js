@@ -4,13 +4,13 @@ class GameManager {
     this.soundManager = window.soundManager;
     this.isGameRunning = false;
     this.isPaused = false;
+    this.isGameOver = false;
     this.gameOverScreen = document.getElementById("game-over-screen");
     this.startScreen = document.getElementById("start-screen");
     this.canvas = document.getElementById("canvas");
   }
 
   startGame() {
-    initLevel();
     this.isGameRunning = true;
     this.isPaused = false;
 
@@ -18,21 +18,10 @@ class GameManager {
     if (this.gameOverScreen) this.gameOverScreen.classList.add("hidden");
     if (this.canvas) this.canvas.style.display = "block";
 
-    
-
-    // Hintergrund setzen
     this.world.setBackgroundObjects(level1.backgroundObjects);
 
     this.world?.run();
     this.soundManager?.play("backgroundMusic");
-    console.log(this.soundManager, "background Music playing");
-    console.log("[DEBUG] Versuche backgroundMusic zu spielen...");
-    console.log("[DEBUG] Sound Keys:", Object.keys(soundManager.sounds));
-    console.log("[DEBUG] soundManager:", soundManager);
-    console.log(
-      "[DEBUG] backgroundMusic existiert:",
-      !!soundManager.sounds["backgroundMusic"]
-    );
   }
 
   stopGame() {
@@ -44,22 +33,20 @@ class GameManager {
     this.soundManager?.stopAll?.();
     clearInterval(this.world?.characterMovementInterval);
     clearInterval(this.world?.characterAnimationInterval);
+    window.removeEventListener("keydown", handleKeyDown);
+
     this.world?.stopObjects?.();
     this.world?.character?.stop?.();
     this.world?.endboss?.stop?.();
+    this.world?.stopGameLoop?.();
   }
 
   showEndScreen(won = false) {
     const screen = this.gameOverScreen;
     const textImg = document.getElementById("game-over-image");
 
-    if (!screen || !textImg) {
-      console.error("❌ Endbildschirm-Elemente fehlen!");
-      return;
-    }
-
-    console.log("📺 Endscreen-Bild:", won ? "You Win" : "Game Over");
-
+    if (!screen || !textImg) return console.error("❌ Endbildschirm-Elemente fehlen!");
+      
     textImg.src = won
       ? "img/You won, you lost/You Win A.png"
       : "img/You won, you lost/Game over A.png";
@@ -74,9 +61,11 @@ class GameManager {
   }
 
   gameOver() {
-    if (!this.isGameRunning) return;
     console.log("💀 Spiel verloren");
-    //this.stopGame(); // ZUERST alles stoppen
+    this.isGameRunning = false;
+    this.isGameOver = true;
+    this.world?.stopGameLoop?.();
+   
     setTimeout(() => {
       this.soundManager?.play("gameOver");
     }, 100);
@@ -85,12 +74,13 @@ class GameManager {
   }
 
   gameWon() {
-    if (!this.isGameRunning) return;
     console.log("🏆 Spiel gewonnen");
-    //this.stopGame(); // ZUERST alles stoppen
+    this.isGameRunning = false;
+    this.world?.stopGameLoop?.();
+
     setTimeout(() => {
       this.soundManager?.play("gameWon");
-    }, 100); // 100 ms warten
+    }, 50); // 100 ms warten
     this.showEndScreen(true); // DANN den Endscreen zeigen
     this.soundManager.stopAll();
   }
@@ -102,7 +92,7 @@ class GameManager {
 
   pauseGame() {
     if (!this.isGameRunning) return;
-    console.log("⏸️ Spiel pausiert");
+
     this.isPaused = true;
     this.world?.pauseObjects?.();
     this.soundManager?.pauseAll?.();
@@ -114,13 +104,6 @@ class GameManager {
     this.isPaused = false;
     this.world?.resumeObjects?.();
     this.soundManager?.resumeAll?.();
-    console.log("[DEBUG] Versuche backgroundMusic zu spielen...");
-    console.log("[DEBUG] Sound Keys:", Object.keys(soundManager.sounds));
-    console.log("[DEBUG] soundManager:", soundManager);
-    console.log(
-      "[DEBUG] backgroundMusic existiert:",
-      !!soundManager.sounds["backgroundMusic"]
-    );
   }
 
   /**
@@ -129,14 +112,27 @@ class GameManager {
    * and starting a new game session.
    */
   restartGame() {
+    console.log("Enemies nach Restart:", world.level.enemies);
+    console.log("🚨 RestartGame gestartet — aktuelle World:", this.world);
+
+    this.soundManager.stopAll();
     gameManager?.stopGame();
+    keyboard.reset();
+    world.character.reset();
+    if (world) {
+      this.world.stopGameLoop();
+      world = null; // Setzt die World-Referenz zurück
+    }
     hideGameOverScreen();
-    if (canvas) canvas.style.opacity = 4;
-    initLevel();
+    canvas.style.opacity = 1;
+
+    initLevel(); // erzeugt level1 samt neuen Gegnern
     world = new World(canvas, keyboard, level1);
     world.soundManager = soundManager;
+
     gameManager = new GameManager(world);
     world.gameManager = gameManager;
+
     gameManager.startGame();
   }
 }
