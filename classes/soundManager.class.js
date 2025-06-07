@@ -23,24 +23,24 @@ class SoundManager {
     }
     if (this.isMuted) return;
 
-    if (this.playingFlags[key]) {
-      // Sound läuft schon, nicht nochmal starten
-      return;
-    }
+    if (this.playingFlags[key]) return;
+  
     this.playingFlags[key] = true;
 
     sound.currentTime = 0; // auf Anfang setzen
     sound.loop = false;
 
     sound.onended = () => {
-      console.log(`[SoundManager] sound ended for key: ${key}`);
       this.playingFlags[key] = false; // Flag zurücksetzen
     };
+    console.log(`[SoundManager] Spiele ab: ${key}`);
 
-    sound.play().catch((err) => {
-      console.warn(`[SoundManager] play failed for key: ${key}, err:`, err);
-      this.playingFlags[key] = false;
-    });
+    setTimeout(() => {
+      sound.play().catch((err) => {
+        console.warn(`[SoundManager] play failed for key: ${key}, err:`, err);
+        this.playingFlags[key] = false;
+      });
+    }, 100); // 100ms delay
   }
 
   pause(key) {
@@ -86,7 +86,14 @@ class SoundManager {
 
   stopAll() {
     for (const key in this.sounds) {
-      this.stop(key);
+      const sound = this.sounds[key];
+      try {
+        sound.pause();
+        sound.currentTime = 0;
+        this.playingFlags[key] = false;
+      } catch (e) {
+        console.warn(`Error stopping sound for key: ${key}`, e);
+      }
     }
   }
 
