@@ -25,7 +25,6 @@ class World {
   startTime;
   allowCollection = false;
   canThrow = true;
-  animationFrameId = null;
 
   // --- Konstruktor ---
   constructor(canvas, keyboard, level, gameManager) {
@@ -112,12 +111,12 @@ class World {
 
   // --- Kollisionen ---
   checkCollisions() {
-    if (!this.gameManager?.isGameRunning) return;
+    if (!this.gameManager.isGameRunning) return;
 
     this.character.checkCollisionsWithEnemy(this.level.enemies);
     this.character.checkCollisionsWithEndboss(this.endboss);
-    
-    this.character.updateHealthBar();
+
+    this.updateHealthBar();
   }
 
   bottleEnemyCollision() {
@@ -126,6 +125,8 @@ class World {
   }
 
   handleBottleHitsForEnemies() {
+    if (!this.gameManager.isGameRunning) return;
+
     this.throwableObjects.forEach((bottle, bottleIndex) => {
       this.level.enemies.forEach((enemy) => {
         if (bottle.isColliding(enemy) && !enemy.isDead) {
@@ -138,6 +139,8 @@ class World {
   }
 
   handleBottleHitForEndboss() {
+    if (!this.gameManager.isGameRunning) return;
+
     this.throwableObjects.forEach((bottle, bottleIndex) => {
       if (
         this.endboss &&
@@ -152,6 +155,8 @@ class World {
   }
 
   checkThrowObjects() {
+    if (!this.gameManager.isGameRunning) return;
+
     if (this.keyboard.D) {
       if (this.canThrow) {
         const didThrow = this.character.throwBottle();
@@ -269,6 +274,10 @@ class World {
     }
   }
 
+  stopGameLoop() {
+    this.stopObjects();
+  }
+
   get isDead() {
     return this.health <= 0;
   }
@@ -342,5 +351,12 @@ class World {
     const percentage = (this.character.collectedCoins / maxCoins) * 100;
     this.coinBar.setPercentage(percentage);
     console.log(`Updated CoinBar: ${percentage}%`);
+  }
+
+   updateHealthBar() {
+    const percentage = (this.health / this.maxHealth) * 100;
+    if (this.world && this.world.healthBar) {
+      this.world.healthBar.setPercentage(percentage);
+    }
   }
 }
