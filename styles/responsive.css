@@ -1,28 +1,188 @@
-@media only screen and (max-width: 720px) {
-  canvas {
+@media (min-height: 481px) and (max-height: 1024px) {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
     width: 100%;
+    touch-action: none;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #startScreen-img {
+    height: 100dvh;
+    width: 100vw;
+    object-fit: fill;
+  }
+
+  .buttons {
+    flex-direction: row;
+    gap: 1.5rem;
+    margin-top: -4rem;
+    max-width: 700px;
+  }
+
+  #learn-button {
+    width: 160px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  #start-button {
+    width: 140px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  #impressum-button {
+    width: 140px;
+    height: 46px;
+    font-size: 20px;
   }
 }
 
-@media only screen and (max-height: 480px) {
-  canvas {
+@media (min-height: 200px) and (max-height: 480px) {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
     height: 100%;
+    width: 100%;
+    touch-action: none;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .startscreen-wrapper {
+    height: 100dvh;
+    width: 100vw;
+  }
+
+  #startScreen-img {
+    object-fit: fill;
+  }
+
+  .buttons {
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: -2rem;
+    max-width: 600px;
+  }
+
+  #learn-button {
+    width: 160px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  #start-button {
+    width: 140px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  #impressum-button,
+  #restart-btn {
+    width: 140px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  .instructions-dialog {
+    width: 80%;
+    height: 80%;
+    overflow-y: auto;
+  }
+
+  .instructions-dialog h2 {
+    margin-top: 0;
+    font-size: 28px;
+  }
+
+  .instructions-dialog p {
+    font-size: 18px;
+  }
+
+  .instructions-dialog ul {
+    font-size: 18px;
+  }
+
+  #game-over-screen {
+    width: 100%;
+    height: 100%;
+  }
+
+  .game-over-content {
+    gap: 0;
+  }
+
+  #game-over-background {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .impressum-content {
+    width: 80%;
+    height: 90%;
+    overflow-y: auto;
+  }
+
+  #background-image,
+  footer {
+    display: none;
+  }
+
+  #restart-btn {
+    margin-top: 1rem;
   }
 }
 
 @media screen and (orientation: portrait) {
+  body {
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
   #rotate-device-overlay {
-    display: flex;
     position: fixed;
-    z-index: 9999;
-    background-color: rgba(0, 0, 0, 0.95);
-    color: white;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    word-break: break-word;
+    width: 100vw;
+    height: 100dvh; /* ✅ Dynamic viewport height (modern mobile fix) */
+    display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
     text-align: center;
-    width: 100%;
-    height: 100%;
     font-size: 24px;
-    border: 5px solid red;
+    touch-action: none;
+  }
+
+  canvas,
+  #background-image,
+  #start-screen,
+  #game-over-screen {
+    display: none;
   }
 }
