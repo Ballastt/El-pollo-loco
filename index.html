@@ -6,7 +6,7 @@
     <meta name="google" content="notranslate" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="styles/overlays.css" />
-    <link rel ="stylesheet" href="styles/responsive.css" />
+    <link rel="stylesheet" href="styles/responsive.css" />
     <link rel="icon" type="image/x-icon" href="img/favicon/tabasco.png" />
     <title>El Pollo Loco</title>
   </head>
@@ -77,9 +77,7 @@
           src="/img/You won, you lost/Game over A.png"
           alt="Game Over"
         />
-        <button id="restart-btn" class="btn-grad">
-          Neu starten
-        </button>
+        <button id="restart-btn" class="btn-grad">Neu starten</button>
       </div>
     </div>
 
@@ -100,7 +98,9 @@
           <li>Sammle Münzen und Tabasco-Flaschen!</li>
           <li>Vermeide Feinde!</li>
           <li>Achtung! Aggressiver Endboss!</li>
-          <li>Pausiere das Spiel mit Klick auf das Pause-Icon oder der SPACE-Taste</li>
+          <li>
+            Pausiere das Spiel mit Klick auf das Pause-Icon oder der SPACE-Taste
+          </li>
         </ul>
         <button onclick="closeInstructions()" class="close-instructions-btn">
           Los geht's!
@@ -152,6 +152,21 @@
       </p>
     </footer>
 
+    <div id="mobile-controls" class="hidden">
+      <div class="control-left">
+        <button id="btn-left">◀️</button>
+        <button id="btn-right">▶️</button>
+      </div>
+      <div class="control-right">
+        <button id="btn-jump">⬆️</button>
+        <button id="btn-throw">🧴</button>
+      </div>
+      <div class="control-top">
+        <button id="btn-pause">⏸</button>
+        <button id="btn-mute">🔇</button>
+      </div>
+    </div>
+
     <!-- Basis-Klassen -->
     <script src="classes/drawable-object.class.js"></script>
     <script src="classes/moveable-objects.class.js"></script>
@@ -186,6 +201,7 @@
     <script src="classes/gameManager.class.js"></script>
 
     <!-- Sonstige Funktionen -->
+    <script src="javascript/touchcontrol.js"></script>
     <script src="javascript/game.js"></script>
   </body>
 </html>
