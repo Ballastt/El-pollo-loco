@@ -58,23 +58,6 @@ class DrawableObject {
    * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
    */
   drawHitbox(ctx) {
-    if (this instanceof Character || this instanceof Endboss) {
-      ctx.beginPath();
-      ctx.lineWidth = "2";
-      ctx.strokeStyle = "red";
-
-      if (this.hitbox) {
-        ctx.rect(
-          this.x + this.hitbox.offsetX,
-          this.y + this.hitbox.offsetY,
-          this.hitbox.width,
-          this.hitbox.height
-        );
-      } else {
-        ctx.rect(this.x, this.y, this.width, this.height);
-      }
-
-      ctx.stroke();
-    }
+    
   }
 }
