@@ -16,37 +16,53 @@ class SoundManager {
   }
 
   play(key) {
+    if (!this.isPlayable(key)) {
+      return;
+    }
+
+    this.prepareSound(key);
+    this.startPlayback(key);
+  }
+
+  isPlayable(key) {
     const sound = this.sounds[key];
     if (!sound) {
       console.warn(`No sound found for key: ${key}`);
-      return;
+      return false;
     }
-    if (this.isMuted) return;
 
-    if (this.playingFlags[key]) return;
-  
+    if (this.isMuted || this.playingFlags[key]) return false;
+
+    return true;
+  }
+
+  prepareSound(key) {
+    const sound = this.sounds[key];
     this.playingFlags[key] = true;
 
-    sound.currentTime = 0; // auf Anfang setzen
+    sound.currentTime = 0;
     sound.loop = false;
+    sound.onended = () => (this.playingFlags[key] = false);
 
-    sound.onended = () => {
-      this.playingFlags[key] = false; // Flag zurücksetzen
-    };
     console.log(`[SoundManager] Spiele ab: ${key}`);
+  }
+
+  startPlayback(key) {
+    const sound = this.sounds[key];
 
     setTimeout(() => {
       sound.play().catch((err) => {
         console.warn(`[SoundManager] play failed for key: ${key}, err:`, err);
         this.playingFlags[key] = false;
       });
-    }, 100); // 100ms delay
+    }, 100);
   }
 
   pause(key) {
     const sound = this.sounds[key];
     if (sound) {
       sound.pause();
+      this.playingFlags[key] = false;
     }
   }
 
@@ -55,33 +71,38 @@ class SoundManager {
     if (sound) {
       sound.pause();
       sound.currentTime = 0;
+      this.playingFlags[key] = false; // 🔧 Wichtig: Rücksetzen des Flags!
     }
   }
 
   pauseAll() {
     console.log("[SoundManager] Pausiere alle Sounds...");
-    this.pausedSounds = [];
-
     for (const key in this.sounds) {
       const sound = this.sounds[key];
-      if (!sound.paused) {
-        this.pause(key);
-        this.pausedSounds.push(key);
-        this.playingFlags[key] = false; // Wichtig: Flag zurücksetzen
+      if (sound && !sound.paused) {
+        sound.pause();
+        this.playingFlags[key] = false; // 🔧 Important!
         console.log(`[SoundManager] Sound pausiert: ${key}`);
       }
     }
   }
 
   resumeAll() {
-    console.log("[SoundManager] Fortsetzen aller pausierten Sounds...");
-    if (!this.pausedSounds) return;
+    console.log("[SoundManager] Setze pausierte Loops fort...");
+    for (const key in this.sounds) {
+      const sound = this.sounds[key];
 
-    this.pausedSounds.forEach((key) => {
-      console.log(`[SoundManager] Sound wird fortgesetzt: ${key}`);
-      this.play(key);
-    });
-    this.pausedSounds = [];
+      const isLoop = this.loopFlags?.[key]; // <- prüfe ob Sound ein Loop ist
+
+      if (sound && sound.paused && isLoop && !sound.ended) {
+        try {
+          sound.play();
+          console.log(`[SoundManager] Loop-Sound fortgesetzt: ${key}`);
+        } catch (e) {
+          console.warn(`[SoundManager] Fehler beim Fortsetzen von ${key}:`, e);
+        }
+      }
+    }
   }
 
   stopAll() {
