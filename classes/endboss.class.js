@@ -298,7 +298,6 @@ class Endboss extends MoveableObject {
       clearInterval(this.animationInterval);
       this.animationInterval = null;
     }
-    console.log("⛔ Endboss gestoppt.");
   }
 
   chargePlayer() {
