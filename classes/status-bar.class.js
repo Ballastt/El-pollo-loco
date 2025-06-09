@@ -96,19 +96,19 @@ class StatusBar extends DrawableObject {
   resolveImageIndex() {
     if (this.isReversed) {
       // For reversed bars (e.g., coins) — images correspond to increasing fill
-      if (this.percentage >= 100) return 5;
-      if (this.percentage > 80) return 4;
-      if (this.percentage > 60) return 3;
-      if (this.percentage > 40) return 2;
-      if (this.percentage > 20) return 1;
+      if (this.percentage == 100) return 5;
+      if (this.percentage > 60 && this.percentage <= 99) return 4;
+      if (this.percentage > 40 && this.percentage <= 60) return 3;
+      if (this.percentage > 20 && this.percentage <= 40) return 2;
+      if (this.percentage > 0.1 && this.percentage <= 20) return 1;
       return 0;
     } else {
       // For normal bars (e.g., health) — images correspond to decreasing fill
-      if (this.percentage >= 100) return 5;
-      if (this.percentage >= 80) return 4;
-      if (this.percentage >= 60) return 3;
-      if (this.percentage >= 40) return 2;
-      if (this.percentage >= 20) return 1;
+      if (this.percentage == 100) return 5;
+      if (this.percentage > 60 && this.percentage <= 99) return 4;
+      if (this.percentage > 40 && this.percentage <= 60) return 3;
+      if (this.percentage > 20 && this.percentage <= 40) return 2;
+      if (this.percentage > 0.1 && this.percentage <= 20) return 1;
       return 0;
     }
   }
