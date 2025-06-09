@@ -14,7 +14,6 @@ class Character extends MoveableObject {
     this.world = world;
 
     this.health = 100;
-    this.maxHealth = 100;
     this.collectedCoins = 0;
     this.collectedBottles = 0;
 
@@ -92,8 +91,6 @@ class Character extends MoveableObject {
       clearInterval(this.animationInterval);
       this.animationInterval = null;
     }
-
-    console.log("🛑 Charakter gestoppt.");
   }
 
   reset() {
@@ -142,17 +139,16 @@ class Character extends MoveableObject {
     sm.stop("walkingSound");
   }
 
-  // --- Kollision und Treffer ---
   checkCollisionsWithEndboss(endboss) {
-    if (this.isColliding(endboss)) {
-      console.log("Kollision mit dem Endboss");
-      if (Date.now() > (this.lastCollision || 0) + 1000) {
-        this.lastCollision = Date.now();
-        this.currentState = this.STATES.HURT;
+    if (this.isColliding(endboss) && this.canBeHit()) {
+      if (endboss.currentState === endboss.STATES.ATTACK) {
+        console.log("Kollision mit dem Endboss während Angriff");
+        this.setState(this.STATES.HURT);
         this.hurtUntil = Date.now() + 500;
 
-        endboss.hurt(10);
-        this.hit(20);
+        this.hit(10); // nur im Angriffszustand!
+      } else {
+        console.log("Kollision mit Endboss, aber kein Angriff");
       }
     }
   }
@@ -177,7 +173,16 @@ class Character extends MoveableObject {
   }
 
   canBeHit() {
-    return Date.now() - this.lastHit >= 500;
+    return Date.now() - this.lastHit >= 800;
+  }
+
+  receiveHitFrom(enemy) {
+    this.setState(this.STATES.HURT);
+    this.hurtUntil = Date.now() + 500;
+    this.hit(10);
+    console.log(
+      `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
+    );
   }
 
   handleEnemyCollision(enemy) {
@@ -190,53 +195,18 @@ class Character extends MoveableObject {
     }
   }
 
-  defeatEnemy(enemy) {
-    console.log(`Enemy defeated by jumping: ${enemy.constructor.name}`);
-    enemy.die();
-    this.bounceOffEnemy();
-  }
-
-  receiveHitFrom(enemy) {
-    const now = Date.now();
-    this.currentState = this.STATES.HURT;
-    this.hit(10);
-    console.log(
-      `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
-    );
-    this.lastHit = now;
-    this.hurtUntil = now + 500;
-  }
-
-  isJumpingOnEnemy(enemy) {
-    const characterBottom = this.y + this.height;
-    const enemyTop = enemy.y;
-    const horizontalOverlap =
-      this.x + this.width > enemy.x && this.x < enemy.x + enemy.width;
-
-    return (
-      characterBottom >= enemyTop && horizontalOverlap && this.isAboveGround()
-    );
-  }
-
-  bounceOffEnemy() {
-    this.speedY = 15;
-  }
-
   hit(damage) {
-    let now = Date.now();
-    if (now - this.lastHit > 1000) {
-      console.log("Character hit() aufgerufen");
-      super.hit(damage);
-      this.lastHit = now;
+    const now = Date.now();
+    if (now - this.lastHit < 1000) return; // Doppeltreffer blockieren
 
-      if (this.world.soundManager) this.world.soundManager.play("hurtSound");
+    console.log("Character hit() aufgerufen");
+    this.lastHit = now;
 
-      this.health = Math.max(0, this.health - damage);
-      this.world.updateHealthBar();
+    this.health = Math.max(0, this.health - damage);
+    this.world.updateHealthBar();
+    if (this.world.soundManager) this.world.soundManager.play("hurtSound");
 
-      console.log(`Character getroffen! Gesundheit: ${this.health}`);
-    }
-
+    console.log(`Character getroffen! Gesundheit: ${this.health}`);
     if (this.health === 0) this.die();
   }
 
@@ -248,7 +218,8 @@ class Character extends MoveableObject {
     console.log("Der Charakter ist gestorben!");
     console.log(this.world.gameManager);
     if (this.world.soundManager) this.world.soundManager.stop("walkingSound");
-    if (this.world && this.world.gameManager) this.world.gameManager.gameOver();
+    this.world?.gameManager?.gameOver(); // Spiel beenden
+    console.log("Game Over ausgelöst", this.world.gameManager.gameOver);
   }
 
   // --- Bewegungs- und Statussteuerung ---
@@ -301,6 +272,27 @@ class Character extends MoveableObject {
     this.playAnimation(animationMap[this.currentState]);
   }
 
+  defeatEnemy(enemy) {
+    console.log(`Enemy defeated by jumping: ${enemy.constructor.name}`);
+    enemy.die();
+    this.bounceOffEnemy();
+  }
+
+  isJumpingOnEnemy(enemy) {
+    const characterBottom = this.y + this.height;
+    const enemyTop = enemy.y;
+    const horizontalOverlap =
+      this.x + this.width > enemy.x && this.x < enemy.x + enemy.width;
+
+    return (
+      characterBottom >= enemyTop && horizontalOverlap && this.isAboveGround()
+    );
+  }
+
+  bounceOffEnemy() {
+    this.speedY = 15;
+  }
+
   // --- Aktionen ---
   throwBottle() {
     console.log("Available bottles:", this.collectedBottles);
@@ -335,13 +327,22 @@ class Character extends MoveableObject {
   }
 
   //Hilfsmethoden
+  stopSnoring() {
+    if (this.isSnoring) {
+      this.world.soundManager.stop("snoringPepe");
+      this.isSnoring = false;
+    }
+  }
+
   handleRightInput() {
     this.moveRight();
+    this.stopSnoring();
     this.isMoving = true;
   }
 
   handleLeftInput() {
     this.moveLeft();
+    this.stopSnoring();
     this.isMoving = true;
   }
 
@@ -376,6 +377,7 @@ class Character extends MoveableObject {
   }
 
   setIdle() {
+    if (this.world?.gameManager?.isPaused) return;
     this.setState(this.STATES.IDLE);
     if (this.isSnoring) {
       this.world.soundManager.stop("snoringPepe");
