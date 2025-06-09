@@ -130,7 +130,6 @@ class World {
     this.throwableObjects.forEach((bottle, bottleIndex) => {
       this.level.enemies.forEach((enemy) => {
         if (bottle.isColliding(enemy) && !enemy.isDead) {
-          console.log("Flasche trifft Feind", enemy);
           enemy.die();
           this.throwableObjects.splice(bottleIndex, 1);
         }
@@ -161,10 +160,10 @@ class World {
       if (this.canThrow) {
         const didThrow = this.character.throwBottle();
         if (didThrow) this.updateThrowBar();
-        this.canThrow = false; // Jetzt nicht mehr werfen, bis Taste losgelassen
+        this.canThrow = false; 
       }
     } else {
-      this.canThrow = true; // Taste losgelassen, wieder bereit für neuen Wurf
+      this.canThrow = true;
     }
     this.bottleEnemyCollision();
   }
@@ -178,12 +177,7 @@ class World {
       bar: this.coinBar,
       maxItems: this.level.totalCoins,
       onCollect: () => {
-        console.log("onCollect() for coin called");
-        console.log("Character in onCollect (coins):", this.character);
         this.character.collectedCoins++;
-        console.log(
-          `Coin added. Total coins: ${this.character.collectedCoins}`
-        );
         this.updateCoinBar();
       },
     });
@@ -198,9 +192,6 @@ class World {
       maxItems: this.level.totalBottles,
       onCollect: () => {
         this.character.collectedBottles++;
-        console.log(
-          `Bottle added. Total bottles: ${this.character.collectedBottles}`
-        );
         this.updateThrowBar();
       },
     });
@@ -214,21 +205,10 @@ class World {
       if (this.character.isColliding(item)) {
         console.log(`${itemType} gesammelt`);
         items.splice(index, 1); // Entferne Item aus dem Level
-
-        // Aktion beim Sammeln
         if (onCollect) onCollect();
-
-        // Audio abspielen
-        if (sound && soundManager) {
-          soundManager.play(sound);
-        } else {
-          console.warn(`SoundManager or soundName is not defined`);
-        }
-
-        // Statusleiste aktualisieren
+        if (sound && soundManager) soundManager?.play(sound);
         if (bar && maxItems) {
-          const percentage =
-            (this.character[characterProperty] / maxItems) * 100;
+          const percentage = (this.character[characterProperty] / maxItems) * 100;
           bar.setPercentage(percentage);
         }
       }
@@ -262,15 +242,10 @@ class World {
       console.log("🌍 Game-Loop gestoppt");
     }
 
-    if (this.character && typeof this.character.stop === "function")
-      this.character.stop();
-    if (this.endboss && typeof this.endboss.stop === "function")
-      this.endboss.stop();
-
+    if (this.character && typeof this.character.stop === "function")  this.character.stop();
+    if (this.endboss && typeof this.endboss.stop === "function") this.endboss.stop();
     for (let enemy of this.enemies || []) {
-      if (typeof enemy.stop === "function") {
-        enemy.stop();
-      }
+      if (typeof enemy.stop === "function") enemy.stop();
     }
   }
 
@@ -338,12 +313,7 @@ class World {
     console.log(
       `Updating ThrowBar: ${percentage}% (Collected: ${this.character.collectedBottles}, Total: ${maxBottles})`
     );
-
-    if (this.throwBar) {
-      this.throwBar.setPercentage(percentage);
-    } else {
-      console.error("ThrowBar is not initialized!");
-    }
+    this.throwBar.setPercentage(percentage);
   }
 
   updateCoinBar() {
@@ -354,9 +324,9 @@ class World {
   }
 
    updateHealthBar() {
-    const percentage = (this.health / this.maxHealth) * 100;
-    if (this.world && this.world.healthBar) {
-      this.world.healthBar.setPercentage(percentage);
-    }
+    const maxHealth = this.level.maxHealth || 100;
+    const percentage = (this.character.health / maxHealth) * 100;
+    this.healthBar.setPercentage(percentage);
+    console.log(`Updated HealthBar: ${percentage}% (Health: ${this.character.health}, Max: ${maxHealth})`);
   }
 }
