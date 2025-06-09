@@ -119,6 +119,21 @@ function initializeGameManager() {
 }
 
 /**
+ * Toggles all sounds based on the current pause state of the game.
+ */
+function toggleSoundForPauseState() {
+  const isPaused = gameManager.isPaused;
+
+  if (isPaused) {
+    soundManager.resumeAll();
+    console.log("▶️ Musik fortgesetzt");
+  } else {
+    soundManager.pauseAll();
+    console.log("⏸ Musik pausiert");
+  }
+}
+
+/**
  * Adds an event listener for the space bar key to toggle game pause/resume.
  */
 function addPauseToggleWithSpace() {
@@ -127,8 +142,8 @@ function addPauseToggleWithSpace() {
 
   window.addEventListener("keydown", (e) => {
     if (e.code === "Space" && !e.repeat && gameManager?.isGameRunning) {
-      e.preventDefault(); // ✅ verhindert Scrollen bei Space
-      console.log("▶️ SPACE gedrückt");
+      e.preventDefault();
+      toggleSoundForPauseState();
       gameManager.togglePause();
     }
   });
@@ -174,6 +189,8 @@ function setupEventListeners() {
 function handlePause() {
   if (!gameManager) return;
   gameManager.pauseGame();
+  soundManager?.pauseAll();
+  console.log("⏸ Spiel pausiert");
   togglePauseResumeButtons(true);
 }
 
@@ -183,6 +200,8 @@ function handlePause() {
 function handleResume() {
   if (!gameManager) return;
   gameManager.resumeGame();
+  soundManager?.resumeAll();
+  console.log("▶️ Spiel fortgesetzt");
   togglePauseResumeButtons(false);
 }
 
@@ -201,8 +220,6 @@ function togglePauseResumeButtons(isPaused) {
  * @param {KeyboardEvent} e - The keyboard event.
  */
 function handleKeyDown(e) {
-  console.log(gameManager, "* gameManager");
-  // Check if gameManager exists and the game is running
   if (!gameManager || !gameManager.isGameRunning) return;
   const key = e.key.toLowerCase();
   if (key === "arrowright") keyboard.RIGHT = true;
@@ -227,6 +244,7 @@ function handleKeyUp(e) {
   if (key === "d") keyboard.D = false;
 }
 
+
 /**
  * Hides the game over screen by changing its CSS classes.
  */
@@ -238,12 +256,4 @@ function hideGameOverScreen() {
   }
 }
 
-/**
- * Checks device orientation and shows an overlay if in portrait mode.
- */
-function checkOrientation() {
-  const overlay = document.getElementById("rotate-device-overlay");
-  if (!overlay) return;
-  overlay.style.display =
-    window.innerHeight > window.innerWidth ? "flex" : "none";
-}
+
