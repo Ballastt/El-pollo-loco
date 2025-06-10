@@ -74,20 +74,13 @@ class Chicken extends MoveableObject {
   }
 
   removeEnemy() {
-    if (this.isRemoved) return console.warn("Enemy already removed:", this);
+    if (this.isRemoved) return;
 
-    console.log("removeEnemy wurde aufgerufen:", this);
     const index = this.enemies.indexOf(this);
-    console.log("Enemy index in array:", index);
-
     if (index > -1) {
-      const removedEnemy = this.enemies.splice(index, 1)[0];
-      console.log(`Removed enemy:`, removedEnemy);
-      this.isRemoved = true; // Markiere das Huhn als entfernt
-    } else {
-      console.error("Enemy not found in the array!");
+      this.enemies.splice(index, 1);
+      this.isRemoved = true;
     }
-    console.log("Enemies array after removal:", this.enemies);
   }
 
   deathAnimationChicken() {
@@ -104,13 +97,11 @@ class Chicken extends MoveableObject {
         }, 500); // 1 Sekunde Verzögerung
       }
     }, 200); // Verlängertes Intervall für bessere Sichtbarkeit
-
-    
   }
 
   die() {
     if (this.isDead) return console.warn("Chicken is already dead:", this);
-    
+
     this.isRemoving = true;
     this.isDead = true; // direkt synchron setzen
 
@@ -118,7 +109,7 @@ class Chicken extends MoveableObject {
     clearInterval(this.animationInterval);
 
     this.soundManager.play(this.deathSoundKey);
-  
+
     this.isRunning = false;
     this.deathAnimationChicken();
   }
