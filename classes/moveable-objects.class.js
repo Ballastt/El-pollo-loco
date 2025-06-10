@@ -167,9 +167,7 @@ class MoveableObject extends DrawableObject {
   die() {
     if (!this.isDead) {
       this.isDead = true;
-
-      clearInterval(this.gravityInterval);
-      console.log(`${this.constructor.name} ist gestorben!`);
+      clearInterval(this.gravityInterval)
     }
   }
 }
