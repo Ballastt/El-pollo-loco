@@ -1,19 +1,97 @@
+/**
+ * Represents the Endboss enemy in the game.
+ * Handles state, animation, movement, collision, and sound logic.
+ * @extends MoveableObject
+ */
 class Endboss extends MoveableObject {
+  /**
+   * Reference to the game world.
+   * @type {World}
+   */
   world;
+
+  /**
+   * Reference to the player character.
+   * @type {Character}
+   */
   character;
+
+  /**
+   * Height of the endboss.
+   * @type {number}
+   */
   height = 400;
+
+  /**
+   * Width of the endboss.
+   * @type {number}
+   */
   width = 300;
+
+  /**
+   * Indicates if the endboss is dead.
+   * @type {boolean}
+   */
   isDead = false;
+
+  /**
+   * Timestamp until which the endboss is hurt.
+   * @type {number}
+   */
   hurtUntil = 0;
+
+  /**
+   * Current state of the endboss.
+   * @type {string}
+   */
   currentState = "walking";
+
+  /**
+   * Walking speed.
+   * @type {number}
+   */
   speedWalk = 15;
+
+  /**
+   * Attack speed.
+   * @type {number}
+   */
   speedAttack = 45;
+
+  /**
+   * Jump force for the endboss.
+   * @type {number}
+   */
   jumpForce = 30;
+
+  /**
+   * Cooldown timestamp for charging attack.
+   * @type {number}
+   */
   chargeCooldown = 0;
+
+  /**
+   * Indicates if the intro sound has been played.
+   * @type {boolean}
+   */
   introSoundPlayed = false;
+
+  /**
+   * Indicates if the endboss is paused.
+   * @type {boolean}
+   */
   isPaused = false;
+
+  /**
+   * Distance at which the endboss starts attacking.
+   * @type {number}
+   */
   ATTACK_DISTANCE = 370;
 
+  /**
+   * Walking animation images.
+   * @type {string[]}
+   */
   IMAGES_WALKING = [
     "img/4_enemie_boss_chicken/1_walk/G1.png",
     "img/4_enemie_boss_chicken/1_walk/G2.png",
@@ -21,6 +99,10 @@ class Endboss extends MoveableObject {
     "img/4_enemie_boss_chicken/1_walk/G4.png",
   ];
 
+  /**
+   * Alert animation images.
+   * @type {string[]}
+   */
   IMAGES_ALERT = [
     "img/4_enemie_boss_chicken/2_alert/G5.png",
     "img/4_enemie_boss_chicken/2_alert/G6.png",
@@ -32,6 +114,10 @@ class Endboss extends MoveableObject {
     "img/4_enemie_boss_chicken/2_alert/G12.png",
   ];
 
+  /**
+   * Attack animation images.
+   * @type {string[]}
+   */
   IMAGES_ATTACK = [
     "img/4_enemie_boss_chicken/3_attack/G13.png",
     "img/4_enemie_boss_chicken/3_attack/G14.png",
@@ -43,18 +129,30 @@ class Endboss extends MoveableObject {
     "img/4_enemie_boss_chicken/3_attack/G20.png",
   ];
 
+  /**
+   * Hurt animation images.
+   * @type {string[]}
+   */
   IMAGES_HURT = [
     "img/4_enemie_boss_chicken/4_hurt/G21.png",
     "img/4_enemie_boss_chicken/4_hurt/G22.png",
     "img/4_enemie_boss_chicken/4_hurt/G23.png",
   ];
 
+  /**
+   * Dead animation images.
+   * @type {string[]}
+   */
   IMAGES_DEAD = [
     "img/4_enemie_boss_chicken/5_dead/G24.png",
     "img/4_enemie_boss_chicken/5_dead/G25.png",
     "img/4_enemie_boss_chicken/5_dead/G26.png",
   ];
 
+  /**
+   * State constants for the endboss.
+   * @type {Object}
+   */
   STATES = {
     WALKING: "walking",
     ALERT: "alert",
@@ -63,6 +161,11 @@ class Endboss extends MoveableObject {
     DEAD: "dead",
   };
 
+  /**
+   * Creates a new Endboss instance.
+   * @param {Character} character - The player character.
+   * @param {World} world - The game world instance.
+   */
   constructor(character, world) {
     super();
     this.character = character;
@@ -76,14 +179,18 @@ class Endboss extends MoveableObject {
 
     this.applyGravity();
     this.animate();
-
-    console.log(`Endboss initialisiert mit Leben: ${this.health}`);
   }
 
+  /**
+   * Starts the animation loop for the endboss.
+   */
   animate() {
     this.startAnimationLoop();
   }
 
+  /**
+   * Starts the animation interval for the endboss.
+   */
   startAnimationLoop() {
     this.animationInterval = setInterval(() => {
       if (this.isPaused) return;
@@ -93,12 +200,18 @@ class Endboss extends MoveableObject {
     }, 100);
   }
 
+  /**
+   * Initializes the endboss position.
+   */
   initPosition() {
     this.x = 6300;
     this.y = 50;
     this.groundY = 50;
   }
 
+  /**
+   * Loads all endboss images.
+   */
   initImages() {
     this.loadImage(this.IMAGES_WALKING[0]);
     this.loadImages(this.IMAGES_WALKING);
@@ -108,6 +221,9 @@ class Endboss extends MoveableObject {
     this.loadImages(this.IMAGES_DEAD);
   }
 
+  /**
+   * Initializes the endboss hitbox.
+   */
   initHitbox() {
     this.hitbox = {
       offsetX: 10,
@@ -117,6 +233,9 @@ class Endboss extends MoveableObject {
     };
   }
 
+  /**
+   * Handles the endboss animation based on its current state.
+   */
   handleAnimations() {
     switch (this.currentState) {
       case this.STATES.WALKING:
@@ -137,19 +256,26 @@ class Endboss extends MoveableObject {
     }
   }
 
+  /**
+   * Pauses the endboss animation and logic.
+   */
   pause() {
     this.isPaused = true;
-    console.log("Endboss pausiert.");
   }
 
+  /**
+   * Resumes the endboss animation and logic.
+   */
   resume() {
     this.isPaused = false;
-    console.log("Endboss läuft weiter.");
   }
 
+  /**
+   * Updates the endboss state based on health, distance, and timers.
+   */
   updateState() {
-    if (this.isDead) return; // 🧹 Wenn tot, dann nichts mehr tun
-    if (this.health <= 0) return this.die(); // stirbt nur 1×
+    if (this.isDead) return;
+    if (this.health <= 0) return this.die();
     if (Date.now() < this.hurtUntil) return this.setHurtState();
 
     const distanceToPlayer = this.calculateDistance(
@@ -162,45 +288,48 @@ class Endboss extends MoveableObject {
     return this.setWalkingState();
   }
 
+  /**
+   * Sets the endboss to the hurt state and stops relevant sounds.
+   */
   setHurtState() {
     this.currentState = this.STATES.HURT;
-    console.log("State: HURT - stoppe alle Sounds");
     this.soundManager.stop("endbossClucking");
     this.soundManager.stop("endbossAngry");
   }
 
+  /**
+   * Sets the endboss to the attack state and plays relevant sounds.
+   */
   setAttackState() {
     if (this.currentState !== this.STATES.ATTACK) {
-      console.log(
-        "State: ATTACK - spiele 'endbossAngry', stoppe 'endbossClucking'"
-      );
       this.soundManager.stop("endbossClucking");
       this.soundManager.play("endbossAngry");
     }
     this.currentState = this.STATES.ATTACK;
   }
 
+  /**
+   * Sets the endboss to the alert state and plays relevant sounds.
+   */
   setAlertState() {
     if (this.currentState !== this.STATES.ALERT) {
-      console.log(
-        "State: ALERT - spiele 'endbossClucking', stoppe 'endbossAngry'"
-      );
       this.soundManager.play("endbossClucking");
       this.soundManager.stop("endbossAngry");
     }
     this.currentState = this.STATES.ALERT;
 
-    console.log(this.introSoundPlayed);
     if (!this.introSoundPlayed) {
       this.soundManager.play("introEndboss");
       this.introSoundPlayed = true;
-      console.log("🎵 Intro abgespielt");
     }
   }
 
+  /**
+   * Sets the endboss to the walking state and plays relevant sounds.
+   */
   setWalkingState() {
     if (this.currentState !== this.STATES.WALKING) {
-      console.log(
+      console.error(
         "State: WALKING - spiele 'endbossClucking', stoppe 'endbossAngry'"
       );
       this.soundManager.stop("endbossAngry");
@@ -209,20 +338,30 @@ class Endboss extends MoveableObject {
     this.currentState = this.STATES.WALKING;
   }
 
-  // Berechnung der Distanz zwischen Endboss und Charakter
+  /**
+   * Calculates the distance between the endboss and the character.
+   * @param {number} characterX - X position of the character.
+   * @param {number} characterY - Y position of the character.
+   * @returns {number} The distance.
+   */
   calculateDistance(characterX, characterY) {
     const dx = this.x - characterX;
     const dy = this.y - characterY;
-    return Math.sqrt(dx * dx + dy * dy); // Pythagoras: √(dx² + dy²)
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
-  //Endboss bewegt sich nur, wenn Charakter am Ende des Spiels
+  /**
+   * Checks if the character is at the end and moves the endboss if so.
+   */
   checkCharacterPositionAndMove() {
     if (this.character.x >= 6000) {
       this.moveTowardsCharacter();
     }
   }
 
+  /**
+   * Ensures the clucking sound is playing if appropriate.
+   */
   ensureClucking() {
     if (
       !this.isDead &&
@@ -233,6 +372,9 @@ class Endboss extends MoveableObject {
     }
   }
 
+  /**
+   * Moves the endboss depending on its current state.
+   */
   moveDependingOnState() {
     if (this.isDead) return;
 
@@ -248,6 +390,10 @@ class Endboss extends MoveableObject {
     }
   }
 
+  /**
+   * Moves the endboss towards the character.
+   * @param {number} [speed=this.speedWalk] - The speed to move.
+   */
   moveTowardsCharacter(speed = this.speedWalk) {
     if (!this.character) return;
     const characterX = this.character.x;
@@ -255,6 +401,10 @@ class Endboss extends MoveableObject {
     else if (this.x < characterX) this.x += speed;
   }
 
+  /**
+   * Hurts the endboss, reducing its health and triggering hurt state.
+   * @param {number} [damage=10] - The amount of damage.
+   */
   hurt(damage = 10) {
     const now = Date.now();
     if (now < this.hurtUntil || this.isDead) return;
@@ -271,28 +421,28 @@ class Endboss extends MoveableObject {
     }
   }
 
+  /**
+   * Handles the death of the endboss, plays sounds, and triggers game win.
+   */
   die() {
     if (this.isDead) return;
     this.isDead = true;
     this.currentState = this.STATES.DEAD;
     this.playAnimation(this.IMAGES_DEAD);
-    console.log("⚰️ Endboss ist tot.");
 
-    // Sounds nur EINMAL stoppen
     this.soundManager.play("endbossDying");
     this.soundManager.stop("endbossClucking");
     this.soundManager.stop("endbossAngry");
 
-    console.log("📦 this.world =", this.world);
-    console.log("🎮 this.world.gameManager =", this.world?.gameManager);
-
     setTimeout(() => {
-      console.log("Death-Animation abgeschlossen");
       this.soundManager.play("gameWon");
       this.world.gameManager.gameWon?.();
-    }, 2000); // 2 Sekunden für die Animation
+    }, 2000);
   }
 
+  /**
+   * Stops the endboss animation interval.
+   */
   stop() {
     if (this.animationInterval) {
       clearInterval(this.animationInterval);
@@ -300,6 +450,9 @@ class Endboss extends MoveableObject {
     }
   }
 
+  /**
+   * Charges at the player if in attack state.
+   */
   chargePlayer() {
     const now = Date.now();
     if (now < this.chargeCooldown) return;
@@ -309,7 +462,8 @@ class Endboss extends MoveableObject {
     const direction = dx > 0 ? 1 : -1;
 
     if (distance > 30) this.x += direction * this.speedAttack;
-    if (!this.isAboveGround() && Math.random() < 0.75) this.speedY = this.jumpForce;
+    if (!this.isAboveGround() && Math.random() < 0.75)
+      this.speedY = this.jumpForce;
     if (distance < 100) this.chargeCooldown = now + 2000;
   }
 }
