@@ -26,8 +26,6 @@ class GameManager {
 
   stopGame() {
     if (!this.isGameRunning) return;
-
-    console.log("🛑 Spiel wird gestoppt...");
     this.isGameRunning = false;
 
     this.soundManager?.stopAll?.();
@@ -62,7 +60,6 @@ class GameManager {
   }
 
   gameOver() {
-    console.log("💀 Spiel verloren");
     this.isGameRunning = false;
     this.isGameOver = true;
     this.world?.stopGameLoop?.();
@@ -75,7 +72,6 @@ class GameManager {
   }
 
   gameWon() {
-    console.log("🏆 Spiel gewonnen");
     this.isGameRunning = false;
     this.world?.stopGameLoop?.();
 
@@ -101,16 +97,12 @@ class GameManager {
 
   resumeGame() {
     if (!this.isGameRunning) return;
-    console.log("▶️ Spiel fortgesetzt");
     this.isPaused = false;
     this.world?.resumeObjects?.();
     this.soundManager?.resumeAll?.();
   }
 
   restartGame() {
-    console.log("Enemies nach Restart:", world.level.enemies);
-    console.log("🚨 RestartGame gestartet — aktuelle World:", this.world);
-
     this.pauseAndResetState();
     this.clearWorld();
     this.startNewGame();
