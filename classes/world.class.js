@@ -146,7 +146,6 @@ class World {
         bottle.isColliding(this.endboss) &&
         !this.endboss.isDead
       ) {
-        console.log("Flasche trifft Endboss");
         this.endboss.hurt(20);
         this.throwableObjects.splice(bottleIndex, 1);
       }
@@ -221,7 +220,6 @@ class World {
       this.endboss.pause();
       this.level.enemies.forEach((enemy) => enemy.pause());
       this.level.clouds.forEach((cloud) => cloud.pause());
-      console.log("Alle Objekte pausiert");
     }
   }
 
@@ -231,7 +229,6 @@ class World {
       this.endboss.resume();
       this.level.enemies.forEach((enemy) => enemy.resume());
       this.level.clouds.forEach((cloud) => cloud.resume());
-      console.log("Alle Objekte fortgesetzt");
     }
   }
 
@@ -239,7 +236,6 @@ class World {
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
-      console.log("🌍 Game-Loop gestoppt");
     }
 
     if (this.character && typeof this.character.stop === "function")  this.character.stop();
@@ -261,7 +257,6 @@ class World {
     if (!this.gameManager.isGameRunning) return;
 
     if (this.character.isDead) {
-      console.log("☠️ Game Over detected in World");
       this.gameManager.isGameRunning = false;
       this.stopObjects(); // Stoppt draw() und gameLoopInterval
       this.gameManager.gameOver(); // Zeigt ggf. Menü, etc.
@@ -309,10 +304,6 @@ class World {
   updateThrowBar() {
     const maxBottles = this.level.totalBottles || 30;
     const percentage = (this.character.collectedBottles / maxBottles) * 100;
-
-    console.log(
-      `Updating ThrowBar: ${percentage}% (Collected: ${this.character.collectedBottles}, Total: ${maxBottles})`
-    );
     this.throwBar.setPercentage(percentage);
   }
 
@@ -320,13 +311,11 @@ class World {
     const maxCoins = this.level.totalCoins || 40;
     const percentage = (this.character.collectedCoins / maxCoins) * 100;
     this.coinBar.setPercentage(percentage);
-    console.log(`Updated CoinBar: ${percentage}%`);
   }
 
    updateHealthBar() {
     const maxHealth = this.level.maxHealth || 100;
     const percentage = (this.character.health / maxHealth) * 100;
     this.healthBar.setPercentage(percentage);
-    console.log(`Updated HealthBar: ${percentage}% (Health: ${this.character.health}, Max: ${maxHealth})`);
   }
 }
