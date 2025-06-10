@@ -91,7 +91,7 @@ function checkOrientation() {
  * @returns {boolean} True if in landscape and screen is smaller than 1024px wide.
  */
 function isMobileLandscape() {
-  return window.innerWidth > window.innerHeight && window.innerWidth < 1224;
+  return window.innerWidth > window.innerHeight && window.innerWidth < 1024;
 }
 
 /**
