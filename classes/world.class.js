@@ -342,8 +342,7 @@ class World {
 
     items.forEach((item, index) => {
       if (this.character.isColliding(item)) {
-        console.log(`${itemType} gesammelt`);
-        items.splice(index, 1); // Entferne Item aus dem Level
+        items.splice(index, 1); 
         if (onCollect) onCollect();
         if (sound && soundManager) soundManager?.play(sound);
         if (bar && maxItems) {
