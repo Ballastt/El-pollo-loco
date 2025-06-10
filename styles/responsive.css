@@ -1,4 +1,4 @@
-@media (min-height: 481px) and (max-height: 1024px) {
+@media screen and (max-width: 1224px) {
   html,
   body {
     margin: 0;
@@ -11,10 +11,9 @@
 
   canvas {
     position: fixed;
-    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
   }
 
   #startScreen-img {
@@ -23,10 +22,14 @@
     object-fit: fill;
   }
 
+  #background-image {
+    display: none;
+  }
+
   .buttons {
     flex-direction: row;
     gap: 1.5rem;
-    margin-top: -4rem;
+    margin-top: -3rem;
     max-width: 700px;
   }
 
@@ -47,9 +50,81 @@
     height: 46px;
     font-size: 20px;
   }
+
+  #game-over-screen {
+    width: 100vw;
+    height: 100dvh;
+  }
+
+  #game-over-background {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+
+  #mobile-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  #mobile-controls button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px; /* icon size */
+    width: 60px; /* smaller but still tap-friendly */
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    pointer-events: all;
+    padding: 0;
+    margin: 10px;
+  }
+
+  .control-left,
+  .control-right {
+    position: absolute;
+    bottom: 0px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .control-left {
+    left: 20px;
+  }
+
+  .control-right {
+    right: 20px;
+  }
+
+  .control-top {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  #salsa-bottle {
+    width: 60px;
+    height: 60px;
+  }
 }
 
-@media (min-height: 200px) and (max-height: 480px) {
+@media screen and (max-width: 800px) {
   html,
   body {
     margin: 0;
@@ -62,10 +137,9 @@
 
   canvas {
     position: fixed;
-    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
   }
 
   .startscreen-wrapper {
@@ -134,7 +208,7 @@
   #game-over-background {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: fill;
   }
 
   .impressum-content {
@@ -143,13 +217,73 @@
     overflow-y: auto;
   }
 
-  #background-image,
-  footer {
+  #background-image {
     display: none;
   }
 
   #restart-btn {
     margin-top: 1rem;
+  }
+
+  #mobile-controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  #mobile-controls button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px; /* icon size */
+    width: 40px; /* smaller but still tap-friendly */
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    pointer-events: all;
+    padding: 0;
+    margin: 6px;
+  }
+
+  .control-left,
+  .control-right {
+    position: absolute;
+    bottom: 0px;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .control-left {
+    left: 20px;
+  }
+
+  .control-right {
+    right: 20px;
+  }
+
+  .control-top {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  #salsa-bottle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hidden {
+    display: none !important;
   }
 }
 
@@ -166,8 +300,8 @@
     left: 0;
     box-sizing: border-box;
     word-break: break-word;
-    width: 100vw;
-    height: 100dvh; /* ✅ Dynamic viewport height (modern mobile fix) */
+    width: 100%; /* ✅ Full viewport width */
+    height: 100%; /* ✅ Dynamic viewport height (modern mobile fix) */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -177,12 +311,5 @@
     text-align: center;
     font-size: 24px;
     touch-action: none;
-  }
-
-  canvas,
-  #background-image,
-  #start-screen,
-  #game-over-screen {
-    display: none;
   }
 }
