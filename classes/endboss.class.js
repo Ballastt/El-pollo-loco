@@ -329,9 +329,6 @@ class Endboss extends MoveableObject {
    */
   setWalkingState() {
     if (this.currentState !== this.STATES.WALKING) {
-      console.error(
-        "State: WALKING - spiele 'endbossClucking', stoppe 'endbossAngry'"
-      );
       this.soundManager.stop("endbossAngry");
       this.soundManager.play("endbossClucking");
     }
