@@ -81,7 +81,7 @@ class GameManager {
     if (!this.isGameRunning) return;
     this.isGameRunning = false;
 
-    this.soundManager?.stopAll?.();
+    this.soundManager?.stopAll();
     clearInterval(this.world?.characterMovementInterval);
     clearInterval(this.world?.characterAnimationInterval);
     window.removeEventListener("keydown", handleKeyDown);
