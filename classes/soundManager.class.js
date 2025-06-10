@@ -43,8 +43,6 @@ class SoundManager {
     sound.currentTime = 0;
     sound.loop = false;
     sound.onended = () => (this.playingFlags[key] = false);
-
-    console.log(`[SoundManager] Spiele ab: ${key}`);
   }
 
   startPlayback(key) {
@@ -76,28 +74,23 @@ class SoundManager {
   }
 
   pauseAll() {
-    console.log("[SoundManager] Pausiere alle Sounds...");
     for (const key in this.sounds) {
       const sound = this.sounds[key];
       if (sound && !sound.paused) {
         sound.pause();
         this.playingFlags[key] = false; // 🔧 Important!
-        console.log(`[SoundManager] Sound pausiert: ${key}`);
       }
     }
   }
 
   resumeAll() {
-    console.log("[SoundManager] Setze pausierte Loops fort...");
     for (const key in this.sounds) {
       const sound = this.sounds[key];
-
       const isLoop = this.loopFlags?.[key]; // <- prüfe ob Sound ein Loop ist
 
       if (sound && sound.paused && isLoop && !sound.ended) {
         try {
           sound.play();
-          console.log(`[SoundManager] Loop-Sound fortgesetzt: ${key}`);
         } catch (e) {
           console.warn(`[SoundManager] Fehler beim Fortsetzen von ${key}:`, e);
         }
@@ -135,14 +128,16 @@ class SoundManager {
     this.isMuted = false;
     localStorage.setItem("isMuted", JSON.stringify(false));
 
-    // Only play looped sounds *after* user interaction
+    // Resume looping sounds immediately if needed
     if (userInteracted) {
       for (const key in this.sounds) {
         const sound = this.sounds[key];
-        if (sound.loop) {
-          sound
-            .play()
-            .catch((err) => console.warn(`Playback blocked: ${err.message}`));
+        if (this.loopFlags[key] && sound.paused) {
+          try {
+            sound.play();
+          } catch (err) {
+            console.warn(`Loop resume failed for ${key}:`, err);
+          }
         }
       }
     }
