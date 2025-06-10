@@ -46,7 +46,7 @@ function generateBackgroundObjects(layerSets) {
  * @returns {SmallChicken|NormalChicken} The newly created enemy instance.
  */
 function createEnemy(x, enemies) {
-  const EnemyClass = Math.random() < 0.5 ? SmallChicken : NormalChicken;
+  const EnemyClass = Math.random() < 0.3 ? SmallChicken : NormalChicken;
   const enemy = new EnemyClass(x, enemies);
   enemy.enemies = enemies;
   return enemy;
@@ -60,8 +60,8 @@ function createEnemy(x, enemies) {
  */
 function generateEnemies() {
   const enemies = [];
-  const amount = 30;
-  const levelLength = 6200;
+  const amount = 35;
+  const levelLength = 6000;
   const availableSpace = levelLength - 600; // Platz ab x=600 bis zum Ende
   const spacing = availableSpace / amount;
 
@@ -70,10 +70,6 @@ function generateEnemies() {
     enemies.push(createEnemy(x, enemies));
   }
 
-  console.log(
-    "🐤 Neue Gegner generiert:",
-    enemies.map((e) => Math.round(e.x))
-  );
   return enemies;
 }
 
