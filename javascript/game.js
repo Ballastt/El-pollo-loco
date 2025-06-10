@@ -61,7 +61,6 @@ function setupStartButton() {
     showLoading(false);
     if (!level1) initLevel();
     initializeGameManager(); // <- Immer aufrufen
-    console.log("✅ GameManager initialisiert:", gameManager);
 
     const bgObjects = generateBackgroundObjects(layerSets);
     world.setBackgroundObjects(bgObjects);
@@ -126,10 +125,8 @@ function toggleSoundForPauseState() {
 
   if (isPaused) {
     soundManager.resumeAll();
-    console.log("▶️ Musik fortgesetzt");
   } else {
     soundManager.pauseAll();
-    console.log("⏸ Musik pausiert");
   }
 }
 
@@ -190,7 +187,6 @@ function handlePause() {
   if (!gameManager) return;
   gameManager.pauseGame();
   soundManager?.pauseAll();
-  console.log("⏸ Spiel pausiert");
   togglePauseResumeButtons(true);
 }
 
@@ -201,7 +197,6 @@ function handleResume() {
   if (!gameManager) return;
   gameManager.resumeGame();
   soundManager?.resumeAll();
-  console.log("▶️ Spiel fortgesetzt");
   togglePauseResumeButtons(false);
 }
 
