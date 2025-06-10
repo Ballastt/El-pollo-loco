@@ -1,29 +1,92 @@
+/**
+ * Represents the main player character in the game.
+ * Handles movement, animation, collisions, state, and interactions.
+ * @extends MoveableObject
+ */
 class Character extends MoveableObject {
-  // --- Eigenschaften ---
+  /**
+   * Reference to the game world.
+   * @type {World}
+   */
   world;
+
+  /**
+   * Timestamp of the last time the character was hit.
+   * @type {number}
+   */
   lastHit = 0;
+
+  /**
+   * Indicates if the character is dead.
+   * @type {boolean}
+   */
   isDead = false;
+
+  /**
+   * Timestamp until which the character is hurt.
+   * @type {number}
+   */
   hurtUntil = 0;
+
+  /**
+   * Indicates if the character is currently snoring (long idle).
+   * @type {boolean}
+   */
   isSnoring = false;
 
-  // --- Konstruktor ---
+  /**
+   * Creates a new Character instance.
+   * @param {World} world - The game world instance.
+   */
   constructor(world) {
     super().loadImage("/img/2_character_pepe/2_walk/W-21.png");
 
     if (!world) throw new Error("world-instanz muss übergeben werden");
     this.world = world;
 
+    /**
+     * The character's health.
+     * @type {number}
+     */
     this.health = 100;
+
+    /**
+     * Number of collected coins.
+     * @type {number}
+     */
     this.collectedCoins = 0;
+
+    /**
+     * Number of collected bottles.
+     * @type {number}
+     */
     this.collectedBottles = 0;
 
     // assuming this is loaded before character.js in HTML:
+    /**
+     * Character state constants.
+     * @type {Object}
+     */
     this.STATES = CharacterStates;
+
+    /**
+     * Character image assets.
+     * @type {Object}
+     */
     this.IMAGES = CharacterAssets;
 
     this.isDead = false;
+
+    /**
+     * Reference to the sound manager.
+     * @type {SoundManager}
+     */
     this.soundManager = soundManager;
 
+    /**
+     * The current state of the character.
+     * @type {string}
+     */
     this.currentState = this.STATES.IDLE;
 
     this.initDimensions();
@@ -33,12 +96,17 @@ class Character extends MoveableObject {
     this.animate();
   }
 
-  // --- Animations- und Bewegungssteuerung ---
+  /**
+   * Starts the movement and animation loops.
+   */
   animate() {
     this.startMovementLoop();
     this.startAnimationLoop();
   }
 
+  /**
+   * Starts the movement interval.
+   */
   startMovementLoop() {
     this.movementInterval = setInterval(() => {
       this.handleMovement();
@@ -49,12 +117,18 @@ class Character extends MoveableObject {
     }, 1000 / 60);
   }
 
+  /**
+   * Starts the animation interval.
+   */
   startAnimationLoop() {
     this.animationInterval = setInterval(() => {
       this.handleAnimations();
     }, 50);
   }
 
+  /**
+   * Initializes character dimensions.
+   */
   initDimensions() {
     this.x = 20;
     this.width = 120;
@@ -64,6 +138,9 @@ class Character extends MoveableObject {
     this.y = this.groundY;
   }
 
+  /**
+   * Loads all character images.
+   */
   initImages() {
     this.loadImages(this.IMAGES.WALKING);
     this.loadImages(this.IMAGES.JUMPING);
@@ -73,6 +150,9 @@ class Character extends MoveableObject {
     this.loadImages(this.IMAGES.DEAD);
   }
 
+  /**
+   * Initializes the character's hitbox.
+   */
   initHitbox() {
     this.hitbox = {
       offsetX: 10,
@@ -82,6 +162,9 @@ class Character extends MoveableObject {
     };
   }
 
+  /**
+   * Stops all movement and animation intervals.
+   */
   stop() {
     if (this.movementInterval) {
       clearInterval(this.movementInterval);
@@ -93,6 +176,9 @@ class Character extends MoveableObject {
     }
   }
 
+  /**
+   * Resets the character to its initial state.
+   */
   reset() {
     super.reset();
 
@@ -109,6 +195,9 @@ class Character extends MoveableObject {
     this.setState(this.STATES.IDLE);
   }
 
+  /**
+   * Resets character stats (health, coins, bottles, etc).
+   */
   resetStats() {
     this.health = this.maxHealth;
     this.collectedCoins = 0;
@@ -118,12 +207,18 @@ class Character extends MoveableObject {
     this.lastMoveTime = Date.now();
   }
 
+  /**
+   * Resets character position.
+   */
   resetPosition() {
     this.x = 20;
     this.y = this.groundY;
     this.speedY = 0;
   }
 
+  /**
+   * Resets character flags (dead, snoring, etc).
+   */
   resetFlags() {
     this.isDead = false;
     this.isSnoring = false;
@@ -132,6 +227,9 @@ class Character extends MoveableObject {
     this.world?.soundManager?.stop("snoringPepe"); // Sicherheitsnetz
   }
 
+  /**
+   * Stops all character-related sounds.
+   */
   stopAllSounds() {
     const sm = this.world?.soundManager;
     if (!sm) return;
@@ -139,52 +237,63 @@ class Character extends MoveableObject {
     sm.stop("walkingSound");
   }
 
+  /**
+   * Checks collision with the endboss and handles hit logic.
+   * @param {Endboss} endboss
+   */
   checkCollisionsWithEndboss(endboss) {
     if (this.isColliding(endboss) && this.canBeHit()) {
       if (endboss.currentState === endboss.STATES.ATTACK) {
-        console.log("Kollision mit dem Endboss während Angriff");
         this.setState(this.STATES.HURT);
         this.hurtUntil = Date.now() + 500;
 
         this.hit(10); // nur im Angriffszustand!
       } else {
-        console.log("Kollision mit Endboss, aber kein Angriff");
+        console.error("Kollision mit Endboss, aber kein Angriff");
       }
     }
   }
 
+  /**
+   * Checks collision with enemies and handles hit/defeat logic.
+   * @param {Array<Enemy>} enemies
+   */
   checkCollisionsWithEnemy(enemies) {
     if (!this.world?.gameManager?.isGameRunning || this.isDead) return;
     if (!this.canBeHit()) return;
 
     for (let enemy of enemies) {
       if (enemy.isDead || !this.isColliding(enemy)) continue;
-
-      console.log("Check Enemy:", enemy.constructor.name, enemy.x, enemy.y);
-      console.log("isJumpingOnEnemy:", this.isJumpingOnEnemy(enemy));
-
       if (this.isJumpingOnEnemy(enemy)) {
         this.defeatEnemy(enemy);
       } else {
         this.receiveHitFrom(enemy);
-        break; // 👉 Nach einem Treffer abbrechen!
+        break; 
       }
     }
   }
 
+  /**
+   * Returns true if the character can be hit.
+   * @returns {boolean}
+   */
   canBeHit() {
     return Date.now() - this.lastHit >= 800;
   }
 
-  receiveHitFrom(enemy) {
+  /**
+   * Handles receiving a hit from an enemy.
+   */
+  receiveHitFrom() {
     this.setState(this.STATES.HURT);
     this.hurtUntil = Date.now() + 500;
     this.hit(10);
-    console.log(
-      `Collision with ${enemy.constructor.name}, remaining health: ${this.health}`
-    );
   }
 
+  /**
+   * Handles collision with a single enemy.
+   * @param {Enemy} enemy
+   */
   handleEnemyCollision(enemy) {
     if (enemy.isDead || !this.isColliding(enemy)) return;
 
@@ -195,39 +304,47 @@ class Character extends MoveableObject {
     }
   }
 
+  /**
+   * Applies damage to the character.
+   * @param {number} damage
+   */
   hit(damage) {
     const now = Date.now();
     if (now - this.lastHit < 1000) return; // Doppeltreffer blockieren
 
-    console.log("Character hit() aufgerufen");
     this.lastHit = now;
 
     this.health = Math.max(0, this.health - damage);
     this.world.updateHealthBar();
     if (this.world.soundManager) this.world.soundManager.play("hurtSound");
-
-    console.log(`Character getroffen! Gesundheit: ${this.health}`);
     if (this.health === 0) this.die();
   }
 
+  /**
+   * Handles character death.
+   */
   die() {
     super.die();
     this.playAnimation(this.IMAGES.DEAD);
     this.isDead = true;
 
-    console.log("Der Charakter ist gestorben!");
-    console.log(this.world.gameManager);
     if (this.world.soundManager) this.world.soundManager.stop("walkingSound");
     this.world?.gameManager?.gameOver(); // Spiel beenden
-    console.log("Game Over ausgelöst", this.world.gameManager.gameOver);
   }
 
   // --- Bewegungs- und Statussteuerung ---
+
+  /**
+   * Handles movement input and updates state.
+   */
   handleMovement() {
     this.handleInput();
     this.handleState();
   }
 
+  /**
+   * Handles keyboard input for movement.
+   */
   handleInput() {
     if (this.isDead || Date.now() < this.hurtUntil) return;
     this.isMoving = false;
@@ -239,6 +356,9 @@ class Character extends MoveableObject {
     if (this.world.keyboard.UP && !this.isAboveGround()) this.handleJumpInput();
   }
 
+  /**
+   * Updates the character's state based on current conditions.
+   */
   handleState() {
     const now = Date.now();
 
@@ -250,6 +370,9 @@ class Character extends MoveableObject {
     return this.setIdleOrLongIdleState(now);
   }
 
+  /**
+   * Plays or stops walking sound based on movement.
+   */
   handleWalkingSound() {
     if (this.isMoving) {
       if (this.world.soundManager) this.world.soundManager.play("walkingSound");
@@ -259,6 +382,10 @@ class Character extends MoveableObject {
   }
 
   // --- Animationen ---
+
+  /**
+   * Handles character animation based on state.
+   */
   handleAnimations() {
     const animationMap = {
       [this.STATES.JUMPING]: this.IMAGES.JUMPING,
@@ -272,12 +399,20 @@ class Character extends MoveableObject {
     this.playAnimation(animationMap[this.currentState]);
   }
 
+  /**
+   * Defeats an enemy and bounces off.
+   * @param {Enemy} enemy
+   */
   defeatEnemy(enemy) {
-    console.log(`Enemy defeated by jumping: ${enemy.constructor.name}`);
     enemy.die();
     this.bounceOffEnemy();
   }
 
+  /**
+   * Returns true if the character is jumping on the enemy.
+   * @param {Enemy} enemy
+   * @returns {boolean}
+   */
   isJumpingOnEnemy(enemy) {
     const characterBottom = this.y + this.height;
     const enemyTop = enemy.y;
@@ -289,14 +424,20 @@ class Character extends MoveableObject {
     );
   }
 
+  /**
+   * Makes the character bounce after defeating an enemy.
+   */
   bounceOffEnemy() {
     this.speedY = 15;
   }
 
   // --- Aktionen ---
-  throwBottle() {
-    console.log("Available bottles:", this.collectedBottles);
 
+  /**
+   * Throws a bottle if available.
+   * @returns {boolean} True if a bottle was thrown.
+   */
+  throwBottle() {
     if (this.collectedBottles > 0) {
       this.collectedBottles--;
 
@@ -320,6 +461,10 @@ class Character extends MoveableObject {
   }
 
   // --- Kamera und Fortschrittsanzeige ---
+
+  /**
+   * Updates the camera position based on character location.
+   */
   updateCamera() {
     if (this.world) {
       this.world.camera_x = -this.x + 100;
@@ -327,6 +472,10 @@ class Character extends MoveableObject {
   }
 
   //Hilfsmethoden
+
+  /**
+   * Stops snoring sound and flag.
+   */
   stopSnoring() {
     if (this.isSnoring) {
       this.world.soundManager.stop("snoringPepe");
@@ -334,18 +483,27 @@ class Character extends MoveableObject {
     }
   }
 
+  /**
+   * Handles right movement input.
+   */
   handleRightInput() {
     this.moveRight();
     this.stopSnoring();
     this.isMoving = true;
   }
 
+  /**
+   * Handles left movement input.
+   */
   handleLeftInput() {
     this.moveLeft();
     this.stopSnoring();
     this.isMoving = true;
   }
 
+  /**
+   * Handles jump input.
+   */
   handleJumpInput() {
     this.jump();
     if (this.world.soundManager) {
@@ -353,20 +511,36 @@ class Character extends MoveableObject {
     }
   }
 
+  /**
+   * Sets the character's state.
+   * @param {string} state
+   */
   setState(state) {
     this.currentState = state;
   }
 
+  /**
+   * Sets the character to jumping state.
+   * @param {number} now
+   */
   setJumpingState(now) {
     this.setState(this.STATES.JUMPING);
     this.lastMoveTime = now;
   }
 
+  /**
+   * Sets the character to walking state.
+   * @param {number} now
+   */
   setWalkingState(now) {
     this.setState(this.STATES.WALKING);
     this.lastMoveTime = now;
   }
 
+  /**
+   * Sets the character to idle or long idle state based on inactivity.
+   * @param {number} now
+   */
   setIdleOrLongIdleState(now) {
     const idleDuration = now - (this.lastMoveTime || now);
     if (idleDuration > 8000) {
@@ -376,6 +550,9 @@ class Character extends MoveableObject {
     }
   }
 
+  /**
+   * Sets the character to idle state and stops snoring if needed.
+   */
   setIdle() {
     if (this.world?.gameManager?.isPaused) return;
     this.setState(this.STATES.IDLE);
@@ -385,8 +562,11 @@ class Character extends MoveableObject {
     }
   }
 
+  /**
+   * Sets the character to long idle state and starts snoring if needed.
+   */
   setLongIdle() {
-    if (this.world?.gameManager?.isPaused) return; // während Pause kein Schnarchen starten
+    if (this.world?.gameManager?.isPaused) return; 
     this.setState(this.STATES.LONG_IDLE);
     if (!this.isSnoring) {
       this.world.soundManager.play("snoringPepe");
