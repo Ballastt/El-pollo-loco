@@ -78,8 +78,12 @@ function toggleMuteUnmute() {
 function checkOrientation() {
   const overlay = document.getElementById("rotate-device-overlay");
   if (!overlay) return;
-  overlay.style.display =
-    window.innerHeight > window.innerWidth ? "flex" : "none";
+
+  if (window.innerHeight > window.innerWidth) {
+    overlay.classList.remove("hidden");
+  } else {
+    overlay.classList.add("hidden");
+  }
 }
 
 /**
@@ -87,7 +91,7 @@ function checkOrientation() {
  * @returns {boolean} True if in landscape and screen is smaller than 1024px wide.
  */
 function isMobileLandscape() {
-  return window.innerWidth > window.innerHeight && window.innerWidth < 1024;
+  return window.innerWidth > window.innerHeight && window.innerWidth < 1224;
 }
 
 /**
