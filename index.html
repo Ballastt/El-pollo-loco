@@ -176,13 +176,21 @@
       <p>Bitte drehe dein Gerät ins Querformat (Landscape), um zu spielen.</p>
     </div>
 
-    <!-- Basis-Klassen -->
+    <!-- Basis-Klassen (Base classes, must come first) -->
     <script src="classes/drawable-object.class.js"></script>
-    <script src="classes/moveable-objects.class.js"></script>
+    <script src="classes/moveable-object.class.js"></script>
 
-    <!-- Spezialisierte Klassen -->
+    <!-- Utility and asset scripts -->
     <script src="javascript/utils.js"></script>
-    <script src="/javascript/character-assets.js"></script>
+    <script src="javascript/character-assets.js"></script>
+
+    <!-- Manager/Helper Classes (should be loaded before World and game objects) -->
+    <script src="classes/statusBarManager.class.js"></script>
+    <script src="classes/itemCollectionManager.class.js"></script>
+    <script src="classes/collisionManager.class.js"></script>
+    <script src="classes/renderer.class.js"></script>
+
+    <!-- Game object classes -->
     <script src="classes/chicken.class.js"></script>
     <script src="classes/normal-chicken.class.js"></script>
     <script src="classes/small-chicken.class.js"></script>
@@ -195,22 +203,27 @@
     <script src="classes/background-object.class.js"></script>
     <script src="classes/coin.class.js"></script>
     <script src="classes/salsaBottle-object.class.js"></script>
+    <script src="classes/endboss.class.js"></script>
 
+    <!-- Sound and audio -->
     <script src="classes/soundManager.class.js"></script>
-    <script src="javascript/audio.js" defer></script>
+    <script src="javascript/audio.js"></script>
 
-    <!-- Welt und Level -->
+    <!-- World, Level, Keyboard (these depend on the above) -->
     <script src="classes/world.class.js"></script>
     <script src="classes/keyboard.class.js"></script>
     <script src="classes/level.class.js"></script>
-    <script src="classes/endboss.class.js"></script>
 
-    <!-- Game-Management -->
+    <!-- Level data (must come after Level class) -->
     <script src="levels/level1.js"></script>
+
+    <!-- Game management -->
     <script src="classes/gameManager.class.js"></script>
 
-    <!-- Sonstige Funktionen -->
+    <!-- Other features -->
     <script src="javascript/touchcontrol.js"></script>
+
+    <!-- Main game logic (should be last) -->
     <script src="javascript/game.js"></script>
   </body>
 </html>
