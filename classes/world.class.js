@@ -127,8 +127,8 @@ class World {
    * @param {GameManager} gameManager - The game manager.
    */
   constructor(canvas, keyboard, level, gameManager) {
-    this.ctx = canvas.getContext("2d");
     this.canvas = canvas;
+    this.ctx = canvas.getContext("2d"); // <-- Make sure this is set first!
     this.keyboard = keyboard;
     this.level = level;
     this.gameManager = gameManager;
@@ -143,7 +143,13 @@ class World {
 
     this.statusBarManager = new StatusBarManager(this);
     this.itemCollectionManager = new ItemCollectionManager(this);
-    this.collisionManager = new CollisionManager(this);
+    this.collisionManager = new CollisionManager(
+      this,
+      this.character,
+      this.endboss,
+      this.throwableObjects,
+      gameManager
+    ); // <-- make sure this is correct!);
     this.renderer = new Renderer(this);
     this.coinBar.setPercentage(0);
 
