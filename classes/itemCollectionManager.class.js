@@ -10,14 +10,14 @@ class ItemCollectionManager {
    */
   checkCoinCollection() {
     this.checkItemCollection("Coin", {
-      items: this.level.coins,
+      items: this.world.level.coins,
       characterProperty: "collectedCoins",
       sound: "coinCollect",
-      bar: this.coinBar,
-      maxItems: this.level.totalCoins,
+      bar: this.world.coinBar,
+      maxItems: this.world.level.totalCoins,
       onCollect: () => {
-        this.character.collectedCoins++;
-        this.updateCoinBar();
+        this.world.character.collectedCoins++;
+        this.world.statusBarManager.updateCoinBar();
       },
     });
   }
@@ -27,14 +27,14 @@ class ItemCollectionManager {
    */
   checkBottleCollection() {
     this.checkItemCollection("Bottle", {
-      items: this.level.bottles,
+      items: this.world.level.bottles,
       characterProperty: "collectedBottles",
       sound: "bottleCollect",
-      bar: this.throwBar,
-      maxItems: this.level.totalBottles,
+      bar: this.world.throwBar,
+      maxItems: this.world.level.totalBottles,
       onCollect: () => {
-        this.character.collectedBottles++;
-        this.updateThrowBar();
+        this.world.character.collectedBottles++;
+        this.world.statusBarManager.updateThrowBar();
       },
     });
   }
@@ -55,13 +55,13 @@ class ItemCollectionManager {
       options;
 
     items.forEach((item, index) => {
-      if (this.character.isColliding(item)) {
+      if (this.world.character.isColliding(item)) {
         items.splice(index, 1);
         if (onCollect) onCollect();
         if (sound && soundManager) soundManager?.play(sound);
         if (bar && maxItems) {
           const percentage =
-            (this.character[characterProperty] / maxItems) * 100;
+            (this.world.character[characterProperty] / maxItems) * 100;
           bar.setPercentage(percentage);
         }
       }
