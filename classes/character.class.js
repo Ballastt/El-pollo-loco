@@ -118,15 +118,6 @@ class Character extends MoveableObject {
   }
 
   /**
-   * Starts the animation interval.
-   */
-  startAnimationLoop() {
-    this.animationInterval = setInterval(() => {
-      this.handleAnimations();
-    }, 50);
-  }
-
-  /**
    * Initializes character dimensions.
    */
   initDimensions() {
@@ -228,52 +219,6 @@ class Character extends MoveableObject {
   }
 
   /**
-   * Stops all character-related sounds.
-   */
-  stopAllSounds() {
-    const sm = this.world?.soundManager;
-    if (!sm) return;
-    sm.stop("snoringPepe");
-    sm.stop("walkingSound");
-  }
-
-  /**
-   * Checks collision with the endboss and handles hit logic.
-   * @param {Endboss} endboss
-   */
-  checkCollisionsWithEndboss(endboss) {
-    if (this.isColliding(endboss) && this.canBeHit()) {
-      if (endboss.currentState === endboss.STATES.ATTACK) {
-        this.setState(this.STATES.HURT);
-        this.hurtUntil = Date.now() + 500;
-
-        this.hit(10); // nur im Angriffszustand!
-      } else {
-        console.error("Kollision mit Endboss, aber kein Angriff");
-      }
-    }
-  }
-
-  /**
-   * Checks collision with enemies and handles hit/defeat logic.
-   * @param {Array<Enemy>} enemies
-   */
-  checkCollisionsWithEnemy(enemies) {
-    if (!this.world?.gameManager?.isGameRunning || this.isDead) return;
-    if (!this.canBeHit()) return;
-
-    for (let enemy of enemies) {
-      if (enemy.isDead || !this.isColliding(enemy)) continue;
-      if (this.isJumpingOnEnemy(enemy)) {
-        this.defeatEnemy(enemy);
-      } else {
-        this.receiveHitFrom(enemy);
-        break; 
-      }
-    }
-  }
-
-  /**
    * Returns true if the character can be hit.
    * @returns {boolean}
    */
@@ -288,20 +233,6 @@ class Character extends MoveableObject {
     this.setState(this.STATES.HURT);
     this.hurtUntil = Date.now() + 500;
     this.hit(10);
-  }
-
-  /**
-   * Handles collision with a single enemy.
-   * @param {Enemy} enemy
-   */
-  handleEnemyCollision(enemy) {
-    if (enemy.isDead || !this.isColliding(enemy)) return;
-
-    if (this.isJumpingOnEnemy(enemy)) {
-      this.defeatEnemy(enemy);
-    } else {
-      this.receiveHitFrom(enemy);
-    }
   }
 
   /**
@@ -332,30 +263,6 @@ class Character extends MoveableObject {
     this.world?.gameManager?.gameOver(); // Spiel beenden
   }
 
-  // --- Bewegungs- und Statussteuerung ---
-
-  /**
-   * Handles movement input and updates state.
-   */
-  handleMovement() {
-    this.handleInput();
-    this.handleState();
-  }
-
-  /**
-   * Handles keyboard input for movement.
-   */
-  handleInput() {
-    if (this.isDead || Date.now() < this.hurtUntil) return;
-    this.isMoving = false;
-    if (!this.lastMoveTime) this.lastMoveTime = Date.now();
-
-    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x)
-      this.handleRightInput();
-    if (this.world.keyboard.LEFT && this.x > 0) this.handleLeftInput();
-    if (this.world.keyboard.UP && !this.isAboveGround()) this.handleJumpInput();
-  }
-
   /**
    * Updates the character's state based on current conditions.
    */
@@ -368,35 +275,6 @@ class Character extends MoveableObject {
     if (this.isMoving) return this.setWalkingState(now);
 
     return this.setIdleOrLongIdleState(now);
-  }
-
-  /**
-   * Plays or stops walking sound based on movement.
-   */
-  handleWalkingSound() {
-    if (this.isMoving) {
-      if (this.world.soundManager) this.world.soundManager.play("walkingSound");
-    } else {
-      if (this.world.soundManager) this.world.soundManager.stop("walkingSound");
-    }
-  }
-
-  // --- Animationen ---
-
-  /**
-   * Handles character animation based on state.
-   */
-  handleAnimations() {
-    const animationMap = {
-      [this.STATES.JUMPING]: this.IMAGES.JUMPING,
-      [this.STATES.WALKING]: this.IMAGES.WALKING,
-      [this.STATES.LONG_IDLE]: this.IMAGES.LONG_IDLE,
-      [this.STATES.IDLE]: this.IMAGES.IDLE,
-      [this.STATES.HURT]: this.IMAGES.HURT,
-      [this.STATES.DEAD]: this.IMAGES.DEAD,
-    };
-
-    this.playAnimation(animationMap[this.currentState]);
   }
 
   /**
@@ -431,8 +309,6 @@ class Character extends MoveableObject {
     this.speedY = 15;
   }
 
-  // --- Aktionen ---
-
   /**
    * Throws a bottle if available.
    * @returns {boolean} True if a bottle was thrown.
@@ -460,117 +336,11 @@ class Character extends MoveableObject {
     return false; // Keine Flaschen vorhanden → kein Wurf
   }
 
-  // --- Kamera und Fortschrittsanzeige ---
-
-  /**
-   * Updates the camera position based on character location.
-   */
-  updateCamera() {
-    if (this.world) {
-      this.world.camera_x = -this.x + 100;
-    }
-  }
-
-  //Hilfsmethoden
-
-  /**
-   * Stops snoring sound and flag.
-   */
-  stopSnoring() {
-    if (this.isSnoring) {
-      this.world.soundManager.stop("snoringPepe");
-      this.isSnoring = false;
-    }
-  }
-
-  /**
-   * Handles right movement input.
-   */
-  handleRightInput() {
-    this.moveRight();
-    this.stopSnoring();
-    this.isMoving = true;
-  }
-
-  /**
-   * Handles left movement input.
-   */
-  handleLeftInput() {
-    this.moveLeft();
-    this.stopSnoring();
-    this.isMoving = true;
-  }
-
-  /**
-   * Handles jump input.
-   */
-  handleJumpInput() {
-    this.jump();
-    if (this.world.soundManager) {
-      this.world.soundManager.play("jumpSound");
-    }
-  }
-
   /**
    * Sets the character's state.
    * @param {string} state
    */
   setState(state) {
     this.currentState = state;
-  }
-
-  /**
-   * Sets the character to jumping state.
-   * @param {number} now
-   */
-  setJumpingState(now) {
-    this.setState(this.STATES.JUMPING);
-    this.lastMoveTime = now;
-  }
-
-  /**
-   * Sets the character to walking state.
-   * @param {number} now
-   */
-  setWalkingState(now) {
-    this.setState(this.STATES.WALKING);
-    this.lastMoveTime = now;
-  }
-
-  /**
-   * Sets the character to idle or long idle state based on inactivity.
-   * @param {number} now
-   */
-  setIdleOrLongIdleState(now) {
-    const idleDuration = now - (this.lastMoveTime || now);
-    if (idleDuration > 8000) {
-      this.setLongIdle();
-    } else {
-      this.setIdle();
-    }
-  }
-
-  /**
-   * Sets the character to idle state and stops snoring if needed.
-   */
-  setIdle() {
-    if (this.world?.gameManager?.isPaused) return;
-    this.setState(this.STATES.IDLE);
-    if (this.isSnoring) {
-      this.world.soundManager.stop("snoringPepe");
-      this.isSnoring = false;
-    }
-  }
-
-  /**
-   * Sets the character to long idle state and starts snoring if needed.
-   */
-  setLongIdle() {
-    if (this.world?.gameManager?.isPaused) return; 
-    this.setState(this.STATES.LONG_IDLE);
-    if (!this.isSnoring) {
-      this.world.soundManager.play("snoringPepe");
-      this.isSnoring = true;
-    }
   }
 }
