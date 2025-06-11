@@ -1,6 +1,10 @@
 class CollisionManager {
-  constructor(world) {
+  constructor(world, character, endboss, throwableObjects, gameManager) {
     this.world = world;
+    this.character = character;
+    this.endboss = endboss;
+    this.throwableObjects = throwableObjects;
+    this.gameManager = gameManager;
   }
 
   // --- Kollisionen ---
@@ -11,10 +15,10 @@ class CollisionManager {
   checkCollisions() {
     if (!this.gameManager.isGameRunning) return;
 
-    this.character.checkCollisionsWithEnemy(this.level.enemies);
+    this.character.checkCollisionsWithEnemy(this.world.level.enemies);
     this.character.checkCollisionsWithEndboss(this.endboss);
 
-    this.updateHealthBar();
+    this.world.statusBarManager.updateHealthBar();
   }
 
   /**
@@ -32,7 +36,7 @@ class CollisionManager {
     if (!this.gameManager.isGameRunning) return;
 
     this.throwableObjects.forEach((bottle, bottleIndex) => {
-      this.level.enemies.forEach((enemy) => {
+      this.world.level.enemies.forEach((enemy) => {
         if (bottle.isColliding(enemy) && !enemy.isDead) {
           enemy.die();
           this.throwableObjects.splice(bottleIndex, 1);
