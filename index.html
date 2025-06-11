@@ -178,7 +178,7 @@
 
     <!-- Basis-Klassen (Base classes, must come first) -->
     <script src="classes/drawable-object.class.js"></script>
-    <script src="classes/moveable-object.class.js"></script>
+    <script src="classes/moveable-objects.class.js"></script>
 
     <!-- Utility and asset scripts -->
     <script src="javascript/utils.js"></script>
@@ -187,9 +187,15 @@
     <!-- Manager/Helper Classes (should be loaded before World and game objects) -->
     <script src="classes/statusBarManager.class.js"></script>
     <script src="classes/itemCollectionManager.class.js"></script>
-    <script src="classes/collisionManager.class.js"></script>
+    <script src="classes/collisionsManager.class.js"></script>
     <script src="classes/renderer.class.js"></script>
 
+    <!-- Character helper classes (add these!) -->
+    <script src="classes/characterAnimationManager.class.js"></script>
+    <script src="classes/characterMovementManager.class.js"></script>
+    <script src="classes/characterCollisionsManager.class.js"></script>
+    <script src="classes/characterSoundManager.class.js"></script>
+    
     <!-- Game object classes -->
     <script src="classes/chicken.class.js"></script>
     <script src="classes/normal-chicken.class.js"></script>
