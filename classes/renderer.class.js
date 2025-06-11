@@ -1,6 +1,8 @@
 class Renderer {
   constructor(world) {
     this.world = world;
+    this.ctx = world.ctx;
+    this.canvas = world.canvas;
   }
 
   draw() {
@@ -8,60 +10,52 @@ class Renderer {
     w.ctx.clearRect(0, 0, w.canvas.width, w.canvas.height);
 
     // Enable collection only after 1 second delay
-    if (!this.allowCollection && Date.now() - this.startTime > 1000) {
-      this.allowCollection = true;
+    if (!w.allowCollection && Date.now() - w.startTime > 1000) {
+      w.allowCollection = true;
     }
 
-    if (this.allowCollection) {
-      this.checkCoinCollection();
-      this.checkBottleCollection();
+    if (w.allowCollection) {
+      w.checkCoinCollection();
+      w.checkBottleCollection();
     }
 
     // Kamerabewegung nur bis zum Levelende
-    if (this.camera_x < this.level_end_x - this.canvas.width) {
-      if (this.keyboard.RIGHT) {
-        this.camera_x += 1;
+    if (w.camera_x < w.level_end_x - w.canvas.width) {
+      if (w.keyboard.RIGHT) {
+        w.camera_x += 1;
       }
     }
 
-    this.ctx.translate(this.camera_x, 0); // Kameradrehung initial
+    w.ctx.translate(w.camera_x, 0); // Kameradrehung initial
 
     // Bewegliche Objekte zeichnen
-    this.addObjectToMap(this.backgroundObjects);
-    this.addObjectToMap(this.level.coins);
-    this.addObjectToMap(this.level.bottles);
-    this.addObjectToMap(this.level.clouds);
-    this.addToMap(this.character);
-    this.addToMap(this.endboss);
-    this.addObjectToMap(this.level.enemies);
-    this.addObjectToMap(this.throwableObjects);
+    this.addObjectToMap(w.backgroundObjects);
+    this.addObjectToMap(w.level.coins);
+    this.addObjectToMap(w.level.bottles);
+    this.addObjectToMap(w.level.clouds);
+    this.addToMap(w.character);
+    this.addToMap(w.endboss);
+    this.addObjectToMap(w.level.enemies);
+    this.addObjectToMap(w.throwableObjects);
 
     // Kamera zurücksetzen
-    this.ctx.translate(-this.camera_x, 0);
+    w.ctx.translate(-w.camera_x, 0);
 
     // UI-Elemente zeichnen
-    this.addToMap(this.healthBar);
-    this.addToMap(this.throwBar);
-    this.addToMap(this.coinBar);
+    this.addToMap(w.healthBar);
+    this.addToMap(w.throwBar);
+    this.addToMap(w.coinBar);
 
     // Nächster Frame
     requestAnimationFrame(() => this.draw());
   }
 
-  /**
-   * Adds an array of objects to the map (draws them).
-   * @param {Array} objects - The objects to add.
-   */
   addObjectToMap(objects) {
     objects.forEach((o) => {
       this.addToMap(o);
     });
   }
 
-  /**
-   * Draws a single object to the map, handling direction and hitbox.
-   * @param {MoveableObject} mo - The object to draw.
-   */
   addToMap(mo) {
     if (mo.otherDirection) this.flipImage(mo);
 
@@ -71,10 +65,6 @@ class Renderer {
     if (mo.otherDirection) this.flipImageBack(mo);
   }
 
-  /**
-   * Flips the image horizontally for drawing mirrored objects.
-   * @param {MoveableObject} mo - The object to flip.
-   */
   flipImage(mo) {
     this.ctx.save();
     this.ctx.translate(mo.width, 0);
@@ -82,10 +72,6 @@ class Renderer {
     mo.x = mo.x * -1;
   }
 
-  /**
-   * Restores the image after flipping.
-   * @param {MoveableObject} mo - The object to restore.
-   */
   flipImageBack(mo) {
     mo.x = mo.x * -1;
     this.ctx.restore();
