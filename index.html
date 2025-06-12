@@ -11,7 +11,7 @@
     <title>El Pollo Loco</title>
   </head>
   <body>
-    <div id="start-screen">
+    <div id="start-screen" class="visible">
       <div class="startscreen-wrapper">
         <img
           src="img/9_intro_outro_screens/start/startscreen_1.png"
@@ -74,7 +74,10 @@
           src="/img/You won, you lost/Game over A.png"
           alt="Game Over"
         />
-        <button id="restart-btn" class="btn-grad">Neu starten</button>
+        <div class="game-over-btns">
+          <button id="restart-btn" class="btn-grad">Neu starten</button>
+          <button id="menu-btn" class="btn-grad">Menu</button>
+        </div>
       </div>
     </div>
 
@@ -195,7 +198,7 @@
     <script src="classes/characterMovementManager.class.js"></script>
     <script src="classes/characterCollisionsManager.class.js"></script>
     <script src="classes/characterSoundManager.class.js"></script>
-    
+
     <!-- Game object classes -->
     <script src="classes/chicken.class.js"></script>
     <script src="classes/normal-chicken.class.js"></script>
