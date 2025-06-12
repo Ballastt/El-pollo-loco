@@ -76,8 +76,8 @@ h1 {
 
 #start-screen {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100dvh;
   background-color: black;
   display: flex;
   justify-content: center;
@@ -86,14 +86,14 @@ h1 {
 
 .startscreen-wrapper {
   position: relative;
-  max-width: 100%;
+  width: 100vw;
   aspect-ratio: 16/9;
   background-color: black;
 }
 
 #startScreen-img {
-  width: 100%;
   height: 100%;
+  width: 100%;
   object-fit: fill;
   display: block;
 }
@@ -277,7 +277,8 @@ h1 {
   height: auto;
 }
 
-#restart-btn {
+#restart-btn,
+#menu-btn {
   position: unset;
   width: 200px;
   height: 50px;
@@ -285,6 +286,12 @@ h1 {
   font-size: 24px;
   font-weight: bold;
   z-index: 1001;
+}
+
+.game-over-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 #rotate-device-overlay {
