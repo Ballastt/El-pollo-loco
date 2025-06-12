@@ -109,7 +109,7 @@ function initializeGameManager() {
   level = level1;
   soundManager ??= new SoundManager();
   gameManager = new GameManager(null);
-
+  if (!level1) initLevel();
   world = new World(canvas, keyboard, level, gameManager);
   world.soundManager = soundManager;
   gameManager.world = world;
@@ -151,6 +151,8 @@ function addPauseToggleWithSpace() {
  */
 function initializeEventListeners() {
   buttons.restart = document.getElementById("restart-btn");
+  buttons.menu = document.getElementById("menu-btn"); // <-- Add this line
+
   if (buttons.pause) buttons.pause.addEventListener("click", handlePause);
   if (buttons.resume) buttons.resume.addEventListener("click", handleResume);
 
@@ -163,6 +165,14 @@ function initializeEventListeners() {
       }
     });
   }
+
+  // Add this for the menu button:
+  if (buttons.menu) {
+    buttons.menu.addEventListener("click", () => {
+      gameManager.showStartScreen();
+    });
+  }
+
   if (buttons.learn) buttons.learn.addEventListener("click", showInstructions);
 
   initializeImpressum();
@@ -239,7 +249,6 @@ function handleKeyUp(e) {
   if (key === "d") keyboard.D = false;
 }
 
-
 /**
  * Hides the game over screen by changing its CSS classes.
  */
@@ -250,5 +259,3 @@ function hideGameOverScreen() {
     screen.classList.add("hidden");
   }
 }
-
-
