@@ -1,63 +1,105 @@
+/**
+ * Handles player movement, input, and camera tracking.
+ * Controls how the character moves in response to keyboard input and updates movement-related state.
+ */
 class CharacterMovementManager {
+  /**
+   * Creates an instance of CharacterMovementManager.
+   * @param {Character} character - The character this manager controls.
+   */
   constructor(character) {
+    /** @type {Character} */
     this.character = character;
   }
 
   /**
-   * Handles movement input and updates state.
+   * Handles movement input and updates the character's movement state.
+   * Delegates to input and state handling methods.
    */
   handleMovement() {
-    this.handleInput();
-    this.handleState();
+    this.handleInput?.();
+    this.handleState?.();
   }
 
   /**
-   * Handles keyboard input for movement.
+   * Handles all keyboard input for movement.
+   * Splits movement into horizontal and jump inputs.
    */
   handleInput() {
-    if (this.isDead || Date.now() < this.hurtUntil) return;
-    this.isMoving = false;
-    if (!this.lastMoveTime) this.lastMoveTime = Date.now();
+    if (this.character.isDead || Date.now() < this.character.hurtUntil) return;
+    if (!this.character.lastMoveTime) this.character.lastMoveTime = Date.now();
 
-    if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x)
+    this.processHorizontalInput();
+    this.processJumpInput();
+  }
+
+  /**
+   * Processes left/right movement input.
+   * Sets `isMoving` to true if horizontal input is detected.
+   */
+  processHorizontalInput() {
+    const world = this.character.world;
+    let moved = false;
+
+    if (world.keyboard.RIGHT && this.character.x < world.level.level_end_x) {
       this.handleRightInput();
-    if (this.world.keyboard.LEFT && this.x > 0) this.handleLeftInput();
-    if (this.world.keyboard.UP && !this.isAboveGround()) this.handleJumpInput();
-  }
-  /**
-   * Handles right movement input.
-   */
-  handleRightInput() {
-    this.moveRight();
-    this.stopSnoring();
-    this.isMoving = true;
+      moved = true;
+    }
+
+    if (world.keyboard.LEFT && this.character.x > 0) {
+      this.handleLeftInput();
+      moved = true;
+    }
+    this.character.isMoving = moved;
   }
 
   /**
-   * Handles left movement input.
+   * Processes jump input.
+   * Triggers jump only if character is grounded.
    */
-  handleLeftInput() {
-    this.moveLeft();
-    this.stopSnoring();
-    this.isMoving = true;
-  }
+  processJumpInput() {
+    const world = this.character.world;
 
-  /**
-   * Handles jump input.
-   */
-  handleJumpInput() {
-    this.jump();
-    if (this.world.soundManager) {
-      this.world.soundManager.play("jumpSound");
+    if (world.keyboard.UP && !this.character.isAboveGround()) {
+      this.handleJumpInput();
     }
   }
 
   /**
-   * Updates the camera position based on character location.
+   * Handles right movement input logic.
+   */
+  handleRightInput() {
+    this.character.moveRight();
+    this.character.stopSnoring?.();
+    this.character.isMoving = true;
+  }
+
+  /**
+   * Handles left movement input logic.
+   */
+  handleLeftInput() {
+    this.character.moveLeft();
+    this.character.stopSnoring?.();
+    this.character.isMoving = true;
+  }
+
+  /**
+   * Handles jump input logic and sound effects.
+   */
+  handleJumpInput() {
+    const world = this.character.world;
+
+    this.character.jump();
+
+    if (world.soundManager) world.soundManager.play("jumpSound");
+  }
+
+  /**
+   * Updates the camera position to follow the character.
    */
   updateCamera() {
-    if (this.world) {
-      this.world.camera_x = -this.x + 100;
+    if (this.character.world) {
+      this.character.world.camera_x = -this.character.x + 100;
     }
   }
 }
