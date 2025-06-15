@@ -18,7 +18,7 @@ class Level {
   bottles;
 
   /** @type {number} The horizontal position representing the end of the level */
-  level_end_x = 6000;
+  level_end_x = 6800;
 
   /** @type {number} Total number of coins in the level */
   totalCoins = 0;
