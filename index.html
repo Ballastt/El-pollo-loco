@@ -36,30 +36,33 @@
     <div id="background-image">
       <h1>El Pollo Loco</h1>
     </div>
-    <canvas
-      id="canvas"
-      width="720px"
-      height="480px"
-      style="display: none"
-    ></canvas>
 
-    <div id="btn-container-bg">
-      <button id="pause-btn">
-        <img src="img/icons_bg/pause.png" alt="pause" />
-      </button>
-      <button id="resume-btn" style="display: none">
-        <img src="img/icons_bg/play-taste.png" alt="resume" />
-      </button>
-      <button id="mute-btn" style="display: inline-block">
-        <img
-          src="img/icons_bg/no-sound.png"
-          alt="Mute Button"
-          id="muteInGame"
-        />
-      </button>
-      <button id="sound-btn" style="display: none">
-        <img src="img/icons_bg/sound_on_ingame.png" alt="Unmute Button" />
-      </button>
+    <div class="game-wrapper">
+      <canvas
+        id="canvas"
+        width="720px"
+        height="480px"
+        style="display: none"
+      ></canvas>
+
+      <div id="btn-container-bg">
+        <button id="pause-btn">
+          <img src="img/icons_bg/pause.png" alt="pause" />
+        </button>
+        <button id="resume-btn" style="display: none">
+          <img src="img/icons_bg/play-taste.png" alt="resume" />
+        </button>
+        <button id="mute-btn" style="display: inline-block">
+          <img
+            src="img/icons_bg/no-sound.png"
+            alt="Mute Button"
+            id="muteInGame"
+          />
+        </button>
+        <button id="sound-btn" style="display: none">
+          <img src="img/icons_bg/sound_on_ingame.png" alt="Unmute Button" />
+        </button>
+      </div>
     </div>
 
     <div id="game-over-screen" class="hidden">
@@ -186,6 +189,7 @@
     <!-- Utility and asset scripts -->
     <script src="javascript/utils.js"></script>
     <script src="javascript/character-assets.js"></script>
+    <script src="javascript/endboss-assets.js"></script>
 
     <!-- Manager/Helper Classes (should be loaded before World and game objects) -->
     <script src="classes/statusBarManager.class.js"></script>
