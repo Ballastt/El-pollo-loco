@@ -45,8 +45,7 @@ class EndbossAnimationManager {
       this.endboss.character.y
     );
 
-    if (this.shouldBeInIntroPhase(distanceToPlayer))
-      return this.handleIntroPhase();
+    if (this.shouldBeInIntroPhase(distanceToPlayer)) return this.handleIntroPhase();
     if (this.shouldAttack(distanceToPlayer)) return this.setAttackState();
     if (this.shouldAlert(distanceToPlayer)) return this.setAlertState();
     return this.setWalkingState();
@@ -112,6 +111,7 @@ class EndbossAnimationManager {
       console.log("[Endboss] Playing endbossAngry");
     }
     this.endboss.currentState = this.endboss.STATES.ATTACK;
+    console.log("[Endboss] State set to ATTACK"); // ← NEU!
   }
 
   /**
