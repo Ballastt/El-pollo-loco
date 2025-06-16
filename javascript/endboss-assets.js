@@ -66,4 +66,4 @@ const EndbossStates = {
   DEAD: "dead",
 };
 
-export { EndbossAssets, EndbossStates };
+
