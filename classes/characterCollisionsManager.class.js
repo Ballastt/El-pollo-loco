@@ -1,6 +1,10 @@
 /**
  * Manages all collision-related logic for the character.
  * Handles interactions with enemies and the endboss, including damage and defeating enemies by jumping on them.
+ *
+ * @class
+ * @property {Character} character - The character this collision manager is responsible for.
+ * @property {World} world - The game world in which the character exists.
  */
 class CharacterCollisionManager {
   /**
@@ -26,60 +30,68 @@ class CharacterCollisionManager {
         this.character.setState(this.character.STATES.HURT);
         this.character.hurtUntil = Date.now() + 500;
         this.character.hit(10);
-      } else {
-        console.error(
-          "Collision with endboss occurred, but endboss was not attacking."
-        );
       }
     }
   }
 
   /**
    * Checks for collisions between the character and all active enemies.
-   * If the character jumps on an enemy, the enemy is defeated.
-   * Otherwise, the character takes damage.
+   * If a collision is detected, determines the proper response (jump or damage).
    * @param {Array<Enemy>} enemies - The list of enemies to check against.
    */
   checkCollisionsWithEnemy(enemies) {
-    if (!this.world?.gameManager?.isGameRunning || this.character.isDead)
-      return;
-    if (!this.canBeHit()) return;
+    if (!this.shouldCheckEnemyCollisions()) return;
 
-    let closestEnemy = null;
-    let minDistance = Infinity;
+    const closestEnemy = this.findClosestCollidingEnemy(enemies);
+    if (!closestEnemy) return;
 
-    for (const enemy of enemies) {
-      if (enemy.isDead || !this.character.isColliding(enemy)) continue;
-
-      const dx = Math.abs(
-        this.character.x +
-          this.character.width / 2 -
-          (enemy.x + enemy.width / 2)
-      );
-
-      if (dx < minDistance) {
-        minDistance = dx;
-        closestEnemy = enemy;
-      }
-    }
-
-    if (closestEnemy) {
-      if (this.character.isJumpingOnEnemy(closestEnemy)) {
-        this.character.defeatEnemy(closestEnemy);
-      } else {
-        this.receiveHitFrom(closestEnemy);
-      }
-    }
+    this.resolveEnemyCollision(closestEnemy);
   }
 
   /**
-   * Handles collision with a single enemy.
-   * If the character jumps on the enemy, it is defeated.
-   * Otherwise, the character takes damage.
-   * @param {Enemy} enemy - The enemy to check and handle collision with.
+   * Determines whether enemy collision checks should proceed.
+   * @returns {boolean} True if checks should be performed.
    */
-  handleEnemyCollision(enemy) {
-    if (enemy.isDead || !this.character.isColliding(enemy)) return;
+  shouldCheckEnemyCollisions() {
+    return (
+      this.world?.gameManager?.isGameRunning &&
+      !this.character.isDead &&
+      this.canBeHit()
+    );
+  }
+
+  /**
+   * Finds the closest enemy that is currently colliding with the character.
+   * @param {Array<Enemy>} enemies - The list of enemies to evaluate.
+   * @returns {Enemy|null} The closest colliding enemy or null if none.
+   */
+  findClosestCollidingEnemy(enemies) {
+    return enemies.reduce((closest, enemy) => {
+      if (enemy.isDead || !this.character.isColliding(enemy)) return closest;
+
+      const dx = this.getDistanceTo(enemy);
+      return !closest || dx < this.getDistanceTo(closest) ? enemy : closest;
+    }, null);
+  }
+
+  /**
+   * Calculates horizontal distance between the character and an enemy.
+   * @param {Enemy} enemy
+   * @returns {number}
+   */
+  getDistanceTo(enemy) {
+    const charCenterX = this.character.x + this.character.width / 2;
+    const enemyCenterX = enemy.x + enemy.width / 2;
+    return Math.abs(charCenterX - enemyCenterX);
+  }
+
+  /**
+   * Resolves a collision between the character and an enemy.
+   * Determines if the enemy should be defeated or the character damaged.
+   * @param {Enemy} enemy - The colliding enemy.
+   */
+  resolveEnemyCollision(enemy) {
+    if (!enemy) return;
 
     if (this.character.isJumpingOnEnemy(enemy)) {
       this.character.defeatEnemy(enemy);
@@ -89,23 +101,24 @@ class CharacterCollisionManager {
   }
 
   /**
-   * Returns true if the character is currently allowed to receive damage.
-   * @returns {boolean}
+   * Checks if the character can currently receive damage.
+   * @returns {boolean} True if the character can be hit.
    */
   canBeHit() {
     return this.character.canBeHit?.() ?? true;
   }
 
   /**
-   * Handles logic when the character receives a hit from an enemy.
-   * @param {Enemy} enemy - The enemy that hit the character.
+   * Applies damage to the character when hit by an enemy.
+   * Skips damage if the character is jumping on the enemy or cannot be hit.
+   * @param {Enemy} enemy - The enemy causing the damage.
    */
   receiveHitFrom(enemy) {
     if (this.world?.gameManager?.isPaused || this.character.isDead) return;
     if (this.character.isJumpingOnEnemy(enemy)) {
-      this.character.defeatEnemy(enemy);
-      return;
+      return this.character.defeatEnemy(enemy);
     }
+
     if (!this.canBeHit()) return;
 
     this.character.setState(this.character.STATES.HURT);
