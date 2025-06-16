@@ -1,134 +1,79 @@
 /**
  * Represents the game world, including the player, enemies, items, UI, and main game loop.
- * Handles drawing, collisions, item collection, pausing, resuming, and stopping the game.
+ * Handles rendering, collisions, item collection, pausing/resuming, and stopping the game.
  */
 class World {
-  // --- Eigenschaften ---
-
-  /**
-   * The main player character.
-   * @type {Character}
-   */
+  // --- Properties ---
+  /** @type {Character} The main player character. */
   character;
 
-  /**
-   * The endboss enemy.
-   * @type {Endboss}
-   */
+  /** @type {Endboss} The endboss enemy. */
   endboss;
 
-  /**
-   * The current level object.
-   * @type {Level}
-   */
+  /** @type {Level} The current level object. */
   level = level1;
 
-  /**
-   * The canvas DOM element.
-   * @type {HTMLCanvasElement}
-   */
+  /** @type {HTMLCanvasElement} The canvas DOM element. */
   canvas;
 
-  /**
-   * The 2D rendering context for the canvas.
-   * @type {CanvasRenderingContext2D}
-   */
+  /** @type {CanvasRenderingContext2D} The 2D drawing context. */
   ctx;
 
-  /**
-   * The keyboard input handler.
-   * @type {Keyboard}
-   */
+  /** @type {Keyboard} The keyboard input handler. */
   keyboard;
 
-  /**
-   * The current camera x position.
-   * @type {number}
-   */
+  /** @type {number} The camera x-position offset for scrolling. */
   camera_x = 0;
 
-  /**
-   * The x position where the level ends.
-   * @type {number}
-   */
-  level_end_x = 6700;
+  /** @type {number} The x-position where the level ends. */
+  level_end_x = 6800;
 
-  /**
-   * Number of collected coins.
-   * @type {number}
-   */
+  /** @type {number} Number of collected coins. */
   collectedCoins = 0;
 
-  /**
-   * Number of collected bottles.
-   * @type {number}
-   */
+  /** @type {number} Number of collected bottles. */
   collectedBottles = 0;
 
-  /**
-   * The health status bar.
-   * @type {StatusBar}
-   */
+  /** @type {StatusBar} Health status bar UI. */
   healthBar;
 
-  /**
-   * The throw (bottle) status bar.
-   * @type {StatusBar}
-   */
+  /** @type {StatusBar} Bottle-throw status bar UI. */
   throwBar;
 
-  /**
-   * The coin status bar.
-   * @type {StatusBar}
-   */
+  /** @type {StatusBar} Coin status bar UI. */
   coinBar;
 
-  /**
-   * Array of background objects.
-   * @type {Array}
-   */
+  /** @type {Array<Object>} Background layer objects. */
   backgroundObjects = [];
 
-  /**
-   * Array of throwable objects (e.g., bottles).
-   * @type {Array}
-   */
+  /** @type {Array<ThrowableObject>} Active thrown objects. */
   throwableObjects = [];
 
-  /**
-   * Reference to the game manager.
-   * @type {GameManager}
-   */
+  /** @type {GameManager} Controls overall game state. */
   gameManager;
 
-  /**
-   * Timestamp when the world was created.
-   * @type {number}
-   */
+  /** @type {number} Timestamp when the world was created. */
   startTime;
 
-  /**
-   * Whether item collection is allowed (after delay).
-   * @type {boolean}
-   */
+  /** @type {boolean} Whether the player is allowed to collect items. */
   allowCollection = false;
 
-  /**
-   * Whether the player can throw a bottle.
-   * @type {boolean}
-   */
+  /** @type {boolean} Whether the player is allowed to throw a bottle. */
   canThrow = true;
+  
+  /** @type {boolean} Whether the endboss health bar has been activated */
+  endbossEncounterStarted = false;
 
   /**
-   * Creates a new World instance.
-   * @param {HTMLCanvasElement} canvas - The canvas element.
+   * Creates a new game world.
+   * @param {HTMLCanvasElement} canvas - The rendering canvas.
    * @param {Keyboard} keyboard - The keyboard input handler.
-   * @param {Level} level - The level object.
-   * @param {GameManager} gameManager - The game manager.
+   * @param {Level} level - The current level instance.
+   * @param {GameManager} gameManager - The game manager instance.
    */
   constructor(canvas, keyboard, level, gameManager) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext("2d"); // <-- Make sure this is set first!
+    this.ctx = canvas.getContext("2d");
     this.keyboard = keyboard;
     this.level = level;
     this.gameManager = gameManager;
@@ -136,10 +81,12 @@ class World {
     this.character = new Character(this);
     this.endboss = new Endboss(this.character, this);
 
-    // Statusbars mit den jeweiligen Bildern initialisieren
     this.healthBar = new StatusBar("health", 0, 0, 250, 60);
     this.throwBar = new StatusBar("throw", 0, 50, 250, 60, true);
     this.coinBar = new StatusBar("coin", 0, 100, 250, 60, true);
+    // Example values, adjust x/y/width/height as needed for your UI
+    this.endbossHealthBar = new StatusBar("endboss", 460, 0, 250, 60);
+    this.endbossHealthBar.setPercentage(100); // Start full
 
     this.statusBarManager = new StatusBarManager(this);
     this.itemCollectionManager = new ItemCollectionManager(this);
@@ -149,25 +96,26 @@ class World {
       this.endboss,
       this.throwableObjects,
       gameManager
-    ); // <-- make sure this is correct!);
+    );
+
     this.renderer = new Renderer(this);
     this.coinBar.setPercentage(0);
-
-    // Set start time on creation
     this.startTime = Date.now();
-
-    this.draw();
+    this.renderer.start();
   }
 
-  // --- Hauptlogik ---
-
   /**
-   * Starts the main game loop (collision checks, throw checks, game over checks).
+   * Starts the main game loop (collisions, throw checks, game-over detection).
    */
   run() {
-    if (this.gameManager.isPaused || !this.gameManager.isGameRunning) {
-      return;
+    if (this.gameLoopInterval) {
+      clearInterval(this.gameLoopInterval);
+      this.gameLoopInterval = null;
     }
+
+    console.log("[World] run");
+
+    if (this.gameManager.isPaused || !this.gameManager.isGameRunning) return;
 
     this.gameLoopInterval = setInterval(() => {
       if (!this.gameManager.isPaused) {
@@ -178,21 +126,41 @@ class World {
     }, 200);
   }
 
+  /**
+   * Stops and cleans up the world (game loop, rendering).
+   */
+  cleanup() {
+    if (this.gameLoopInterval) {
+      clearInterval(this.gameLoopInterval);
+      this.gameLoopInterval = null;
+      console.log("[World] cleanup: cleared gameLoopInterval");
+    }
+    this.renderer?.stop();
+  }
+
+  /** Draws the entire game world (delegates to Renderer). */
   draw() {
     this.renderer.draw();
   }
 
-  // If you need to add objects to the map from World:
+  /**
+   * Adds one or more objects to the render list.
+   * @param {Array<DrawableObject>} objects - Objects to be rendered.
+   */
   addObjectToMap(objects) {
     this.renderer.addObjectToMap(objects);
   }
 
+  /**
+   * Adds a single object to the render list.
+   * @param {DrawableObject} mo - Object to add.
+   */
   addToMap(mo) {
     this.renderer.addToMap(mo);
   }
 
   /**
-   * Checks if the player can throw a bottle and handles bottle throwing logic.
+   * Checks if the player has pressed the throw key and handles bottle throwing logic.
    */
   checkThrowObjects() {
     if (!this.gameManager.isGameRunning) return;
@@ -209,57 +177,47 @@ class World {
     this.bottleEnemyCollision();
   }
 
-  /**
-   * Pauses all objects in the world (character, endboss, enemies, clouds).
-   */
+  /** Pauses all moving objects in the world. */
   pauseObjects() {
-    if (this.level) {
-      this.character.pause();
-      this.endboss.pause();
-      this.level.enemies.forEach((enemy) => enemy.pause());
-      this.level.clouds.forEach((cloud) => cloud.pause());
-    }
+    if (!this.level) return;
+    this.character.pause();
+    this.endboss.pause();
+    this.level.enemies.forEach((enemy) => enemy.pause());
+    this.level.clouds.forEach((cloud) => cloud.pause());
   }
 
-  /**
-   * Resumes all objects in the world (character, endboss, enemies, clouds).
-   */
+  /** Resumes all previously paused objects in the world. */
   resumeObjects() {
-    if (this.level) {
-      this.character.resume();
-      this.endboss.resume();
-      this.level.enemies.forEach((enemy) => enemy.resume());
-      this.level.clouds.forEach((cloud) => cloud.resume());
-    }
+    if (!this.level) return;
+    this.character.resume();
+    this.endboss.resume();
+    this.level.enemies.forEach((enemy) => enemy.resume());
+    this.level.clouds.forEach((cloud) => cloud.resume());
   }
 
-  /**
-   * Stops all objects and clears the main game loop interval.
-   */
+  /** Stops all objects and the main game loop. */
   stopObjects() {
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
     }
 
-    if (this.character && typeof this.character.stop === "function")
-      this.character.stop();
-    if (this.endboss && typeof this.endboss.stop === "function")
-      this.endboss.stop();
+    this.character?.stop?.();
+    this.endboss?.stop?.();
+
     for (let enemy of this.level.enemies || []) {
-      if (typeof enemy.stop === "function") enemy.stop();
+      enemy?.stop?.();
     }
   }
 
-  /**
-   * Stops the main game loop.
-   */
+  /** Fully stops the game logic and rendering. */
   stopGameLoop() {
+    this.character.stop();
     this.stopObjects();
   }
 
   /**
-   * Returns true if the character's health is zero or below.
+   * Returns true if the character is dead.
    * @returns {boolean}
    */
   get isDead() {
@@ -267,56 +225,70 @@ class World {
   }
 
   /**
-   * Checks if the game is over (character dead), stops objects, and triggers game over logic.
+   * Checks if the game is over (e.g., character died), and stops the world if so.
    */
   checkGameOver() {
     if (!this.gameManager.isGameRunning) return;
 
     if (this.character.isDead) {
       this.gameManager.isGameRunning = false;
-      this.stopObjects(); // Stoppt draw() und gameLoopInterval
-      this.gameManager.gameOver(); // Zeigt ggf. Menü, etc.
+      this.stopObjects();
+      this.gameManager.gameOver();
     }
   }
 
   /**
-   * Sets the background objects for the world and level.
-   * @param {Array} backgroundObjects - The background objects.
+   * Sets the background layers for the level.
+   * @param {Array<Object>} backgroundObjects - Background layers to assign.
    */
   setBackgroundObjects(backgroundObjects) {
     this.backgroundObjects = backgroundObjects;
     this.level.backgroundObjects = backgroundObjects;
   }
 
-  /**
-   * Updates the sound volume for coin and bottle collection sounds.
-   */
+  /** Updates sound volumes for collection sounds. */
   updateSoundVolume() {
-    if (this.coinCollectSound) this.coinCollectSound.volume = this.soundVolume;
-    if (this.bottleCollectSound)
+    if (this.coinCollectSound) {
+      this.coinCollectSound.volume = this.soundVolume;
+    }
+    if (this.bottleCollectSound) {
       this.bottleCollectSound.volume = this.soundVolume;
+    }
   }
 
-  // Replace these methods in World:
+  // --- Delegated Methods (Manager Classes) ---
+
+  /** Checks coin collection logic. */
   checkCoinCollection() {
     this.itemCollectionManager.checkCoinCollection();
   }
+
+  /** Checks bottle collection logic. */
   checkBottleCollection() {
     this.itemCollectionManager.checkBottleCollection();
   }
+
+  /** Updates the throw bar UI. */
   updateThrowBar() {
     this.statusBarManager.updateThrowBar();
   }
+
+  /** Updates the coin bar UI. */
   updateCoinBar() {
     this.statusBarManager.updateCoinBar();
   }
+
+  /** Updates the health bar UI. */
   updateHealthBar() {
     this.statusBarManager.updateHealthBar();
   }
 
+  /** Performs collision checks for all entities. */
   checkCollisions() {
     this.collisionManager.checkCollisions();
   }
+
+  /** Checks for collisions between bottles and enemies. */
   bottleEnemyCollision() {
     this.collisionManager.bottleEnemyCollision();
   }
