@@ -3,9 +3,13 @@ class Renderer {
     this.world = world;
     this.ctx = world.ctx;
     this.canvas = world.canvas;
+    this.endboss = world.endboss;
+    this.isDrawing = false;
   }
 
   draw() {
+    if (!this.isDrawing) return;
+
     const w = this.world;
     w.ctx.clearRect(0, 0, w.canvas.width, w.canvas.height);
 
@@ -19,16 +23,18 @@ class Renderer {
       w.checkBottleCollection();
     }
 
-    // Kamerabewegung nur bis zum Levelende
+    // Camera movement
     if (w.camera_x < w.level_end_x - w.canvas.width) {
       if (w.keyboard.RIGHT) {
         w.camera_x += 1;
       }
     }
 
-    w.ctx.translate(w.camera_x, 0); // Kameradrehung initial
+    // Use save/restore for camera
+    w.ctx.save();
+    w.ctx.translate(w.camera_x, 0);
 
-    // Bewegliche Objekte zeichnen
+    // Draw objects
     this.addObjectToMap(w.backgroundObjects);
     this.addObjectToMap(w.level.coins);
     this.addObjectToMap(w.level.bottles);
@@ -38,15 +44,27 @@ class Renderer {
     this.addObjectToMap(w.level.enemies);
     this.addObjectToMap(w.throwableObjects);
 
-    // Kamera zurücksetzen
-    w.ctx.translate(-w.camera_x, 0);
+    // In drawWorld() oder drawObjects(), temporär hinzufügen:
+    this.world.character.drawHitbox(this.ctx);
+    this.world.level.enemies.forEach((e) => e.drawHitbox?.(this.ctx));
 
-    // UI-Elemente zeichnen
+    w.ctx.restore();
+
+    // UI elements (drawn without camera translation)
     this.addToMap(w.healthBar);
     this.addToMap(w.throwBar);
     this.addToMap(w.coinBar);
 
-    // Nächster Frame
+    const distanceToBoss = Math.abs(w.character.x - w.endboss.x);
+
+    if (!w.endbossEncounterStarted && distanceToBoss < 500) {
+      w.endbossEncounterStarted = true;
+    }
+
+    if (w.endbossHealthBar && w.endbossEncounterStarted) {
+      this.addToMap(w.endbossHealthBar);
+    }
+
     requestAnimationFrame(() => this.draw());
   }
 
@@ -60,7 +78,7 @@ class Renderer {
     if (mo.otherDirection) this.flipImage(mo);
 
     mo.draw(this.ctx);
-    mo.drawHitbox(this.ctx);
+    // mo.drawHitbox(this.ctx); // Removed for performance
 
     if (mo.otherDirection) this.flipImageBack(mo);
   }
@@ -75,5 +93,17 @@ class Renderer {
   flipImageBack(mo) {
     mo.x = mo.x * -1;
     this.ctx.restore();
+  }
+
+  start() {
+    if (this.isDrawing) return;
+    this.isDrawing = true;
+    console.log("[Renderer] start");
+    this.draw();
+  }
+
+  stop() {
+    this.isDrawing = false;
+    console.log("[Renderer] stop");
   }
 }
