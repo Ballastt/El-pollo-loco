@@ -67,10 +67,8 @@ class SoundManager {
    */
   isPlayable(key) {
     const sound = this.sounds[key];
-    if (!sound) {
-      console.warn(`No sound found for key: ${key}`);
-      return false;
-    }
+
+    if (!sound) return false;
 
     if (this.isMuted || this.playingFlags[key]) return false;
 
@@ -86,7 +84,7 @@ class SoundManager {
     this.playingFlags[key] = true;
 
     sound.currentTime = 0;
-    sound.loop = false;
+    sound.loop = this.loopFlags[key] ?? false;
     sound.onended = () => (this.playingFlags[key] = false);
   }
 
@@ -99,7 +97,6 @@ class SoundManager {
 
     setTimeout(() => {
       sound.play().catch((err) => {
-        console.warn(`[SoundManager] play failed for key: ${key}, err:`, err);
         this.playingFlags[key] = false;
       });
     }, 100);
