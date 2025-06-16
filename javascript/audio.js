@@ -20,7 +20,7 @@ let userInteracted = false;
 let soundManager;
 
 /** @type {boolean} Global mute state for UI syncing */
-let isMuted = false;
+let isMuted = true;
 
 /**
  * Initializes the SoundManager and loads all game sounds with appropriate settings.
@@ -30,21 +30,51 @@ function initializeSoundManager() {
   soundManager = new SoundManager();
 
   // Start screen and ambient sounds
-  soundManager.addSound("backgroundMusic", "audio/audio_start_screen.mp3", true, 0.2);
-  soundManager.addSound("normalChickenWalking", "audio/normal_chicken_walking.mp3", true, 0.4);
+  soundManager.addSound(
+    "backgroundMusic",
+    "audio/audio_start_screen.mp3",
+    true,
+    0.2
+  );
+  soundManager.addSound(
+    "normalChickenWalking",
+    "audio/normal_chicken_walking.mp3",
+    true,
+    0.4
+  );
   soundManager.addSound("chickenDeath", "audio/dying_chicken.mp3", false, 0.8);
-  soundManager.addSound("smallChickenWalking", "audio/small_chicken_walking.mp3", true, 0.8);
+  soundManager.addSound(
+    "smallChickenWalking",
+    "audio/small_chicken_walking.mp3",
+    true,
+    0.8
+  );
   soundManager.addSound("coinCollect", "audio/get_coin.mp3", false, 0.5);
   soundManager.addSound("bottleCollect", "audio/get_bottle.mp3", false, 0.5);
-  soundManager.addSound("walkingSound", "audio/character_walk_on_sand.mp3", true, 1.0);
+  soundManager.addSound(
+    "walkingSound",
+    "audio/character_walk_on_sand.mp3",
+    true,
+    1.0
+  );
   soundManager.addSound("jumpSound", "audio/character_jumping.mp3", false, 0.8);
   soundManager.addSound("hurtSound", "audio/pepe_hurting.mp3", false, 0.8);
   soundManager.addSound("snoringPepe", "audio/pepe_snoring.mp3", false, 0.7);
   soundManager.addSound("PepeDying", "audio/pepe_dying.mp3", false, 0.6);
 
   // Endboss sounds
-  soundManager.addSound("introEndboss", "audio/endboss_intro_sound.mp3", false, 1.0);
-  soundManager.addSound("endbossClucking", "audio/endboss_clucking.mp3", false, 0.6);
+  soundManager.addSound(
+    "introEndboss",
+    "audio/endboss_intro_sound.mp3",
+    false,
+    1.0
+  );
+  soundManager.addSound(
+    "endbossClucking",
+    "audio/endboss_clucking.mp3",
+    false,
+    0.6
+  );
   soundManager.addSound("endbossAngry", "audio/endboss_angry.mp3", false, 0.8);
   soundManager.addSound("endbossHurt", "audio/endboss_hurting.mp3", false, 0.7);
   soundManager.addSound("endbossDying", "audio/endboss_dying.mp3", false, 0.6);
@@ -55,7 +85,7 @@ function initializeSoundManager() {
   soundManager.addSound("gameOver", "audio/game_over.mp3", false, 0.8);
 
   // Set default or saved volume
-  soundManager.setVolume(localStorage.getItem('volume') || 1.0);
+  soundManager.setVolume(localStorage.getItem("volume") || 1.0);
 }
 
 /**
@@ -92,7 +122,9 @@ function handleSoundToggle(willBeMuted, source) {
     isInGame ? soundManager.pauseAll() : soundManager.pause("backgroundMusic");
   } else {
     if (userInteracted) {
-      isInGame ? soundManager.resumeAll() : soundManager.play("backgroundMusic");
+      isInGame
+        ? soundManager.resumeAll()
+        : soundManager.play("backgroundMusic");
     }
   }
 }
@@ -134,10 +166,10 @@ function setupMuteButtons() {
  * @param {"startScreen"|"inGame"} source - Where the toggle was triggered from.
  */
 function handleMuteToggle(source) {
+  isMuted = !isMuted;
   updateMuteState(isMuted);
   handleSoundToggle(isMuted, source);
   syncMuteUI(isMuted);
-  isMuted = !isMuted;
 }
 
 /**
@@ -161,7 +193,7 @@ window.addEventListener("load", () => {
   initializeSoundManager();
   setupMuteButtons();
   setupStartButtonAudio();
-  soundManager.unmute();          // Restore previous mute state
-  updateMuteState(false);         // Update icon
-  syncMuteUI(false);              // Set button visibility
+  soundManager.unmute(); // Restore previous mute state
+  updateMuteState(true); // Update icon
+  syncMuteUI(false); // Set button visibility
 });
