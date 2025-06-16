@@ -1,30 +1,13 @@
 /**
  * Global variables for the canvas, game world, current level, and game manager.
- * @type {HTMLCanvasElement|undefined}
  */
 let canvas, world, level, gameManager;
-
-/**
- * Instance of Keyboard class to track key states.
- * @type {Keyboard}
- */
 const keyboard = new Keyboard();
-
-/**
- * Object to cache frequently used DOM button elements.
- * @type {Object.<string, HTMLElement|null>}
- */
 const buttons = {};
-
 let spaceListenerAdded = false;
 
 /**
- * Initializes the game when DOM content is fully loaded:
- * - Caches buttons.
- * - Initializes sound manager.
- * - Sets up the start button.
- * - Attaches event listeners.
- * - Logs currently active sounds.
+ * Initializes the game when DOM content is fully loaded.
  */
 document.addEventListener("DOMContentLoaded", () => {
   cacheButtons();
@@ -41,17 +24,13 @@ function cacheButtons() {
   buttons.start = document.getElementById("start-button");
   buttons.pause = document.getElementById("pause-btn");
   buttons.resume = document.getElementById("resume-btn");
-  buttons.restart = document.getElementById("restart-button");
+  buttons.restart = document.getElementById("restart-btn");
+  buttons.menu = document.getElementById("menu-btn");
   buttons.learn = document.getElementById("learn-button");
 }
 
 /**
- * Sets up the start button click event to:
- * - Show a loading screen.
- * - Preload required images.
- * - Initialize level and game manager if needed.
- * - Generate and set background objects.
- * - Start the game.
+ * Sets up the start button click event to start the game.
  */
 function setupStartButton() {
   if (!buttons.start) return;
@@ -59,8 +38,8 @@ function setupStartButton() {
     showLoading(true);
     await preloadImages(layerSets.flat());
     showLoading(false);
-    if (!level1) initLevel();
-    initializeGameManager(); // <- Immer aufrufen
+    if (!level1) initLevel(); // Only call here!
+    initializeGameManager();
 
     const bgObjects = generateBackgroundObjects(layerSets);
     world.setBackgroundObjects(bgObjects);
@@ -69,47 +48,19 @@ function setupStartButton() {
 }
 
 /**
- * Toggles the loading screen visibility.
- * @param {boolean} visible - Whether to show or hide the loading screen.
- */
-function showLoading(visible) {
-  const loadingScreen = document.getElementById("loading-screen");
-  if (loadingScreen) loadingScreen.style.display = visible ? "block" : "none";
-}
-
-/**
- * Preloads an array of image paths.
- * @param {string[]} paths - Array of image URLs to preload.
- * @returns {Promise<void>} Resolves when all images are loaded or errored.
- */
-async function preloadImages(paths) {
-  await Promise.all(
-    paths.map(
-      (path) =>
-        new Promise((resolve) => {
-          const img = new Image();
-          img.src = path;
-          img.onload = resolve;
-          img.onerror = () => {
-            console.warn("Error loading:", path);
-            resolve();
-          };
-        })
-    )
-  );
-}
-
-/**
  * Initializes the game manager, world, and canvas context.
- * Also adds keyboard listener for pausing with space bar.
  */
 function initializeGameManager() {
+  if (world && typeof world.cleanup === "function") world.cleanup();
+  if (gameManager && typeof gameManager.cleanup === "function")
+    gameManager.cleanup();
+
   canvas = document.getElementById("canvas");
   if (!canvas) return console.error("Canvas not found");
   level = level1;
   soundManager ??= new SoundManager();
   gameManager = new GameManager(null);
-  if (!level1) initLevel();
+
   world = new World(canvas, keyboard, level, gameManager);
   world.soundManager = soundManager;
   gameManager.world = world;
@@ -118,16 +69,39 @@ function initializeGameManager() {
 }
 
 /**
- * Toggles all sounds based on the current pause state of the game.
+ * Helper to add a click event listener to a button if it exists.
  */
-function toggleSoundForPauseState() {
-  const isPaused = gameManager.isPaused;
+function addButtonListener(btn, handler) {
+  if (btn) btn.addEventListener("click", handler);
+}
 
-  if (isPaused) {
-    soundManager.resumeAll();
-  } else {
-    soundManager.pauseAll();
-  }
+/**
+ * Sets up all button event listeners using a mapping.
+ */
+function setupButtonListeners() {
+  const buttonMap = [
+    { btn: buttons.pause, handler: handlePause },
+    { btn: buttons.resume, handler: handleResume },
+    { btn: buttons.learn, handler: showInstructions },
+    { btn: buttons.restart, handler: () => gameManager?.restartGame() },
+    {
+      btn: buttons.menu,
+      handler: () => {
+        gameManager.showStartScreen();
+        // Optionally clean up world/gameManager here if needed
+      },
+    },
+  ];
+
+  buttonMap.forEach(({ btn, handler }) => addButtonListener(btn, handler));
+  initializeImpressum();
+}
+
+/**
+ * Initializes all relevant event listeners for buttons and window events.
+ */
+function initializeEventListeners() {
+  setupButtonListeners();
 }
 
 /**
@@ -147,37 +121,8 @@ function addPauseToggleWithSpace() {
 }
 
 /**
- * Initializes all relevant event listeners for buttons and window events.
+ * Sets up window event listeners for keyboard and orientation.
  */
-function initializeEventListeners() {
-  buttons.restart = document.getElementById("restart-btn");
-  buttons.menu = document.getElementById("menu-btn"); // <-- Add this line
-
-  if (buttons.pause) buttons.pause.addEventListener("click", handlePause);
-  if (buttons.resume) buttons.resume.addEventListener("click", handleResume);
-
-  if (buttons.restart) {
-    buttons.restart.addEventListener("click", () => {
-      if (gameManager) {
-        gameManager.restartGame();
-      } else {
-        console.warn("GameManager not initialized yet");
-      }
-    });
-  }
-
-  // Add this for the menu button:
-  if (buttons.menu) {
-    buttons.menu.addEventListener("click", () => {
-      gameManager.showStartScreen();
-    });
-  }
-
-  if (buttons.learn) buttons.learn.addEventListener("click", showInstructions);
-
-  initializeImpressum();
-}
-
 function setupEventListeners() {
   window.removeEventListener("keydown", handleKeyDown);
   window.removeEventListener("keyup", handleKeyUp);
@@ -212,7 +157,6 @@ function handleResume() {
 
 /**
  * Toggles visibility of pause and resume buttons based on pause state.
- * @param {boolean} isPaused - True if game is paused, false otherwise.
  */
 function togglePauseResumeButtons(isPaused) {
   if (!buttons.pause || !buttons.resume) return;
@@ -222,7 +166,6 @@ function togglePauseResumeButtons(isPaused) {
 
 /**
  * Handles keydown events to update keyboard state flags.
- * @param {KeyboardEvent} e - The keyboard event.
  */
 function handleKeyDown(e) {
   if (!gameManager || !gameManager.isGameRunning) return;
@@ -237,7 +180,6 @@ function handleKeyDown(e) {
 
 /**
  * Handles keyup events to update keyboard state flags.
- * @param {KeyboardEvent} e - The keyboard event.
  */
 function handleKeyUp(e) {
   const key = e.key.toLowerCase();
@@ -257,5 +199,45 @@ function hideGameOverScreen() {
   if (screen) {
     screen.classList.remove("visible");
     screen.classList.add("hidden");
+  }
+}
+
+/**
+ * Shows the loading screen.
+ */
+function showLoading(visible) {
+  const loadingScreen = document.getElementById("loading-screen");
+  if (loadingScreen) loadingScreen.style.display = visible ? "block" : "none";
+}
+
+/**
+ * Preloads an array of image paths.
+ */
+async function preloadImages(paths) {
+  await Promise.all(
+    paths.map(
+      (path) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.src = path;
+          img.onload = resolve;
+          img.onerror = () => {
+            console.warn("Error loading:", path);
+            resolve();
+          };
+        })
+    )
+  );
+}
+
+/**
+ * Toggles all sounds based on the current pause state of the game.
+ */
+function toggleSoundForPauseState() {
+  const isPaused = gameManager.isPaused;
+  if (isPaused) {
+    soundManager.resumeAll();
+  } else {
+    soundManager.pauseAll();
   }
 }
