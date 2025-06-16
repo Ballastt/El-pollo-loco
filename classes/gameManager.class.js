@@ -1,107 +1,89 @@
 /**
- * Manages the overall game state, screens, and game flow.
- * Handles starting, stopping, pausing, resuming, and restarting the game.
+ * Manages the overall game lifecycle, including start, pause, resume, game over, and victory handling.
+ * Handles visibility of game screens, world control, and sound coordination.
  */
 class GameManager {
   /**
-   * Creates a new GameManager instance.
-   * @param {World} world - The game world instance.
+   * Creates a new GameManager.
+   * @param {World} world - The initial game world instance.
    */
   constructor(world) {
-    /**
-     * Reference to the game world.
-     * @type {World}
-     */
+    /** @type {World} */
     this.world = world;
 
-    /**
-     * Reference to the sound manager.
-     * @type {SoundManager}
-     */
+    /** @type {SoundManager} */
     this.soundManager = soundManager;
 
-    /**
-     * Indicates if the game is currently running.
-     * @type {boolean}
-     */
+    /** @type {boolean} */
     this.isGameRunning = false;
 
-    /**
-     * Indicates if the game is currently paused.
-     * @type {boolean}
-     */
+    /** @type {boolean} */
     this.isPaused = false;
 
-    /**
-     * Indicates if the game is over.
-     * @type {boolean}
-     */
+    /** @type {boolean} */
     this.isGameOver = false;
 
-    /**
-     * Reference to the game over screen DOM element.
-     * @type {HTMLElement}
-     */
+    /** @type {HTMLElement} */
     this.gameOverScreen = document.getElementById("game-over-screen");
 
-    /**
-     * Reference to the start screen DOM element.
-     * @type {HTMLElement}
-     */
+    /** @type {HTMLElement} */
     this.startScreen = document.getElementById("start-screen");
 
-    /**
-     * Reference to the canvas DOM element.
-     * @type {HTMLCanvasElement}
-     */
+    /** @type {HTMLCanvasElement} */
     this.canvas = document.getElementById("canvas");
   }
 
   /**
-   * Starts the game, hides start/game over screens, and runs the world.
+   * Starts the game: hides UI, initializes world, and plays background music.
    */
   startGame() {
     this.isGameRunning = true;
     this.isPaused = false;
-
     if (this.startScreen) this.startScreen.style.display = "none";
     if (this.gameOverScreen) this.gameOverScreen.classList.add("hidden");
     if (this.canvas) this.canvas.style.display = "block";
-
     this.world.setBackgroundObjects(level1.backgroundObjects);
-
     this.world?.run();
     this.soundManager?.play("backgroundMusic");
   }
 
   /**
-   * Stops the game, clears intervals, removes listeners, and stops all objects.
+   * Stops the game loop and sounds, and removes keyboard listeners.
    */
   stopGame() {
     if (!this.isGameRunning) return;
     this.isGameRunning = false;
-
     this.soundManager?.stopAll();
-    clearInterval(this.world?.characterMovementInterval);
-    clearInterval(this.world?.characterAnimationInterval);
-    window.removeEventListener("keydown", handleKeyDown);
-
-    this.world?.stopObjects?.();
     this.world?.character?.stop?.();
     this.world?.endboss?.stop?.();
+    this.world?.stopObjects?.();
     this.world?.stopGameLoop?.();
+    window.removeEventListener("keydown", handleKeyDown);
   }
 
   /**
-   * Shows the end screen with win or lose image.
-   * @param {boolean} [won=false] - True if the player won, false if lost.
+   * Displays the start screen and hides game canvas.
+   */
+  showStartScreen() {
+    hideGameOverScreen();
+    if (this.startScreen) {
+      this.startScreen.classList.add("visible");
+      this.startScreen.classList.remove("hidden");
+      this.startScreen.style.display = "flex";
+    }
+    if (this.canvas) {
+      this.canvas.style.opacity = 1;
+      this.canvas.style.display = "none";
+    }
+  }
+
+  /**
+   * Displays the end screen with a win or lose message.
+   * @param {boolean} [won=false] - Whether the player won the game.
    */
   showEndScreen(won = false) {
     const screen = this.gameOverScreen;
     const textImg = document.getElementById("game-over-image");
-
-    if (!screen || !textImg)
-      return console.error("❌ Endbildschirm-Elemente fehlen!");
 
     textImg.src = won
       ? "img/You won, you lost/You Win A.png"
@@ -110,43 +92,36 @@ class GameManager {
     screen.classList.remove("hidden");
     screen.style.zIndex = "1000";
     this.canvas.style.opacity = 0.2;
-
-    setTimeout(() => {
-      screen.classList.add("visible");
-    }, 800);
+    setTimeout(() => screen.classList.add("visible"), 800);
   }
 
   /**
-   * Handles game over logic, stops the game, plays sound, and shows end screen.
+   * Triggers game over logic, sound, and screen.
    */
   gameOver() {
     this.isGameRunning = false;
     this.isGameOver = true;
     this.world?.stopGameLoop?.();
 
-    setTimeout(() => {
-      this.soundManager?.play("gameOver");
-    }, 100);
+    setTimeout(() => this.soundManager?.play("gameOver"), 100);
     this.showEndScreen(false);
     this.soundManager?.stopAll();
   }
 
   /**
-   * Handles game win logic, stops the game, plays sound, and shows win screen.
+   * Triggers win logic, sound, and victory screen.
    */
   gameWon() {
     this.isGameRunning = false;
     this.world?.stopGameLoop?.();
 
-    setTimeout(() => {
-      this.soundManager?.play("gameWon");
-    }, 50); // 100 ms warten
+    setTimeout(() => this.soundManager?.play("gameWon"), 50);
     this.showEndScreen(true);
     this.soundManager?.stopAll();
   }
 
   /**
-   * Toggles the pause state of the game.
+   * Toggles between paused and unpaused game state.
    */
   togglePause() {
     if (!this.isGameRunning) return;
@@ -154,18 +129,17 @@ class GameManager {
   }
 
   /**
-   * Pauses the game and all objects.
+   * Pauses the game and sound.
    */
   pauseGame() {
     if (!this.isGameRunning) return;
-
     this.isPaused = true;
     this.world?.pauseObjects?.();
     this.soundManager?.pauseAll?.();
   }
 
   /**
-   * Resumes the game and all objects.
+   * Resumes the game and sound after a pause.
    */
   resumeGame() {
     if (!this.isGameRunning) return;
@@ -175,7 +149,7 @@ class GameManager {
   }
 
   /**
-   * Restarts the game by resetting state, clearing world, and starting a new game.
+   * Restarts the game: resets state, world, and starts a new session.
    */
   restartGame() {
     this.pauseAndResetState();
@@ -184,37 +158,34 @@ class GameManager {
   }
 
   /**
-   * Pauses and resets the game state, stops all sounds and the game.
+   * Stops sounds and resets keyboard/game state.
    */
   pauseAndResetState() {
     this.soundManager?.stopAll();
-    gameManager?.stopGame();
+    this.stopGame();
     keyboard.reset();
   }
 
   /**
-   * Clears the world and hides the game over screen.
+   * Clears the current world and resets UI.
    */
   clearWorld() {
-    if (world) {
-      this.world.stopGameLoop();
-      world = null;
-    }
+    this.world?.character?.stop?.();
+    this.world?.endboss?.stop?.();
+    this.world?.stopGameLoop?.();
+    this.world = null;
     hideGameOverScreen();
-    canvas.style.opacity = 1;
+    this.canvas.style.opacity = 1;
   }
 
   /**
-   * Initializes and starts a new game.
+   * Initializes and starts a fresh game session.
    */
   startNewGame() {
     initLevel();
-    world = new World(canvas, keyboard, level1);
-    world.soundManager = soundManager;
-
-    gameManager = new GameManager(world);
-    world.gameManager = gameManager;
-
-    gameManager.startGame();
+    this.world = new World(this.canvas, keyboard, level1, this);
+    this.world.soundManager = this.soundManager;
+    this.world.gameManager = this;
+    this.startGame();
   }
 }
