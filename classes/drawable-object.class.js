@@ -53,11 +53,46 @@ class DrawableObject {
   }
 
   /**
-   * Draws the hitbox for debugging purposes if the object is a Character or Endboss.
-   * Draws a red rectangle outlining the hitbox or the entire image if no hitbox is set.
-   * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+   * Draws the hitbox as a semi-transparent red rectangle.
+   * Only for debugging – remove or disable for production.
+   * @param {CanvasRenderingContext2D} ctx
    */
   drawHitbox(ctx) {
-    
+    const bounds = this.getHitboxBounds?.();
+    if (!bounds) return;
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(
+      bounds.left,
+      bounds.top,
+      bounds.right - bounds.left,
+      bounds.bottom - bounds.top
+    );
+    ctx.restore();
+  }
+
+  /**
+   * Returns the hitbox bounds of the object.
+   * Defaults to the object's full bounds if no custom hitbox is defined.
+   * @returns {{ left: number, right: number, top: number, bottom: number, centerX: number, centerY: number }}
+   */
+  getHitboxBounds() {
+    const offsetX = this.hitbox?.offsetX || 0;
+    const offsetY = this.hitbox?.offsetY || 0;
+    const width = this.hitbox?.width || this.width;
+    const height = this.hitbox?.height || this.height;
+
+    const left = this.x + offsetX;
+    const top = this.y + offsetY;
+    return {
+      left,
+      top,
+      right: left + width,
+      bottom: top + height,
+      centerX: left + width / 2,
+      centerY: top + height / 2,
+    };
   }
 }
