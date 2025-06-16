@@ -1,6 +1,7 @@
 /**
  * Class representing a moveable object that extends DrawableObject.
- * Handles position, movement, gravity, animation, collision detection, and health.
+ * Handles movement, gravity, animation, collision detection, health, and pause logic.
+ * @extends DrawableObject
  */
 class MoveableObject extends DrawableObject {
   currentImage = 0;
@@ -15,22 +16,41 @@ class MoveableObject extends DrawableObject {
   paused = false;
 
   /**
-   * Applies gravity to the object, updating its vertical position over time.
-   * Stops movement when object reaches the ground.
+   * Applies gravity to the object.
+   * Continuously decreases vertical speed and updates vertical position.
+   * Stops when the object reaches the ground.
    */
   applyGravity() {
-    const tolerance = 2;
+    if (this.gravityInterval) clearInterval(this.gravityInterval);
+
     this.gravityInterval = setInterval(() => {
       if (!this.paused) {
-        if (this.isAboveGround() || this.speedY > 0) {
-          this.y -= this.speedY;
-          this.speedY -= this.acceleration;
-        } else if (this.y >= this.groundY - tolerance) {
-          this.y = this.groundY;
-          this.speedY = 0;
-        }
+        this.isAboveGround() || this.speedY > 0
+          ? this.applyGravityStep()
+          : this.landIfOnGround();
       }
     }, 1000 / 25);
+  }
+
+  /**
+   * Applies one step of vertical acceleration.
+   * Called when object is in the air.
+   */
+  applyGravityStep() {
+    this.y -= this.speedY;
+    this.speedY -= this.acceleration;
+  }
+
+   /**
+   * Snaps object to ground level and resets vertical speed.
+   * Called when falling should stop.
+   */
+  landIfOnGround() {
+    const tolerance = 2;
+    if (this.y >= this.groundY - tolerance) {
+      this.y = this.groundY;
+      this.speedY = 0;
+    }
   }
 
   /**
@@ -52,7 +72,6 @@ class MoveableObject extends DrawableObject {
    */
   playAnimation(images) {
     if (!this.paused) {
-      // Prüfen, ob pausiert
       let i = this.currentImage % images.length;
       let path = images[i];
       this.img = this.imageCache[path];
@@ -100,8 +119,8 @@ class MoveableObject extends DrawableObject {
    * @param {MoveableObject} mo - The other object to check collision with.
    * @returns {boolean} True if colliding, false otherwise.
    */
-  isColliding(mo) {
-    const thisHitbox = this.hitbox
+  getHitbox() {
+    return this.hitbox
       ? {
           x: this.x + this.hitbox.offsetX,
           y: this.y + this.hitbox.offsetY,
@@ -109,21 +128,21 @@ class MoveableObject extends DrawableObject {
           height: this.hitbox.height,
         }
       : { x: this.x, y: this.y, width: this.width, height: this.height };
+  }
 
-    const moHitbox = mo.hitbox
-      ? {
-          x: mo.x + mo.hitbox.offsetX,
-          y: mo.y + mo.hitbox.offsetY,
-          width: mo.hitbox.width,
-          height: mo.hitbox.height,
-        }
-      : { x: mo.x, y: mo.y, width: mo.width, height: mo.height };
-
+  /**
+   * Checks for collision with another object.
+   * @param {MoveableObject} mo
+   * @returns {boolean}
+   */
+  isColliding(mo) {
+    const a = this.getHitbox();
+    const b = mo.getHitbox();
     return (
-      thisHitbox.x + thisHitbox.width > moHitbox.x &&
-      thisHitbox.y + thisHitbox.height > moHitbox.y &&
-      thisHitbox.x < moHitbox.x + moHitbox.width &&
-      thisHitbox.y < moHitbox.y + moHitbox.height
+      a.x + a.width > b.x &&
+      a.y + a.height > b.y &&
+      a.x < b.x + b.width &&
+      a.y < b.y + b.height
     );
   }
 
@@ -131,7 +150,7 @@ class MoveableObject extends DrawableObject {
    * Makes the object jump by setting vertical speed.
    */
   jump() {
-    if (!this.paused) {
+    if (!this.paused && !this.isAboveGround()) {
       this.speedY = 34;
     }
   }
@@ -148,6 +167,7 @@ class MoveableObject extends DrawableObject {
     }
   }
 
+  /** Resets key properties to initial state. */
   reset() {
     this.health = 100;
     this.speedY = 0;
@@ -156,8 +176,8 @@ class MoveableObject extends DrawableObject {
     this.currentImage = 0;
   }
 
+   /** Stops movement/animation logic. */
   stop() {
-    clearInterval(this.gravityInterval);
     this.paused = true;
   }
 
@@ -167,7 +187,7 @@ class MoveableObject extends DrawableObject {
   die() {
     if (!this.isDead) {
       this.isDead = true;
-      clearInterval(this.gravityInterval)
+      clearInterval(this.gravityInterval);
     }
   }
 }
