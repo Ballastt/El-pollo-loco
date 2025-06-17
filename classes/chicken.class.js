@@ -194,7 +194,7 @@ class Chicken extends MoveableObject {
 
         setTimeout(() => {
           this.removeEnemy();
-        }, 500);
+        }, 300);
       }
     }, 200);
   }
