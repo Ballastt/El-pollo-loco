@@ -38,7 +38,7 @@ function setupStartButton() {
     showLoading(true);
     await preloadImages(layerSets.flat());
     showLoading(false);
-    if (!level1) initLevel(); // Only call here!
+    if (!level1) initLevel(); 
     initializeGameManager();
 
     const bgObjects = generateBackgroundObjects(layerSets);
@@ -52,8 +52,7 @@ function setupStartButton() {
  */
 function initializeGameManager() {
   if (world && typeof world.cleanup === "function") world.cleanup();
-  if (gameManager && typeof gameManager.cleanup === "function")
-    gameManager.cleanup();
+  if (gameManager && typeof gameManager.cleanup === "function") gameManager.cleanup();
 
   canvas = document.getElementById("canvas");
   if (!canvas) return console.error("Canvas not found");
@@ -88,11 +87,9 @@ function setupButtonListeners() {
       btn: buttons.menu,
       handler: () => {
         gameManager.showStartScreen();
-        // Optionally clean up world/gameManager here if needed
       },
     },
   ];
-
   buttonMap.forEach(({ btn, handler }) => addButtonListener(btn, handler));
   initializeImpressum();
 }
