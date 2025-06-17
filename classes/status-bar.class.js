@@ -68,7 +68,6 @@ class StatusBar extends DrawableObject {
     this.height = height;
     this.isReversed = isReversed;
 
-    // Select images based on the type
     this.images = StatusBar.IMAGE_SETS[type];
     if (!this.images) throw new Error(`StatusBar type "${type}" is not defined.`);
   
@@ -83,12 +82,10 @@ class StatusBar extends DrawableObject {
    * @param {number} percentage - The new percentage value to set.
    */
   setPercentage(percentage) {
-    this.percentage = Math.max(0, Math.min(percentage, 100)); // Clamp between 0 and 100
+    this.percentage = Math.max(0, Math.min(percentage, 100)); 
 
-    // Determine the appropriate image based on the current percentage
     let path = this.images[this.resolveImageIndex()];
 
-    // Load the image if it is not already cached
     if (!this.imageCache[path]) this.loadImage(path);
     this.img = this.imageCache[path];
 
@@ -103,7 +100,6 @@ class StatusBar extends DrawableObject {
    */
   resolveImageIndex() {
     if (this.isReversed) {
-      // For reversed bars (e.g., coins) — images correspond to increasing fill
       if (this.percentage == 100) return 5;
       if (this.percentage > 60 && this.percentage <= 99) return 4;
       if (this.percentage > 40 && this.percentage <= 60) return 3;
@@ -111,7 +107,6 @@ class StatusBar extends DrawableObject {
       if (this.percentage > 0.1 && this.percentage <= 20) return 1;
       return 0;
     } else {
-      // For normal bars (e.g., health) — images correspond to decreasing fill
       if (this.percentage == 100) return 5;
       if (this.percentage > 60 && this.percentage <= 99) return 4;
       if (this.percentage > 40 && this.percentage <= 60) return 3;
