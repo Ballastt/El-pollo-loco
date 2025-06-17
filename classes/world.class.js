@@ -112,9 +112,6 @@ class World {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
     }
-
-    console.log("[World] run");
-
     if (this.gameManager.isPaused || !this.gameManager.isGameRunning) return;
 
     this.gameLoopInterval = setInterval(() => {
@@ -133,7 +130,6 @@ class World {
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
-      console.log("[World] cleanup: cleared gameLoopInterval");
     }
     this.renderer?.stop();
   }
