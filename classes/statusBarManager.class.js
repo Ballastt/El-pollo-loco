@@ -1,3 +1,11 @@
+/**
+ * Manages the status bar UI elements for the game world.
+ * 
+ * Responsible for updating the visual representation of the character's
+ * health, collected coins, and throwable bottles.
+ * 
+ * @class
+ */
 class StatusBarManager {
   constructor(world) {
     this.world = world;
