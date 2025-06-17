@@ -34,10 +34,10 @@ class CharacterMovementManager {
   }
 
   /**
-   * Processes left/right movement input.
-   * Sets `isMoving` to true if horizontal input is detected.
+   * Processes horizontal movement input.
+   * @returns moved to true if keyboard input is detected.
    */
-  processHorizontalInput() {
+  hasMovedHorizontally() {
     const world = this.character.world;
     let moved = false;
 
@@ -50,7 +50,21 @@ class CharacterMovementManager {
       this.handleLeftInput();
       moved = true;
     }
+
+    return moved;
+  }
+
+  /**
+   * Processes left/right movement input.
+   * Sets `isMoving` to true if horizontal input is detected.
+   */
+  processHorizontalInput() {
+    const moved = this.hasMovedHorizontally();
     this.character.isMoving = moved;
+
+    if (moved) {
+      this.character.lastMoveTime = Date.now();
+    }
   }
 
   /**
