@@ -24,7 +24,7 @@ class CharacterAnimationManager {
   startAnimationLoop() {
     this.animationInterval = setInterval(() => {
       this.handleAnimations();
-    }, 120);
+    }, 160);
   }
 
   /**
@@ -76,19 +76,12 @@ class CharacterAnimationManager {
    * @param {number} now - The current timestamp.
    */
   setIdleOrLongIdleState(now) {
-    const char = this.character;
-    const idleDuration = now - (char.lastMoveTime || now);
-    const isSafeToIdle =
-      !char.isDead &&
-      !char.isSnoring &&
-      char.speedY === 0 &&
-      char.currentState !== char.STATES.JUMPING &&
-      char.currentState !== char.STATES.WALKING &&
-      char.currentState !== char.STATES.HURT;
-
-    if (!isSafeToIdle) return;
-
-    idleDuration > 8000 ? this.setLongIdle() : this.setIdle();
+    const idleDuration = now - (this.character.lastMoveTime || now);
+    if (idleDuration > 8000) {
+      this.setLongIdle();
+    } else {
+      this.setIdle();
+    }
   }
 
   /**
