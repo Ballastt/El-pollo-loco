@@ -244,9 +244,9 @@ class Endboss extends MoveableObject {
 
   /**
    * Hurts the endboss, reducing its health and triggering hurt state.
-   * @param {number} [damage=5] - The amount of damage.
+   * @param {number} [damage=10] - The amount of damage.
    */
-  hurt(damage = 5) {
+  hurt(damage = 10) {
     const now = Date.now();
     if (now < this.hurtUntil || this.isDead) return;
 
@@ -266,10 +266,15 @@ class Endboss extends MoveableObject {
    */
   applyDamage(damage) {
     this.health -= damage;
+
     if (this.health <= 0) {
       this.health = 0;
+      this.updateHealthBar(); 
       this.isDead = true;
+  
       this.die();
+    } else {
+      this.updateHealthBar(); 
     }
   }
 
@@ -287,8 +292,6 @@ class Endboss extends MoveableObject {
    * Handles the death of the endboss, plays sounds, and triggers game win.
    */
   die() {
-    if (this.isDead) return;
-    console.log("[Endboss] Dying now!");
     this.isDead = true;
     this.currentState = this.STATES.DEAD;
     this.playAnimation(this.IMAGES_DEAD);
