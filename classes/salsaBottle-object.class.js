@@ -63,7 +63,6 @@ class SalsaBottle extends ThrowableObject {
     this.loadImages(this.IMAGES_ROTATION);
     this.loadImages(this.IMAGES_SPLASH);
     this.loadImages(this.IMAGES_GROUND);
-    console.log("SalsaBottle created:", this);
 
     this.isSplashing = false;
     this.isRemoved = false;
@@ -165,7 +164,6 @@ class SalsaBottle extends ThrowableObject {
     if (array) {
       const index = array.indexOf(this);
       if (index > -1) {
-        console.log(`Bottle removed from world.${name}`);
         array.splice(index, 1);
       }
     }
