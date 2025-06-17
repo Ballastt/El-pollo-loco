@@ -52,10 +52,8 @@ class SoundManager {
    * @param {string} key - The sound key.
    */
   play(key) {
-    if (!this.isPlayable(key)) {
-      return;
-    }
-
+    if (!this.isPlayable(key)) return;
+    
     this.prepareSound(key);
     this.startPlayback(key);
   }
@@ -202,7 +200,6 @@ class SoundManager {
     this.isMuted = false;
     localStorage.setItem("isMuted", JSON.stringify(false));
 
-    // Resume looping sounds immediately if needed
     if (userInteracted) {
       for (const key in this.sounds) {
         const sound = this.sounds[key];
