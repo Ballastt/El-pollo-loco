@@ -45,7 +45,6 @@ class ThrowableObject extends MoveableObject {
    */
   checkGroundCollision() {
     if (this.y >= 370) {
-      // 370 is the ground level
       this.splash();
       clearInterval(this.throwInterval);
     }
@@ -61,7 +60,6 @@ class ThrowableObject extends MoveableObject {
     this.speedX = this.otherDirection ? -10 : 10;
     this.speedY = -20;
 
-    // Interval to update position and apply gravity every 25 ms
     this.throwInterval = setInterval(() => {
       if (this.isFlying) {
         this.x += this.speedX;
