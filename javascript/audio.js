@@ -114,7 +114,6 @@ function updateStartScreenMuteIcon(muted) {
     ? "img/9_intro_outro_screens/start/sound-off.png"
     : "img/9_intro_outro_screens/start/sound-on.png";
   muteIcon?.setAttribute("src", newSrc);
-  console.log(newSrc);
 }
 
 /**
