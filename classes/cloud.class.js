@@ -38,11 +38,10 @@ class Cloud extends MoveableObject {
     setInterval(() => {
       this.moveLeft();
 
-      // Reset position when the cloud moves out of view to the left
       if (this.x + this.width < 0) {
         this.x = 6000;
-        this.y = 0 + Math.random() * 40; // New random vertical position
+        this.y = 0 + Math.random() * 40; 
       }
-    }, 1000 / 60); // 60 frames per second
+    }, 1000 / 60); 
   }
 }
