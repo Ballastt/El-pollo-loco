@@ -20,11 +20,11 @@ class Coin extends CollectableObject {
    * @param {number} y - The vertical position of the coin.
    */
   constructor(x, y) {
-    super(x, y, 100, 100); // Pass size to CollectableObject
+    super(x, y, 100, 100); 
     this.loadImage("img/8_coin/coin_1.png");
     this.loadCollectableImages(this.IMAGES_COIN);
 
-    this.initHitbox(); // Initialize hitbox for the coin
+    this.initHitbox(); 
     this.animate();
   }
 
@@ -43,7 +43,6 @@ class Coin extends CollectableObject {
    * @type {{offsetX: number, offsetY: number, width: number, height: number}}
    */
   initHitbox() {
-    // Override to set specific hitbox for the coin
     this.hitbox = {
       offsetX: 30,
       offsetY: 30,
