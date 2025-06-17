@@ -16,11 +16,11 @@ class NormalChicken extends Chicken {
         "img/3_enemies_chicken/chicken_normal/1_walk/3_w.png",
       ],
       ["img/3_enemies_chicken/chicken_normal/2_dead/dead.png"],
-      55,              // width of the chicken
-      55,              // height of the chicken
-      [0.35, 0.75],    // hitbox offsets [offsetX, offsetY] relative to the sprite
-      "normalChickenWalking",  // name of the walking animation
-      "chickenDeath"           // name of the death animation
+      55,              
+      55,             
+      [0.35, 0.75],    
+      "normalChickenWalking", 
+      "chickenDeath"           
     );
 
     /**
