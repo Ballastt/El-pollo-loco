@@ -1,6 +1,6 @@
 /**
  * Sets up touch controls for mobile devices.
- * Maps directional and action buttons to the `keyboard` object.
+ * Maps directional and action buttons to the `keyboard` object to simulate key presses.
  */
 document
   .getElementById("btn-left")
@@ -31,8 +31,25 @@ document
   ?.addEventListener("touchend", () => (keyboard.SPACE = false));
 
 /**
- * Adds event listeners to pause and resume game using UI buttons.
- * Toggles visibility between pause and play buttons.
+ * Detects the device type based on touch support and screen width.
+ * @returns {"desktop" | "mobile" | "tablet" | "hybrid"} A string indicating the device type.
+ */
+function detectDeviceType() {
+  const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+  if (!hasTouch) return "desktop";
+
+  const width = window.innerWidth;
+
+  if (width <= 767) return "mobile";
+  if (width <= 1366) return "tablet";
+
+  return "hybrid";
+}
+
+/**
+ * Adds event listeners to pause and resume the game via UI buttons.
+ * Toggles visibility between the pause and play buttons accordingly.
  */
 function togglePausePlay() {
   const btnPause = document.getElementById("btn-pause");
@@ -52,8 +69,8 @@ function togglePausePlay() {
 }
 
 /**
- * Adds event listeners to mute and unmute game audio using UI buttons.
- * Toggles visibility between mute and unmute buttons.
+ * Adds event listeners to mute and unmute all sounds using the UI.
+ * Updates the visible button depending on the mute state.
  */
 function toggleMuteUnmute() {
   const btnMute = document.getElementById("btn-mute");
@@ -73,7 +90,8 @@ function toggleMuteUnmute() {
 }
 
 /**
- * Displays an overlay prompting the user to rotate the device if in portrait mode.
+ * Displays or hides an overlay prompting the user to rotate their device
+ * if it's in portrait mode on mobile.
  */
 function checkOrientation() {
   const overlay = document.getElementById("rotate-device-overlay");
@@ -87,33 +105,45 @@ function checkOrientation() {
 }
 
 /**
- * Determines if the device is in mobile landscape mode.
- * @returns {boolean} True if in landscape and screen is smaller than 1024px wide.
+ * Checks if the current device is in landscape mode and narrow enough to be considered mobile.
+ * @returns {boolean} True if device is in landscape mode on a small screen.
  */
 function isMobileLandscape() {
   return window.innerWidth > window.innerHeight && window.innerWidth < 1024;
 }
 
 /**
- * Shows or hides mobile touch controls based on device orientation and size.
+ * Shows or hides the on-screen mobile controls depending on device type and orientation.
  */
 function showMobileControlsIfLandscape() {
   const controls = document.getElementById("mobile-controls");
   if (!controls) return;
 
-  if (isMobileLandscape()) {
+  const type = detectDeviceType();
+  const isLandscape = window.innerWidth > window.innerHeight;
+
+  if (
+    (type === "mobile" || type === "tablet" || type === "hybrid") &&
+    isLandscape
+  ) {
     controls.classList.remove("hidden");
   } else {
     controls.classList.add("hidden");
   }
 }
 
-// Initialize control toggles and visibility on load
+/**
+ * Initializes UI toggle behavior and shows/hides elements based on device layout.
+ * Called when the DOM content is fully loaded.
+ */
 document.addEventListener("DOMContentLoaded", () => {
   togglePausePlay();
   toggleMuteUnmute();
   showMobileControlsIfLandscape();
 });
 
-// Re-evaluate control visibility on screen resize
+/**
+ * Re-checks and updates visibility of mobile controls on screen size or orientation change.
+ */
 window.addEventListener("resize", showMobileControlsIfLandscape);
+window.addEventListener("orientationchange", showMobileControlsIfLandscape);
