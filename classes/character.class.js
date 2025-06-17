@@ -196,47 +196,20 @@ class Character extends MoveableObject {
   /** Evaluates and updates the character's current state. */
   handleState() {
     const now = Date.now();
-
-    this.resetJumpFlagIfLanded();
+    const inAir = this.isAboveGround();
+    if (!inAir && this.wasInAirLastFrame) this.animationManager.resetJumpAnimationFlag();
+    this.wasInAirLastFrame = inAir;
     if (this.isDead) return;
-    if (this.isHurt(now)) return;
-    if (this.isAboveGround()) return this.setJumpingState(now);
-    if (this.isMoving) return this.setWalking(now);
-
+    if (this.hurtUntil && now < this.hurtUntil) return this.setState(this.STATES.HURT);
+    if (inAir) return this.setJumpingState(now);
+    if (this.isMoving) {
+      this.setWalkingState(now);
+      this.lastMoveTime = now;
+      return;
+    }
     this.animationManager.setIdleOrLongIdleState(now);
   }
-
-  /** Resets the jump animation flag when landing after being airborne. */
-  resetJumpFlagIfLanded() {
-    const inAir = this.isAboveGround();
-    if (!inAir && this.wasInAirLastFrame) {
-      this.animationManager.resetJumpAnimationFlag();
-    }
-    this.wasInAirLastFrame = inAir;
-  }
-
-  /**
-   * Checks if the character is currently in a hurt state.
-   * @param {number} now - Current timestamp.
-   * @returns {boolean}
-   */
-  isHurt(now) {
-    if (this.hurtUntil && now < this.hurtUntil) {
-      this.setState(this.STATES.HURT);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Updates character state to walking and sets movement timestamp.
-   * @param {number} now - Current timestamp.
-   */
-  setWalking(now) {
-    this.setWalkingState(now);
-    this.lastMoveTime = now;
-  }
-
+  
   /**
    * Determines whether the character is jumping on the given enemy.
    * @param {Enemy} enemy
