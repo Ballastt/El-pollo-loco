@@ -60,11 +60,11 @@ function generateEnemies() {
   const enemies = [];
   const amount = 30;
   const levelLength = 6800;
-  const availableSpace = levelLength - 600; 
+  const availableSpace = levelLength - 1000; 
   const spacing = availableSpace / amount;
 
   for (let i = 0; i < amount; i++) {
-    const x = 600 + i * spacing;
+    const x = 1000 + i * spacing;
     enemies.push(createEnemy(x, enemies));
   }
 
