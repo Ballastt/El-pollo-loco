@@ -158,9 +158,8 @@ class SalsaBottle extends ThrowableObject {
   /**
    * Helper method to remove this bottle from a given array in the world.
    * @param {Array} array - The array to remove from.
-   * @param {string} name - The name of the array for logging purposes.
    */
-  removeFromArray(array, name) {
+  removeFromArray(array) {
     if (array) {
       const index = array.indexOf(this);
       if (index > -1) {
