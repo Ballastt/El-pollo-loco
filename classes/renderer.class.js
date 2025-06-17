@@ -64,9 +64,9 @@ class Renderer {
     this.addObjectToMap(w.level.enemies);
     this.addObjectToMap(w.throwableObjects);
 
-    // Debug hitboxes
+    /* Debug hitboxes
     this.world.character.drawHitbox(this.ctx);
-    this.world.level.enemies.forEach((e) => e.drawHitbox?.(this.ctx));
+    this.world.level.enemies.forEach((e) => e.drawHitbox?.(this.ctx));*/
 
     w.ctx.restore();
 
