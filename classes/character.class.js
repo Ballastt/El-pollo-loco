@@ -93,9 +93,9 @@ class Character extends MoveableObject {
   /** Initializes the character's hitbox. */
   initHitbox() {
     this.hitbox = {
-      offsetX: 10,
+      offsetX: 12,
       offsetY: 100,
-      width: 86,
+      width: 76,
       height: 146,
     };
   }
