@@ -197,10 +197,12 @@ class Character extends MoveableObject {
   handleState() {
     const now = Date.now();
     const inAir = this.isAboveGround();
-    if (!inAir && this.wasInAirLastFrame) this.animationManager.resetJumpAnimationFlag();
+    if (!inAir && this.wasInAirLastFrame)
+      this.animationManager.resetJumpAnimationFlag();
     this.wasInAirLastFrame = inAir;
     if (this.isDead) return;
-    if (this.hurtUntil && now < this.hurtUntil) return this.setState(this.STATES.HURT);
+    if (this.hurtUntil && now < this.hurtUntil)
+      return this.setState(this.STATES.HURT);
     if (inAir) return this.setJumpingState(now);
     if (this.isMoving) {
       this.setWalkingState(now);
@@ -209,7 +211,7 @@ class Character extends MoveableObject {
     }
     this.animationManager.setIdleOrLongIdleState(now);
   }
-  
+
   /**
    * Determines whether the character is jumping on the given enemy.
    * @param {Enemy} enemy
@@ -244,20 +246,32 @@ class Character extends MoveableObject {
   }
 
   /**
-   * Throws a bottle if one is available.
+   * Determines whether the character can throw a bottle.
+   * @returns {boolean}
+   */
+  canThrowBottle() {
+    return (
+      this.collectedBottles > 0 &&
+      !this.isSnoring &&
+      this.currentState !== this.STATES.LONG_IDLE
+     
+    );
+  }
+
+  /**
+   * Throws a bottle if allowed.
    * @returns {boolean} True if a bottle was thrown.
    */
   throwBottle() {
-    if (this.collectedBottles <= 0) return false;
+    if (!this.canThrowBottle()) return false;
+
     this.collectedBottles--;
+
     const offsetX = this.otherDirection ? -10 : 60;
     const offsetY = 80;
-    const bottle = new SalsaBottle(
-      this.x + offsetX,
-      this.y + offsetY,
-      this.otherDirection,
-      this.world
-    );
+
+    const bottle = new SalsaBottle(this.x + offsetX, this.y + offsetY, this.otherDirection, this.world);
+
     this.world.throwableObjects.push(bottle);
     this.world.updateThrowBar();
     return true;
