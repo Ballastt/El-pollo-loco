@@ -29,6 +29,10 @@ class Keyboard {
     this.D = false;
   }
 
+  /**
+   * Resets the keyboard input states to `false`.
+   * Typically used to clear all movement or action keys.
+   */
   reset() {
     keyboard.SPACE = false;
     keyboard.LEFT = false;
