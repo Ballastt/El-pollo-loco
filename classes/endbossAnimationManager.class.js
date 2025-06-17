@@ -106,10 +106,8 @@ class EndbossAnimationManager {
     if (this.endboss.currentState !== this.endboss.STATES.ATTACK) {
       this.endboss.soundManager.stop("endbossClucking");
       this.endboss.soundManager.play("endbossAngry");
-      console.log("[Endboss] Playing endbossAngry");
     }
     this.endboss.currentState = this.endboss.STATES.ATTACK;
-    console.log("[Endboss] State set to ATTACK"); // ← NEU!
   }
 
   /**
