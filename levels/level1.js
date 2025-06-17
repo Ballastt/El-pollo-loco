@@ -55,14 +55,12 @@ function createEnemy(x, enemies) {
 /**
  * Generates an array of enemy instances distributed across the level.
  * Each enemy is either a SmallChicken or NormalChicken placed with slight randomness.
- *
- * @returns {(SmallChicken|NormalChicken)[]} Array of enemy instances.
  */
 function generateEnemies() {
   const enemies = [];
-  const amount = 35;
-  const levelLength = 6000;
-  const availableSpace = levelLength - 600; // Platz ab x=600 bis zum Ende
+  const amount = 30;
+  const levelLength = 6800;
+  const availableSpace = levelLength - 600; 
   const spacing = availableSpace / amount;
 
   for (let i = 0; i < amount; i++) {
