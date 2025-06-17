@@ -14,16 +14,13 @@ class SoundManager {
     this.sounds = {};
 
     /**
-     * Indicates if all sounds are muted.
-     * @type {boolean}
-     */
-    this.isMuted = JSON.parse(localStorage.getItem("isMuted")) || false;
-
-    /**
      * Flags for currently playing sounds.
      * @type {Object.<string, boolean>}
      */
     this.playingFlags = {};
+
+    const storedMute = localStorage.getItem("isMuted");
+    this.isMuted = storedMute === "true"; // convert string to boolean
   }
 
   /**
@@ -53,7 +50,7 @@ class SoundManager {
    */
   play(key) {
     if (!this.isPlayable(key)) return;
-    
+
     this.prepareSound(key);
     this.startPlayback(key);
   }
@@ -189,7 +186,8 @@ class SoundManager {
    */
   mute() {
     this.isMuted = true;
-    localStorage.setItem("isMuted", JSON.stringify(true));
+    localStorage.setItem("isMuted", "true");
+    console.log("[SoundManager] Muted.");
     this.pauseAll();
   }
 
@@ -198,7 +196,8 @@ class SoundManager {
    */
   unmute() {
     this.isMuted = false;
-    localStorage.setItem("isMuted", JSON.stringify(false));
+    localStorage.setItem("isMuted", "false");
+    console.log("[SoundManager] Unmuted.");
 
     if (userInteracted) {
       for (const key in this.sounds) {
