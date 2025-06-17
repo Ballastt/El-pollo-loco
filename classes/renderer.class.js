@@ -90,9 +90,10 @@ class Renderer {
     w.ctx.translate(w.camera_x, 0);
 
     this.addObjectToMap(w.backgroundObjects);
+    this.addObjectToMap(w.level.clouds);
     this.addObjectToMap(w.level.coins);
     this.addObjectToMap(w.level.bottles);
-    this.addObjectToMap(w.level.clouds);
+    
     this.addToMap(w.character);
     this.addToMap(w.endboss);
     this.addObjectToMap(w.level.enemies);
