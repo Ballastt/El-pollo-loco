@@ -1,19 +1,40 @@
+/**
+ * Handles all rendering logic for the game world.
+ * Responsible for drawing the background, characters, enemies, UI elements, and managing camera translation.
+ */
 class Renderer {
+  /**
+   * Creates a new Renderer instance.
+   * @param {World} world - The game world to render.
+   */
   constructor(world) {
+    /** @type {World} */
     this.world = world;
+
+    /** @type {CanvasRenderingContext2D} */
     this.ctx = world.ctx;
+
+    /** @type {HTMLCanvasElement} */
     this.canvas = world.canvas;
+
+    /** @type {Endboss} */
     this.endboss = world.endboss;
+
+    /** @type {boolean} Whether rendering is currently active. */
     this.isDrawing = false;
   }
 
+  /**
+   * Starts the drawing loop for the game world.
+   * Uses `requestAnimationFrame` to render each frame.
+   */
   draw() {
     if (!this.isDrawing) return;
 
     const w = this.world;
     w.ctx.clearRect(0, 0, w.canvas.width, w.canvas.height);
 
-    // Enable collection only after 1 second delay
+    // Allow item collection after 1 second
     if (!w.allowCollection && Date.now() - w.startTime > 1000) {
       w.allowCollection = true;
     }
@@ -23,18 +44,17 @@ class Renderer {
       w.checkBottleCollection();
     }
 
-    // Camera movement
+    // Move camera if not at level end
     if (w.camera_x < w.level_end_x - w.canvas.width) {
       if (w.keyboard.RIGHT) {
         w.camera_x += 1;
       }
     }
 
-    // Use save/restore for camera
     w.ctx.save();
     w.ctx.translate(w.camera_x, 0);
 
-    // Draw objects
+    // Draw all world elements
     this.addObjectToMap(w.backgroundObjects);
     this.addObjectToMap(w.level.coins);
     this.addObjectToMap(w.level.bottles);
@@ -44,19 +64,18 @@ class Renderer {
     this.addObjectToMap(w.level.enemies);
     this.addObjectToMap(w.throwableObjects);
 
-    // In drawWorld() oder drawObjects(), temporär hinzufügen:
+    // Debug hitboxes
     this.world.character.drawHitbox(this.ctx);
     this.world.level.enemies.forEach((e) => e.drawHitbox?.(this.ctx));
 
     w.ctx.restore();
 
-    // UI elements (drawn without camera translation)
+    // Draw UI (not affected by camera)
     this.addToMap(w.healthBar);
     this.addToMap(w.throwBar);
     this.addToMap(w.coinBar);
 
     const distanceToBoss = Math.abs(w.character.x - w.endboss.x);
-
     if (!w.endbossEncounterStarted && distanceToBoss < 500) {
       w.endbossEncounterStarted = true;
     }
@@ -68,21 +87,30 @@ class Renderer {
     requestAnimationFrame(() => this.draw());
   }
 
+  /**
+   * Adds an array of objects to the render queue.
+   * @param {Array<DrawableObject>} objects - The objects to draw.
+   */
   addObjectToMap(objects) {
-    objects.forEach((o) => {
-      this.addToMap(o);
-    });
+    objects.forEach((o) => this.addToMap(o));
   }
 
+  /**
+   * Draws a single object, flipping it if it faces left.
+   * @param {DrawableObject} mo - The drawable object.
+   */
   addToMap(mo) {
     if (mo.otherDirection) this.flipImage(mo);
 
     mo.draw(this.ctx);
-    // mo.drawHitbox(this.ctx); // Removed for performance
 
     if (mo.otherDirection) this.flipImageBack(mo);
   }
 
+  /**
+   * Applies a horizontal flip transformation before drawing the object.
+   * @param {DrawableObject} mo - The object to flip.
+   */
   flipImage(mo) {
     this.ctx.save();
     this.ctx.translate(mo.width, 0);
@@ -90,20 +118,28 @@ class Renderer {
     mo.x = mo.x * -1;
   }
 
+  /**
+   * Reverses the horizontal flip transformation after drawing.
+   * @param {DrawableObject} mo - The object to restore.
+   */
   flipImageBack(mo) {
     mo.x = mo.x * -1;
     this.ctx.restore();
   }
 
+  /**
+   * Starts the renderer's drawing loop.
+   */
   start() {
     if (this.isDrawing) return;
     this.isDrawing = true;
-    console.log("[Renderer] start");
     this.draw();
   }
 
+  /**
+   * Stops the renderer's drawing loop.
+   */
   stop() {
     this.isDrawing = false;
-    console.log("[Renderer] stop");
   }
 }
