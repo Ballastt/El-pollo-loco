@@ -131,7 +131,6 @@ class Endboss extends MoveableObject {
     this.gameManager = world?.gameManager;
     this.soundManager = soundManager;
 
-    // Use the global EndbossAssets and EndbossStates
     this.IMAGES_WALKING = EndbossAssets.WALKING;
     this.IMAGES_ALERT = EndbossAssets.ALERT;
     this.IMAGES_ATTACK = EndbossAssets.ATTACK;
