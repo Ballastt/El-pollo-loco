@@ -14,11 +14,11 @@ class CollectableBottle extends CollectableObject {
    * @param {Object} world - Reference to the game world (optional, for context).
    */
   constructor(x, y, world) {
-    super(x, y, 70, 50); // Position and size of the bottle
+    super(x, y, 70, 50); 
     this.world = world;
-    this.loadImage("img/6_salsa_bottle/salsa_bottle.png"); // Load bottle image
+    this.loadImage("img/6_salsa_bottle/salsa_bottle.png"); 
 
-    this.initHitbox(); // Initialize hitbox
+    this.initHitbox(); 
   }
 
   /**
@@ -26,7 +26,6 @@ class CollectableBottle extends CollectableObject {
    * @type {{offsetX: number, offsetY: number, width: number, height: number}}
    */
   initHitbox() {
-    // Override to set specific hitbox for the bottle
     this.hitbox = {
       offsetX: 23,
       offsetY: 6,
