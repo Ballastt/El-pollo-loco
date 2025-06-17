@@ -7,8 +7,6 @@ class CollisionManager {
     this.gameManager = gameManager;
   }
 
-  // --- Kollisionen ---
-
   /**
    * Checks for collisions between the character and enemies/endboss, and updates health bar.
    */
