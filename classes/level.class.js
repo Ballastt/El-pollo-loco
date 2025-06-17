@@ -40,8 +40,6 @@ class Level {
     this.backgroundObjects = backgroundObjects;
     this.coins = coins;
     this.bottles = bottles;
-
-    // Automatically set the totals
     this.totalCoins = coins.length;
     this.totalBottles = bottles.length;
   }
