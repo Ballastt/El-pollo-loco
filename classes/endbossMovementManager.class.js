@@ -23,7 +23,6 @@ class EndbossMovementManager {
         this.moveTowardsCharacter(this.endboss.speedWalk);
         break;
       case this.endboss.STATES.WALKING:
-        // Idle or patrol logic could go here
         break;
     }
   }
