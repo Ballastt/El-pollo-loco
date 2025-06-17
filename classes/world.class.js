@@ -84,9 +84,9 @@ class World {
     this.healthBar = new StatusBar("health", 0, 0, 250, 60);
     this.throwBar = new StatusBar("throw", 0, 50, 250, 60, true);
     this.coinBar = new StatusBar("coin", 0, 100, 250, 60, true);
-    // Example values, adjust x/y/width/height as needed for your UI
+
     this.endbossHealthBar = new StatusBar("endboss", 460, 0, 250, 60);
-    this.endbossHealthBar.setPercentage(100); // Start full
+    this.endbossHealthBar.setPercentage(100); 
 
     this.statusBarManager = new StatusBarManager(this);
     this.itemCollectionManager = new ItemCollectionManager(this);
@@ -251,8 +251,6 @@ class World {
       this.bottleCollectSound.volume = this.soundVolume;
     }
   }
-
-  // --- Delegated Methods (Manager Classes) ---
 
   /** Checks coin collection logic. */
   checkCoinCollection() {
