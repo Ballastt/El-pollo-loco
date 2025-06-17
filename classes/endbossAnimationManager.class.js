@@ -40,14 +40,12 @@ class EndbossAnimationManager {
     if (this.endboss.health <= 0) return this.endboss.die();
     if (Date.now() < this.endboss.hurtUntil) return this.setHurtState();
 
-    const distanceToPlayer = this.endboss.calculateDistance(
-      this.endboss.character.x,
-      this.endboss.character.y
-    );
+    const distanceToPlayer = this.endboss.calculateDistance(this.endboss.character.x, this.endboss.character.y);
 
     if (this.shouldBeInIntroPhase(distanceToPlayer)) return this.handleIntroPhase();
     if (this.shouldAttack(distanceToPlayer)) return this.setAttackState();
     if (this.shouldAlert(distanceToPlayer)) return this.setAlertState();
+    
     return this.setWalkingState();
   }
 
