@@ -22,7 +22,7 @@ class CollectableObject extends MoveableObject {
     this.height = height;
     this.speed = 0; 
 
-    this.initHitbox(); // Initialize hitbox
+    this.initHitbox(); 
   }
 
   /**
