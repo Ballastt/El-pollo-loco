@@ -25,6 +25,55 @@ class Renderer {
   }
 
   /**
+   * Updates the camera position based on character movement.
+   * Moves the camera right if the character moves right and hasn't reached the level's end.
+   */
+  updateCamera() {
+    if (
+      this.world.camera_x <
+      this.world.level_end_x - this.world.canvas.width
+    ) {
+      if (this.world.keyboard.RIGHT) {
+        this.world.camera_x += 1;
+      }
+    }
+  }
+
+  /**
+   * Enables item collection after a delay and checks for collected items.
+   */
+  checkAndHandleItemCollection() {
+    if (
+      !this.world.allowCollection &&
+      Date.now() - this.world.startTime > 1000
+    ) {
+      this.world.allowCollection = true;
+    }
+
+    if (this.world.allowCollection) {
+      this.world.checkCoinCollection();
+      this.world.checkBottleCollection();
+    }
+  }
+
+  /**
+   * Checks if the endboss encounter should start based on distance,
+   * and renders the endboss health bar if applicable.
+   */
+  updateEndbossHealthbar() {
+    const w = this.world;
+    const ENDBOSS_TRIGGER_DISTANCE = 500;
+    const distanceToBoss = Math.abs(w.character.x - w.endboss.x);
+    if (!w.endbossEncounterStarted && distanceToBoss < ENDBOSS_TRIGGER_DISTANCE) {
+      w.endbossEncounterStarted = true;
+    }
+
+    if (w.endbossHealthBar && w.endbossEncounterStarted) {
+      this.addToMap(w.endbossHealthBar);
+    }
+  }
+
+  /**
    * Starts the drawing loop for the game world.
    * Uses `requestAnimationFrame` to render each frame.
    */
@@ -34,27 +83,12 @@ class Renderer {
     const w = this.world;
     w.ctx.clearRect(0, 0, w.canvas.width, w.canvas.height);
 
-    // Allow item collection after 1 second
-    if (!w.allowCollection && Date.now() - w.startTime > 1000) {
-      w.allowCollection = true;
-    }
-
-    if (w.allowCollection) {
-      w.checkCoinCollection();
-      w.checkBottleCollection();
-    }
-
-    // Move camera if not at level end
-    if (w.camera_x < w.level_end_x - w.canvas.width) {
-      if (w.keyboard.RIGHT) {
-        w.camera_x += 1;
-      }
-    }
+    this.checkAndHandleItemCollection();
+    this.updateCamera();
 
     w.ctx.save();
     w.ctx.translate(w.camera_x, 0);
 
-    // Draw all world elements
     this.addObjectToMap(w.backgroundObjects);
     this.addObjectToMap(w.level.coins);
     this.addObjectToMap(w.level.bottles);
@@ -70,19 +104,11 @@ class Renderer {
 
     w.ctx.restore();
 
-    // Draw UI (not affected by camera)
     this.addToMap(w.healthBar);
     this.addToMap(w.throwBar);
     this.addToMap(w.coinBar);
 
-    const distanceToBoss = Math.abs(w.character.x - w.endboss.x);
-    if (!w.endbossEncounterStarted && distanceToBoss < 500) {
-      w.endbossEncounterStarted = true;
-    }
-
-    if (w.endbossHealthBar && w.endbossEncounterStarted) {
-      this.addToMap(w.endbossHealthBar);
-    }
+    this.updateEndbossHealthbar();
 
     requestAnimationFrame(() => this.draw());
   }
