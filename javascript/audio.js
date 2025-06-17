@@ -5,8 +5,6 @@
 const startScreen = document.getElementById("start-screen"); // The start screen container
 const startButton = document.getElementById("start-button"); // Button to start the game
 const learnButton = document.getElementById("learn-button"); // Button to show "about the game"
-const muteButton = document.getElementById("mute-button"); // Start screen mute button
-const muteIcon = document.getElementById("muteStartScreen"); // Icon inside the start screen mute button
 const muteButtonInGame = document.getElementById("mute-btn"); // In-game mute button (to mute)
 const soundButtonInGame = document.getElementById("sound-btn"); // In-game unmute button (to unmute)
 
@@ -21,18 +19,6 @@ let userInteracted = false;
  * @type {SoundManager}
  */
 let soundManager;
-
-/**
- * Tracks mute state for the start screen.
- * @type {boolean}
- */
-let isMutedStartScreen = true;
-
-/**
- * Tracks mute state during gameplay.
- * @type {boolean}
- */
-let isMutedInGame = false;
 
 /**
  * Initializes the global SoundManager with all game-related sounds.
@@ -55,19 +41,7 @@ function initializeSoundManager() {
 function ensureUserInteraction() {
   if (!userInteracted) {
     userInteracted = true;
-    soundManager.unmute(); // Enables audio system after first user gesture
   }
-}
-
-/**
- * Updates the mute icon on the start screen based on mute state.
- * @param {boolean} muted - Whether sound is currently muted.
- */
-function updateStartScreenMuteIcon(muted) {
-  const newSrc = muted
-    ? "img/9_intro_outro_screens/start/sound-off.png"
-    : "img/9_intro_outro_screens/start/sound-on.png";
-  muteIcon?.setAttribute("src", newSrc);
 }
 
 /**
@@ -79,36 +53,14 @@ function updateInGameMuteIcons(muted) {
   soundButtonInGame.style.display = muted ? "none" : "inline-block";
 }
 
-/**
- * Toggles sound on the start screen.
- * Starts/stops background music and updates the icon accordingly.
- */
-function toggleStartScreenSound() {
-  isMutedStartScreen = !isMutedStartScreen;
-
-  if (isMutedStartScreen) {
-    soundManager.stop("backgroundMusic");
+function toggleSound() {
+  if (soundManager.isMuted) {
+    soundManager.unmute();
   } else {
-    soundManager.play("backgroundMusic");
+    soundManager.mute();
   }
 
-  updateStartScreenMuteIcon(isMutedStartScreen);
-}
-
-/**
- * Toggles in-game sound by pausing or resuming all sounds.
- * Updates button visibility accordingly.
- */
-function toggleInGameSound() {
-  isMutedInGame = !isMutedInGame;
-
-  if (isMutedInGame) {
-    soundManager.pauseAll();
-  } else {
-    soundManager.resumeAll();
-  }
-
-  updateInGameMuteIcons(isMutedInGame);
+  updateInGameMuteIcons(soundManager.isMuted);
 }
 
 /**
@@ -116,13 +68,9 @@ function toggleInGameSound() {
  * for both the start screen and in-game interface.
  */
 function setupMuteButtons() {
-  muteButton?.addEventListener("click", () => {
-    toggleStartScreenSound();
-  });
-
   [muteButtonInGame, soundButtonInGame].forEach((btn) => {
     btn?.addEventListener("click", () => {
-      toggleInGameSound();
+      toggleSound();
     });
   });
 }
@@ -135,9 +83,6 @@ function setupStartButtonAudio() {
   if (startButton) {
     startButton.addEventListener("click", () => {
       ensureUserInteraction();
-      isMutedStartScreen = false;
-      updateStartScreenMuteIcon(isMutedStartScreen);
-
       if (!soundManager.isMuted) soundManager.play("backgroundMusic");
     });
   }
@@ -151,7 +96,9 @@ window.addEventListener("load", () => {
   initializeSoundManager();
   setupMuteButtons();
   setupStartButtonAudio();
-
   updateInGameMuteIcons(soundManager.isMuted);
-  updateStartScreenMuteIcon(isMutedStartScreen);
+
+  if (!soundManager.isMuted) {
+    soundManager.unmute();
+  }
 });
