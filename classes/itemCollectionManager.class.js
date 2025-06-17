@@ -3,8 +3,6 @@ class ItemCollectionManager {
     this.world = world;
   }
 
-  // --- Sammelaktionen ---
-
   /**
    * Checks for coin collection by the character.
    */
