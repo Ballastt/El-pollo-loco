@@ -133,6 +133,30 @@ function showMobileControlsIfLandscape() {
 }
 
 /**
+ * Prevents context menu only on mobile touch buttons.
+ * Prevents long-press context menus from interrupting gameplay on touch devices.
+ */
+function preventContextMenuOnTouchButtons() {
+  const buttonIds = [
+    "btn-left",
+    "btn-right",
+    "btn-jump",
+    "btn-throw",
+    "btn-pause",
+    "btn-play",
+    "btn-mute",
+    "btn-unmute",
+  ];
+
+  buttonIds.forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener("contextmenu", (e) => e.preventDefault());
+    }
+  });
+}
+
+/**
  * Initializes UI toggle behavior and shows/hides elements based on device layout.
  * Called when the DOM content is fully loaded.
  */
@@ -140,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
   togglePausePlay();
   toggleMuteUnmute();
   showMobileControlsIfLandscape();
+  preventContextMenuOnTouchButtons();
 });
 
 /**
