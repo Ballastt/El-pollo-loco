@@ -21,12 +21,18 @@
   font-display: swap;
 }
 
+html,
 body {
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden; 
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
   display: flex;
-  align-items: center; /* vertical centering */
-  justify-content: center; /* horizontal centering */
-  overflow: hidden;
+  align-items: center; 
+  justify-content: center; 
   font-family: "Mountains of Christmas", "Comic Sans MS", "Brush Script MT",
     cursive;
 }
@@ -44,10 +50,11 @@ body {
   width: 720px;
   height: 480px;
   z-index: 4;
-  position: relative; /* or just remove position */
+  position: relative; 
   top: unset;
   left: unset;
   transform: unset;
+  flex-shrink: 0;
 }
 
 #btn-container-bg {
@@ -61,11 +68,17 @@ body {
 }
 
 h1 {
-  font-family: "Mountains of Christmas", cursive;
-  font-size: 5rem;
-  padding: 0px;
+  font-size: 80px;
+  min-height: 100px;
+  width: 600px;
   font-weight: bold;
-  text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+  text-shadow: 4px 4px 10px rgba(169, 131, 87, 0.5);
+  color: white;
+  padding: 50px;
+  text-align: center;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  flex-shrink: 0;
 }
 
 #background-image {
@@ -74,11 +87,11 @@ h1 {
   left: 0;
   z-index: 4;
   width: 100vw;
-  height: 100dvh;
+  height: 100vh;
   background-image: url("img/icons_bg/bg-img_loco.png");
   background-position: center;
   background-repeat: no-repeat;
-
+  background-size: cover;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,11 +101,6 @@ h1 {
 
 #background-image button {
   pointer-events: auto;
-}
-
-#background-image h1 {
-  color: white;
-  padding-top: 30px;
 }
 
 #start-screen {
@@ -141,38 +149,27 @@ h1 {
 }
 
 .btn-grad:hover {
-  background-position: right center; /* change the direction of the change here */
+  background-position: right center; 
   color: #fff;
   text-decoration: none;
 }
 
 .buttons {
   position: absolute;
-  top: 10%;
+  top: 80px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 3rem;
+  gap: 24px;
   flex-wrap: wrap;
   justify-content: space-around;
   align-items: center;
-  margin-top: -3.5rem;
-  width: 90%;
+
+  width: 720px;
   max-width: 800px;
   z-index: 2;
-}
-
-#mute-button {
-  border-radius: 50%;
-  z-index: 2;
-  width: 48px;
-  height: 48px;
-  margin-top: 1rem;
-}
-
-#muteStartScreen {
-  height: 32px !important;
-  width: 32px !important;
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 
 #learn-button {
@@ -181,25 +178,15 @@ h1 {
   font-family: "Mountains of Christmas", cursive;
   font-size: 24px;
   font-weight: bold;
-  margin-top: 1rem;
 }
 
-#start-button {
-  width: 200px;
-  height: 50px;
-  font-family: "Mountains of Christmas", cursive;
-  font-size: 24px;
-  font-weight: bold;
-  margin-top: 1rem;
-}
-
+#start-button,
 #impressum-button {
   width: 200px;
   height: 50px;
   font-family: "Mountains of Christmas", cursive;
   font-size: 24px;
   font-weight: bold;
-  margin-top: 1rem;
 }
 
 #pause-btn,
@@ -239,7 +226,7 @@ h1 {
 #mute-btn:hover,
 #resume-btn:hover,
 #sound-btn:hover {
-  transform: scale(1.2); /* Button wird um 20% größer */
+  transform: scale(1.2); 
 }
 
 #game-over-screen {
