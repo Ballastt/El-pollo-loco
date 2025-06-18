@@ -109,7 +109,7 @@ function addPauseToggleWithSpace() {
   spaceListenerAdded = true;
 
   window.addEventListener("keydown", (e) => {
-    if (e.code === "Space" && !e.repeat && gameManager?.isGameRunning) {
+    if (e.code === "Escape" && !e.repeat && gameManager?.isGameRunning) {
       e.preventDefault();
       toggleSoundForPauseState();
       gameManager.togglePause();
@@ -171,7 +171,7 @@ function handleKeyDown(e) {
   if (key === "arrowleft") keyboard.LEFT = true;
   if (key === "arrowup") keyboard.UP = true;
   if (key === "arrowdown") keyboard.DOWN = true;
-  if (key === " ") keyboard.SPACE = true;
+  if (key === "escape") keyboard.ESC = true;
   if (key === "d") keyboard.D = true;
 }
 
@@ -184,7 +184,7 @@ function handleKeyUp(e) {
   if (key === "arrowleft") keyboard.LEFT = false;
   if (key === "arrowup") keyboard.UP = false;
   if (key === "arrowdown") keyboard.DOWN = false;
-  if (key === " ") keyboard.SPACE = false;
+  if (key === "escape") keyboard.ESC = false;
   if (key === "d") keyboard.D = false;
 }
 
