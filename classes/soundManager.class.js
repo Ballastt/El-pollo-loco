@@ -187,7 +187,6 @@ class SoundManager {
   mute() {
     this.isMuted = true;
     localStorage.setItem("isMuted", "true");
-    console.log("[SoundManager] Muted.");
     this.pauseAll();
   }
 
@@ -197,8 +196,6 @@ class SoundManager {
   unmute() {
     this.isMuted = false;
     localStorage.setItem("isMuted", "false");
-    console.log("[SoundManager] Unmuted.");
-
     if (userInteracted) {
       for (const key in this.sounds) {
         const sound = this.sounds[key];
