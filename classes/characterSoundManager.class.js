@@ -21,6 +21,7 @@ class CharacterSoundManager {
     if (!sm) return;
     if (this.character.isMoving) {
       sm.play("walkingSound");
+      this.stopSnoring();
     } else {
       sm.stop("walkingSound");
     }
