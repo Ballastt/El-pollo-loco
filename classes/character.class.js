@@ -197,19 +197,45 @@ class Character extends MoveableObject {
   handleState() {
     const now = Date.now();
     const inAir = this.isAboveGround();
-    if (!inAir && this.wasInAirLastFrame)
-      this.animationManager.resetJumpAnimationFlag();
-    this.wasInAirLastFrame = inAir;
+
+    this.updateJumpFlag(inAir);
+
     if (this.isDead) return;
-    if (this.hurtUntil && now < this.hurtUntil)
-      return this.setState(this.STATES.HURT);
+    if (this.isHurt(now)) return this.setState(this.STATES.HURT);
     if (inAir) return this.setJumpingState(now);
-    if (this.isMoving) {
-      this.setWalkingState(now);
-      this.lastMoveTime = now;
-      return;
-    }
+    if (this.isMoving) return this.setWalking(now);
+
     this.animationManager.setIdleOrLongIdleState(now);
+  }
+
+  /**
+   * Checks if the character is currently in a hurt state based on time.
+   * @param {number} now - The current timestamp in milliseconds.
+   * @returns {boolean} True if the character is still hurt; otherwise, false.
+   */
+  isHurt(now) {
+    return this.hurtUntil && now < this.hurtUntil;
+  }
+
+  /**
+   * Sets the character state to walking and updates the last movement timestamp.
+   * @param {number} now - The current timestamp in milliseconds.
+   */
+  setWalking(now) {
+    this.setWalkingState(now);
+    this.lastMoveTime = now;
+  }
+
+  /**
+   * Updates the jump animation flag based on whether the character is airborne.
+   * Resets the jump animation flag if the character has just landed.
+   * @param {boolean} inAir - True if the character is currently above the ground.
+   */
+  updateJumpFlag(inAir) {
+    if (!inAir && this.wasInAirLastFrame) {
+      this.animationManager.resetJumpAnimationFlag();
+    }
+    this.wasInAirLastFrame = inAir;
   }
 
   /**
@@ -254,7 +280,23 @@ class Character extends MoveableObject {
       this.collectedBottles > 0 &&
       !this.isSnoring &&
       this.currentState !== this.STATES.LONG_IDLE
-     
+    );
+  }
+
+  /**
+   * Creates a new salsa bottle object positioned relative to the character's location.
+   * The horizontal offset depends on the character's facing direction.
+   *
+   * @returns {SalsaBottle} A newly instantiated SalsaBottle object ready to be thrown.
+   */
+  createBottle() {
+    const offsetX = this.otherDirection ? -10 : 60;
+    const offsetY = 80;
+    return new SalsaBottle(
+      this.x + offsetX,
+      this.y + offsetY,
+      this.otherDirection,
+      this.world
     );
   }
 
@@ -264,14 +306,9 @@ class Character extends MoveableObject {
    */
   throwBottle() {
     if (!this.canThrowBottle()) return false;
-
     this.collectedBottles--;
 
-    const offsetX = this.otherDirection ? -10 : 60;
-    const offsetY = 80;
-
-    const bottle = new SalsaBottle(this.x + offsetX, this.y + offsetY, this.otherDirection, this.world);
-
+    const bottle = this.createBottle();
     this.world.throwableObjects.push(bottle);
     this.world.updateThrowBar();
     return true;
