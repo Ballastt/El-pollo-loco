@@ -86,9 +86,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px; 
-    width: 60px; 
-    height: 60px;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.6);
     color: white;
@@ -118,14 +118,13 @@
   .control-top {
     position: absolute;
     top: 10px;
-    right: 10px;
+    left: 40%;
     display: flex;
     flex-direction: row;
     gap: 10px;
   }
 
   .game-over-content {
-
     height: auto;
   }
 
@@ -134,8 +133,8 @@
   }
 
   #salsa-bottle {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
   }
 }
 
@@ -251,8 +250,8 @@
   }
 
   #mobile-controls button {
-    font-size: 24px; 
-    width: 42px; 
+    font-size: 24px;
+    width: 42px;
     height: 42px;
     background-color: rgba(0, 0, 0, 0.5);
     margin: 4px;
@@ -307,7 +306,7 @@
 
   .game-over-btns {
     align-items: center;
-  } 
+  }
 }
 
 @media screen and (orientation: portrait) {
@@ -323,8 +322,8 @@
     left: 0;
     box-sizing: border-box;
     word-break: break-word;
-    width: 100%; 
-    height: 100%; 
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
