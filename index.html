@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="styles/overlays.css" />
     <link rel="stylesheet" href="styles/responsive.css" />
     <link rel="icon" type="image/x-icon" href="img/favicon/tabasco.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-...your integrity hash..."
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <title>El Pollo Loco</title>
   </head>
   <body>
@@ -33,8 +40,8 @@
     <div class="game-wrapper">
       <canvas
         id="canvas"
-        width="720px"
-        height="480px"
+        width="720"
+        height="480"
         style="display: none"
       ></canvas>
 
@@ -145,11 +152,11 @@
 
     <div id="mobile-controls" class="hidden">
       <div class="control-left">
-        <button id="btn-left">◀️</button>
-        <button id="btn-right">▶️</button>
+        <button id="btn-left"><i class="fa-solid fa-left-long"></i></button>
+        <button id="btn-right"><i class="fa-solid fa-right-long"></i></button>
       </div>
       <div class="control-right">
-        <button id="btn-jump">⬆️</button>
+        <button id="btn-jump"><i class="fa-solid fa-up-long"></i></button>
         <button id="btn-throw">
           <img
             id="salsa-bottle"
@@ -159,10 +166,10 @@
         </button>
       </div>
       <div class="control-top">
-        <button id="btn-pause">⏸</button>
-        <button id="btn-play" class="hidden">▶</button>
-        <button id="btn-mute">🔇</button>
-        <button id="btn-unmute" class="hidden">🔊</button>
+        <button id="btn-pause"><i class="fa-solid fa-circle-pause"></i></button>
+        <button id="btn-play" class="hidden"><i class="fa-solid fa-circle-play"></i></button>
+        <button id="btn-mute"><i class="fa-solid fa-volume-mute"></i></button>
+        <button id="btn-unmute" class="hidden"><i class="fa-solid fa-volume-up"></i></button>
       </div>
     </div>
 
