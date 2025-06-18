@@ -58,7 +58,7 @@ function createEnemy(x, enemies) {
  */
 function generateEnemies() {
   const enemies = [];
-  const amount = 30;
+  const amount = 35;
   const levelLength = 6800;
   const availableSpace = levelLength - 1000; 
   const spacing = availableSpace / amount;
@@ -139,7 +139,7 @@ let level1;
  */
 function initLevel() {
   level1 = new Level(
-    generateEnemies(),
+    generateEnemies(35),
     generateClouds(),
     generateBackgroundObjects(layerSets),
     generateCoins(40),
