@@ -164,7 +164,6 @@
   .buttons {
     flex-direction: row;
     gap: 1rem;
-    margin-top: -2rem;
     max-width: 600px;
   }
 
@@ -181,7 +180,8 @@
   }
 
   #impressum-button,
-  #restart-btn {
+  #restart-btn,
+  #menu-btn {
     width: 140px;
     height: 46px;
     font-size: 20px;
@@ -231,10 +231,6 @@
     display: none;
   }
 
-  #restart-btn {
-    margin-top: 1rem;
-  }
-
   #mobile-controls {
     position: fixed;
     bottom: 0;
@@ -246,19 +242,11 @@
   }
 
   #mobile-controls button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px; /* icon size */
-    width: 40px; /* smaller but still tap-friendly */
-    height: 40px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    pointer-events: all;
-    padding: 0;
-    margin: 6px;
+    font-size: 24px; 
+    width: 42px; 
+    height: 42px;
+    background-color: rgba(0, 0, 0, 0.5);
+    margin: 4px;
   }
 
   .control-left,
@@ -281,7 +269,7 @@
   .control-top {
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 280px;
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -302,10 +290,15 @@
     max-width: 100vw;
     max-height: 100vh;
   }
+
   #btn-container-bg {
     top: 10px;
     gap: 0.5rem;
   }
+
+  .game-over-btns {
+    align-items: center;
+  } 
 }
 
 @media screen and (orientation: portrait) {
@@ -321,8 +314,8 @@
     left: 0;
     box-sizing: border-box;
     word-break: break-word;
-    width: 100%; /* ✅ Full viewport width */
-    height: 100%; /* ✅ Dynamic viewport height (modern mobile fix) */
+    width: 100%; 
+    height: 100%; 
     display: flex;
     justify-content: center;
     align-items: center;
