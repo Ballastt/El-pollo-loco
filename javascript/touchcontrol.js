@@ -25,10 +25,10 @@ document
 
 document
   .getElementById("btn-throw")
-  ?.addEventListener("touchstart", () => (keyboard.SPACE = true));
+  ?.addEventListener("touchstart", () => (keyboard.D = true));
 document
   .getElementById("btn-throw")
-  ?.addEventListener("touchend", () => (keyboard.SPACE = false));
+  ?.addEventListener("touchend", () => (keyboard.D = false));
 
 /**
  * Detects the device type based on touch support and screen width.
