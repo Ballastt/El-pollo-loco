@@ -39,7 +39,7 @@
   .buttons {
     flex-direction: row;
     gap: 1.5rem;
-    margin-top: -3rem;
+    margin-top: -1rem;
     max-width: 700px;
   }
 
@@ -125,7 +125,7 @@
   }
 
   .game-over-content {
-    gap: 0;
+
     height: auto;
   }
 
@@ -221,7 +221,7 @@
   }
 
   .game-over-content {
-    gap: 0;
+    gap: 1rem;
   }
 
   #game-over-background {
