@@ -24,15 +24,15 @@
 html,
 body {
   height: 100%;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 body {
   height: 100vh;
   width: 100vw;
   display: flex;
-  align-items: center; 
-  justify-content: center; 
+  align-items: center;
+  justify-content: center;
   font-family: "Mountains of Christmas", "Comic Sans MS", "Brush Script MT",
     cursive;
 }
@@ -50,7 +50,7 @@ body {
   width: 720px;
   height: 480px;
   z-index: 4;
-  position: relative; 
+  position: relative;
   top: unset;
   left: unset;
   transform: unset;
@@ -67,18 +67,24 @@ body {
   gap: 0.6rem;
 }
 
+.h1-wrapper {
+  position: absolute;
+  top: 0;
+  min-width: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 4;
+}
+
 h1 {
   font-size: 80px;
-  min-height: 100px;
-  width: 600px;
   font-weight: bold;
   text-shadow: 4px 4px 10px rgba(169, 131, 87, 0.5);
   color: white;
-  padding: 50px;
+  margin: 40px 0;
   text-align: center;
-  margin-block-start: 0;
-  margin-block-end: 0;
-  flex-shrink: 0;
 }
 
 #background-image {
@@ -149,14 +155,14 @@ h1 {
 }
 
 .btn-grad:hover {
-  background-position: right center; 
+  background-position: right center;
   color: #fff;
   text-decoration: none;
 }
 
 .buttons {
   position: absolute;
-  top: 80px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -172,16 +178,9 @@ h1 {
   flex-grow: 0;
 }
 
-#learn-button {
-  width: 200px;
-  height: 50px;
-  font-family: "Mountains of Christmas", cursive;
-  font-size: 24px;
-  font-weight: bold;
-}
-
 #start-button,
-#impressum-button {
+#impressum-button,
+#learn-button {
   width: 200px;
   height: 50px;
   font-family: "Mountains of Christmas", cursive;
@@ -226,7 +225,7 @@ h1 {
 #mute-btn:hover,
 #resume-btn:hover,
 #sound-btn:hover {
-  transform: scale(1.2); 
+  transform: scale(1.2);
 }
 
 #game-over-screen {
